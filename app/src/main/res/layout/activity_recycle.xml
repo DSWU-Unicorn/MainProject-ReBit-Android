@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".RecycleActivity">
+
+
+  <Button
+      android:id="@+id/tip_button"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="오늘의 Tip! 장류 버리는 방법"
+      app:layout_constraintBottom_toTopOf="@+id/linearLayout3"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintVertical_bias="0.1"
+      android:fontFamily="@font/bmjua"/>
+
+  <LinearLayout
+      android:id="@+id/linearLayout3"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:gravity="center"
+      android:orientation="horizontal"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent">
+
+    <Button
+        android:id="@+id/left_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_weight="0.5"
+        android:text="이전"
+        android:textSize="20dp" />
+
+    <ImageView
+        android:id="@+id/cardnews_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="3"
+        android:src="@drawable/cardnews_0" />
+
+    <Button
+        android:id="@+id/right_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_weight="0.5"
+        android:text="다음"
+        android:textSize="20dp" />
+  </LinearLayout>
+
+  <LinearLayout
+      android:id="@+id/linearLayout"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:gravity="center"
+      android:orientation="horizontal"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/linearLayout3">
+
+    <Button
+        android:id="@+id/guide_btn"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginRight="100dp"
+        android:text="분리수거 가이드" />
+
+    <Button
+        android:id="@+id/camera_btn"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:text="카메라" />
+
+  </LinearLayout>
+
+  <Button
+      android:id="@+id/close_btn"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="Go Back"
+      android:layout_marginBottom="10dp"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
