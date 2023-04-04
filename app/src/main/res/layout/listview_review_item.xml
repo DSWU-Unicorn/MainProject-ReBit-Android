@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+    <LinearLayout
+        android:id="@+id/listView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_margin="10dp"
+        android:padding="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                >
+                <ImageView
+                    android:id="@+id/userImageArea"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/user_icon"
+                    />
+                <TextView
+                    android:id="@+id/userNameTextArea"
+                    android:layout_width="wrap_content"
+                    android:gravity="center"
+                    android:layout_margin="20dp"
+                    android:textStyle="bold|italic"
+                    android:layout_height="wrap_content"
+                    android:text="홍길동"
+                    />
+                <TextView
+                    android:id="@+id/reviewDateTextArea"
+                    android:layout_width="100dp"
+                    android:gravity="center"
+                    android:layout_marginTop="20dp"
+                    android:layout_height="wrap_content"
+                    android:text="2023.3.23"/>
+            </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp"
+            android:layout_margin="10dp">
+            <ImageView
+                android:id="@+id/ReviewImageArea"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:src="@drawable/review_0"
+                >
+            </ImageView>
+
+            <TextView
+                android:id="@+id/reviewTextArea"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_margin="10dp"
+                android:text="주는 이 온갖 힘있다. 이상이 인생을 인생을 이상은 투명하되 끝에 듣는다. 따뜻한 그들은 우리 물방아 풀이 사막이다. 곧 청춘의 생명을 긴지라 청춘 물방아 속에 약동하다. 얼마나 오직 주는 그림자는 것은 보는 타오르고 황금시대다. 용감하고 귀는 생생하며, 거선의 피는 말이다. 반짝이는 가지에 이는 같이 무엇을 가슴이 찾아 크고 힘있다. 그것은 방황하여도, 그들의 눈이 무엇이 같은 눈에 있을 교향악이다. 어디 이상, 이상 인간에 있는 공자는 사랑의 산야에 것이 보라. 시들어 두손을 천자만홍이 것이다.보라, 방황하여도, 천고에 부패뿐이다." />
+        </LinearLayout>
+    </LinearLayout>
+
+
+</LinearLayout>
