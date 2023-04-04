@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <Button
+            android:id="@+id/recycle_btn"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:text="분리해"
+            android:layout_marginRight="100dp"/>
+
+        <Button
+            android:id="@+id/todo_btn"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:text="용기내"
+            />
+<!--        <Button-->
+<!--            android:id="@+id/create_review_btn"-->
+<!--            android:layout_width="100dp"-->
+<!--            android:layout_height="100dp"-->
+<!--            android:text="가게정보보기"/>-->
+
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
