@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".GuideActivity">
+
+    <TextView
+        android:id="@+id/loc_text"
+        android:layout_width="300dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="1dp"
+        android:background="@color/purple_200"
+        android:gravity="center_vertical"
+        android:text="현재 위치: "
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/scrollView3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ScrollView
+        android:id="@+id/scrollView3"
+        android:layout_width="wrap_content"
+        android:layout_height="400dp"
+        android:layout_marginTop="72dp"
+        android:layout_marginBottom="97dp"
+        app:layout_constraintBottom_toTopOf="@+id/successButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/loc_text">
+
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="300dp"
+            android:layout_height="200dp"
+            android:layout_marginTop="10dp"
+
+            android:fontFamily="@font/bmjua"
+            android:text="환경을 위해서 재활용 쓰레기 분리배출 하는 방법을 알아보세요.
+
+[비닐봉투]
+- 내용물을 비우고 이물질을 제거한 뒤 흩날리지 않도록 봉투에 담아 배출한다.
+- 깨끗하게 이물질 제거가 되지 않은 랩필름 등은 분리배출에서 제외한다.
+
+[플라스틱]
+- 물로 헹구어 겉면의 이물질 등을 제거해서 배출한다.
+- 페트병은 비닐 라벨을 제거한 후 찌그러트려 뚜껑을 닫고 배출한다.
+- 투명 페트병은 투명 페트병 전용 배출함을 이용한다.
+
+[스티로폼]
+- 상표 등 스티로폼 외의 재질을 제거한 후 물로 헹구어 투명 비닐봉투에 담아 배출한다.
+- 이물질이 너무 많이 묻었다면 종량제 봉투에 담아 버린다.
+
+[캔류]
+- 내용물을 비우고 압착해서 부피를 줄여 배출한다.
+- 부탄가스나 스프레이 등은 환기가 잘 되는 곳에서 구멍을 뚫어 가스를 빼준 후 배출한다."
+            android:textSize="30sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </ScrollView>
+
+    <Button
+        android:id="@+id/successButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="139dp"
+        android:layout_marginLeft="139dp"
+        android:layout_marginEnd="158dp"
+        android:layout_marginRight="158dp"
+        android:layout_marginBottom="16dp"
+        android:text="포인트 획득!"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/scrollView3" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
