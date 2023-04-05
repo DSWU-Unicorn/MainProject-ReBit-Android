@@ -4,20 +4,30 @@ import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import kr.ac.duksung.rebit.databinding.ActivityRecycleBinding
+import kr.ac.duksung.rebit.network.RetofitClient
+import kr.ac.duksung.rebit.network.RetrofitService
+import kr.ac.duksung.rebit.network.dto.ApiResponse
+import kr.ac.duksung.rebit.network.dto.CardNewsVO
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
 
 class RecycleActivity : AppCompatActivity() {
+    private lateinit var retrofit : Retrofit
+    private lateinit var retrofitService: RetrofitService
     private lateinit var binding: ActivityRecycleBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_recycle)
-
 
         val image_view = findViewById<ImageView>(R.id.cardnews_view)
         val next_btn = findViewById<Button>(R.id.right_btn)
@@ -26,6 +36,12 @@ class RecycleActivity : AppCompatActivity() {
         val tip_button = findViewById<Button>(R.id.tip_button)
         val guide_button = findViewById<Button>(R.id.guide_btn)
         val close_btn = findViewById<Button>(R.id.close_btn)
+
+        //서버 연결
+        initRetrofit()
+
+        //통신
+        getCardNews()
 
 
         next_btn.setOnClickListener {
@@ -83,4 +99,40 @@ class RecycleActivity : AppCompatActivity() {
         }
 
     }
+
+    //서버 연결
+    private fun initRetrofit() {
+        retrofit = RetofitClient.getInstance()
+        retrofitService = retrofit.create(RetrofitService::class.java)
+    }
+
+    //통신
+    fun getCardNews() {
+        retrofitService.getCardNews("2023-03-16")?.enqueue(object :
+            Callback<ApiResponse<ArrayList<CardNewsVO>>> {
+            override fun onResponse(
+                call: Call<ApiResponse<ArrayList<CardNewsVO>>>,
+                response: Response<ApiResponse<ArrayList<CardNewsVO>>>
+            ) {
+                if(response.isSuccessful) {
+                    //정상적으로 통신 성공
+                    val result : ApiResponse<ArrayList<CardNewsVO>>? = response.body();
+                    val data = result?.getResult();
+
+                    Log.d("CardNews" ,"onresponse 성공: "+ result?.toString() )
+                    Log.d("CardNews", "data : "+ data?.toString())
+                } else {
+                    //통신 실패(응답코드 3xx, 4xx 등)
+                    Log.d("YMC", "onResponse 실패" + response.errorBody().toString())
+                }
+            }
+
+            override fun onFailure(call: Call<ApiResponse<ArrayList<CardNewsVO>>>, t: Throwable) {
+                //통신 실패(인터넷 끊김, 예외 발생 등 시스템적인 이유)
+                Log.d("YMC", "onFailure 에러: " + t.message.toString());
+            }
+
+        })
+    }
+
 }
