@@ -1,4 +1,4 @@
-import android.R
+import kr.ac.duksung.rebit.R
 import android.content.Context
 import android.net.Uri
 import android.view.LayoutInflater
@@ -15,7 +15,7 @@ class MultiImageAdapter(val mData: ArrayList<Uri>, val mContext: Context) :
     // 아이템 뷰를 저장하는 뷰홀더 클래스.
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var image: ImageView = itemView.findViewById(R.id.content)
+        var image: ImageView = itemView.findViewById(R.id.image)
         //         var image: ImageView = itemView.findViewById(R.id.image)
     }
 
@@ -24,7 +24,7 @@ class MultiImageAdapter(val mData: ArrayList<Uri>, val mContext: Context) :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val context = parent.context
         val inflater = LayoutInflater.from(context)
-        val view = inflater.inflate(R.layout.multi_img_item, parent, false)
+        val view = inflater.inflate(R.layout.multi_image_item, parent, false)
         // multi_image_item
         return ViewHolder(view)
     }
