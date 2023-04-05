@@ -12,11 +12,6 @@ import androidx.appcompat.app.AlertDialog
 import kr.ac.duksung.rebit.databinding.ActivityRecycleBinding
 
 class RecycleActivity : AppCompatActivity() {
-//    var cnt =0
-//    var str_cnt=""
-//    var final_path_str=""
-//private var currentIndex = 0
-
     private lateinit var binding: ActivityRecycleBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,6 +25,7 @@ class RecycleActivity : AppCompatActivity() {
         val next_btn = findViewById<Button>(R.id.right_btn)
         val before_btn = findViewById<Button>(R.id.left_btn)
         val camera_btn = findViewById<Button>(R.id.camera_btn)
+
         val tip_button = findViewById<Button>(R.id.tip_button)
         val guide_button = findViewById<Button>(R.id.guide_btn)
         val close_btn = findViewById<Button>(R.id.close_btn)
@@ -40,15 +36,8 @@ class RecycleActivity : AppCompatActivity() {
             image_view.setImageResource(R.drawable.cardnews_1)
         }
 
-
         before_btn.setOnClickListener {
             Toast.makeText(this, "이전 클릭 완료", Toast.LENGTH_LONG).show()
-
-            // 2. 화면이 클릭되면, 다음 화면으로 넘어가서, 사진을 크게 보여줌! + 환경부 인스타그램 연결
-//            val intent = Intent(this, CardNewsActivity::class.java)
-//            cnt--
-//            intent.putExtra("data", cnt)
-//             startActivity(intent)
             image_view.setImageResource(R.drawable.cardnews_0)
         }
 
@@ -62,19 +51,25 @@ class RecycleActivity : AppCompatActivity() {
             var intent = Intent(this, CameraActivity::class.java)
             startActivity(intent)
         }
+        guide_button.setOnClickListener {
+            var intent = Intent(this, GuideActivity::class.java)
+            startActivity(intent)
+        }
 
 
-        // 뷰 바인딩
-        binding = ActivityRecycleBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        // 오늘의 Tip 기능
+        // 뷰 바인딩-> 여기선 사용하지 않겠음. Github Issues #6 참고
+//        binding = ActivityRecycleBinding.inflate(layoutInflater)
+//        setContentView(binding.root)
 
-        binding.tipButton.setOnClickListener {
+
+        tip_button.setOnClickListener {
             // Dialog만들기
             val mDialogView = LayoutInflater.from(this).inflate(R.layout.today_tip_dialog, null)
             val mBuilder = AlertDialog.Builder(this)
                 .setView(mDialogView)
 
-            val mAlertDialog=mBuilder.show()
+            val mAlertDialog = mBuilder.show()
 
             // 포인트 획득 버튼 클릭시
             val okButton = mDialogView.findViewById<Button>(R.id.successButton)
@@ -83,11 +78,11 @@ class RecycleActivity : AppCompatActivity() {
                 Toast.makeText(this, "포인트를 획득했습니다!", Toast.LENGTH_SHORT).show()
                 mAlertDialog.dismiss()
             }
-
         }
 
+
         close_btn.setOnClickListener {
-            finish()
+            finish() // 전에 띄운 intent가 나오네? // 수정필요
         }
 
     }
