@@ -1,4 +1,5 @@
-import kr.ac.duksung.rebit.R
+package kr.ac.duksung.rebit
+
 import android.content.Context
 import android.net.Uri
 import android.view.LayoutInflater
@@ -7,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import kotlinx.coroutines.NonDisposableHandle.parent
 
 class MultiImageAdapter(val mData: ArrayList<Uri>, val mContext: Context) :
     RecyclerView.Adapter<MultiImageAdapter.ViewHolder>() {
