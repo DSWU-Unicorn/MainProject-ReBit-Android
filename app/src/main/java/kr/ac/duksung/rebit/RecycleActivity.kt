@@ -65,26 +65,26 @@ class RecycleActivity : AppCompatActivity() {
 
 
         // 뷰 바인딩
-//        binding = ActivityRecycleBinding.inflate(layoutInflater)
-//        setContentView(binding.root)
-//
-//        binding.tipButton.setOnClickListener {
-//            // Dialog만들기
-//            val mDialogView = LayoutInflater.from(this).inflate(R.layout.today_tip_dialog, null)
-//            val mBuilder = AlertDialog.Builder(this)
-//                .setView(mDialogView)
-//
-//            val mAlertDialog=mBuilder.show()
-//
-//            // 포인트 획득 버튼 클릭시
-//            val okButton = mDialogView.findViewById<Button>(R.id.successButton)
-//            okButton.setOnClickListener {
-//
-//                Toast.makeText(this, "포인트를 획득했습니다!", Toast.LENGTH_SHORT).show()
-//                mAlertDialog.dismiss()
-//            }
-//
-//        }
+        binding = ActivityRecycleBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        binding.tipButton.setOnClickListener {
+            // Dialog만들기
+            val mDialogView = LayoutInflater.from(this).inflate(R.layout.today_tip_dialog, null)
+            val mBuilder = AlertDialog.Builder(this)
+                .setView(mDialogView)
+
+            val mAlertDialog=mBuilder.show()
+
+            // 포인트 획득 버튼 클릭시
+            val okButton = mDialogView.findViewById<Button>(R.id.successButton)
+            okButton.setOnClickListener {
+
+                Toast.makeText(this, "포인트를 획득했습니다!", Toast.LENGTH_SHORT).show()
+                mAlertDialog.dismiss()
+            }
+
+        }
 
         close_btn.setOnClickListener {
             finish()
