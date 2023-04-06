@@ -10,6 +10,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.viewpager.widget.ViewPager
 import kr.ac.duksung.rebit.databinding.ActivityRecycleBinding
 import kr.ac.duksung.rebit.network.RetofitClient
 import kr.ac.duksung.rebit.network.RetrofitService
@@ -24,12 +25,14 @@ class RecycleActivity : AppCompatActivity() {
     private lateinit var retrofit : Retrofit
     private lateinit var retrofitService: RetrofitService
     private lateinit var binding: ActivityRecycleBinding
+    private var imageList = arrayListOf<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_recycle)
 
-        val image_view = findViewById<ImageView>(R.id.cardnews_view)
+
+        //val image_view = findViewById<ImageView>(R.id.cardnews_view)
         val next_btn = findViewById<Button>(R.id.right_btn)
         val before_btn = findViewById<Button>(R.id.left_btn)
         val camera_btn = findViewById<Button>(R.id.camera_btn)
@@ -44,6 +47,7 @@ class RecycleActivity : AppCompatActivity() {
         getCardNews()
 
 
+        /*
         next_btn.setOnClickListener {
             Toast.makeText(this, "다음 클릭 완료", Toast.LENGTH_LONG).show()
             image_view.setImageResource(R.drawable.cardnews_1)
@@ -54,11 +58,16 @@ class RecycleActivity : AppCompatActivity() {
             image_view.setImageResource(R.drawable.cardnews_0)
         }
 
+         */
+
+        /*
         image_view.setOnClickListener {
             var intent =
                 Intent(Intent.ACTION_VIEW, Uri.parse("https://www.instagram.com/p/CpjvrxZrkTP/"))
             startActivity(intent)
         }
+
+         */
 
         camera_btn.setOnClickListener {
             var intent = Intent(this, CameraActivity::class.java)
@@ -121,6 +130,17 @@ class RecycleActivity : AppCompatActivity() {
 
                     Log.d("CardNews" ,"onresponse 성공: "+ result?.toString() )
                     Log.d("CardNews", "data : "+ data?.toString())
+
+                    for (cardNews in data!!) {
+                        imageList.add(cardNews.image_src)
+                    }
+                    Log.d("CardNews", "imageList : "+ imageList?.toString())
+
+                    //
+                    val adapter = ViewPagerAdapter(imageList)
+                    val pager = findViewById<ViewPager>(R.id.viewPager)
+                    pager.adapter = adapter
+
                 } else {
                     //통신 실패(응답코드 3xx, 4xx 등)
                     Log.d("YMC", "onResponse 실패" + response.errorBody().toString())
