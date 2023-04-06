@@ -1,26 +1,16 @@
 package kr.ac.duksung.rebit
 
 import android.app.AlertDialog
-import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.util.Log.d
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import android.widget.*
-import androidx.core.view.MenuItemCompat.getActionView
-import androidx.core.view.contains
-import kr.ac.duksung.rebit.databinding.ActivityMainBinding
+import android.widget.AdapterView.OnItemClickListener
+import androidx.appcompat.app.AppCompatActivity
 import kr.ac.duksung.rebit.databinding.ActivityTogoBinding
 import net.daum.mf.map.api.MapView
-import java.security.AccessControlContext
-import java.security.AccessController.getContext
-import java.util.logging.Logger
+
 
 class TogoActivity : AppCompatActivity() {
 
@@ -53,9 +43,14 @@ class TogoActivity : AppCompatActivity() {
             this, android.R.layout.simple_list_item_1,
             user
         )
-        binding.userList.adapter = userAdapter;
+        binding.searchView.isSubmitButtonEnabled = true
 
-        binding.searchView.isSubmitButtonEnabled=true
+        binding.searchView.setOnQueryTextFocusChangeListener { searchView, hasFocus ->
+            if (hasFocus) {
+                // focus 를 가지고 있는 경우에만 가게목록이 뜨도록.
+                binding.userList.adapter = userAdapter;
+            }
+        }
 
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
@@ -65,12 +60,15 @@ class TogoActivity : AppCompatActivity() {
                 }
                 return false
             }
+
             override fun onQueryTextChange(newText: String?): Boolean {
+
                 userAdapter.filter.filter(newText)
                 return false
             }
         })
 
+        // 검색돋보기 클릭시
         binding.searchView.setOnClickListener {
             // Dialog만들기
             val mDialogView = LayoutInflater.from(this).inflate(R.layout.store_info_dialog, null)
@@ -80,7 +78,7 @@ class TogoActivity : AppCompatActivity() {
             mBuilder.show()
 
             val pic_btn = mDialogView.findViewById<Button>(R.id.pic_btn)
-            pic_btn.setOnClickListener{
+            pic_btn.setOnClickListener {
                 Toast.makeText(this, "내 용기가 맞을까? 확인하러 가기", Toast.LENGTH_SHORT).show()
                 val intent = Intent(this, CameraActivity::class.java)
                 startActivity(intent)
@@ -102,7 +100,6 @@ class TogoActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         }
-
 
 
         //지도
