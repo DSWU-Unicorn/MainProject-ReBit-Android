@@ -32,6 +32,9 @@
         android:theme="@style/Theme.Rebit"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+        <activity
+            android:name=".StoreDetailActivity"
+            android:exported="false" />
 
         <meta-data
             android:name="com.kakao.sdk.AppKey"

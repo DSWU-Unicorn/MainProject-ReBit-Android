@@ -16,7 +16,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_margin="10dp"
-            android:padding="8dp">
+            >
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -26,43 +26,109 @@
                 <ImageView
                     android:id="@+id/storeImageArea"
                     android:layout_width="match_parent"
-                    android:layout_height="100dp"
+                    android:layout_height="250dp"
                     android:src="@drawable/review_3"
                     />
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginLeft="100dp"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="10dp"
                     >
 
                     <TextView
                         android:id="@+id/storeNameTextArea"
                         android:layout_width="wrap_content"
-                        android:gravity="center"
-                        android:layout_gravity="center_vertical"
-                        android:layout_margin="20dp"
-                        android:textStyle="bold|italic"
                         android:layout_height="wrap_content"
-                        android:text="00상점"
+                        android:textStyle="bold"
+                        android:text="00 상점"
                         android:textSize="32sp"
                         />
                     <TextView
                         android:id="@+id/storeKindTextArea"
                         android:layout_width="wrap_content"
-                        android:gravity="center"
-                        android:layout_gravity="top"
-                        android:layout_marginTop="30dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
                         android:text="일반음식"/>
-                </LinearLayout>
 
+                </LinearLayout>
+                <TextView
+
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#DFDFDF"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="주소"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
+
+                    <TextView
+                        android:id="@+id/addressTxt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="서울시 은평구"
+                        android:textColor="#000000"/>
+
+                </LinearLayout>
+                <TextView
+
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#DFDFDF"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="전화번호"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
+
+                    <TextView
+                        android:id="@+id/floorTxt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="1234-5678"
+                        android:textColor="#000000"/>
+
+                </LinearLayout>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#DFDFDF"/>
             </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_margin="10dp">
+                <TextView
+                    android:id="@+id/reviewTextArea"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:layout_marginTop="10dp"
+                    android:text="메뉴판 쓰는 자리입니다."/>
                 <LinearLayout
                     android:id="@+id/linearLayout"
                     android:layout_width="wrap_content"
@@ -84,26 +150,13 @@
                         android:layout_height="wrap_content"
                         android:text="리뷰작성" />
                 </LinearLayout>
-
-                <!--                <TextView-->
-                <!--                    android:id="@+id/ReviewImageArea"-->
-                <!--                    android:layout_width="match_parent"-->
-                <!--                    android:layout_height="200dp"-->
-                <!--                    android:text="메뉴"-->
-                <!--                    >-->
-                <!--                </TextView>-->
-
-                <TextView
-                    android:id="@+id/reviewTextArea"
-                    android:layout_width="match_parent"
-                    android:layout_height="100dp"
-                    android:layout_margin="20dp"
-                    android:text="메뉴판"/>
             </LinearLayout>
+
             <Button
                 android:id="@+id/goto_review_btn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="50dp"
                 android:text="리뷰 보러가기"/>
         </LinearLayout>
     </LinearLayout>
