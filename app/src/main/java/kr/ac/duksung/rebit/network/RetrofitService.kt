@@ -6,6 +6,7 @@ import kr.ac.duksung.rebit.network.dto.RecycleDetailVO
 import kr.ac.duksung.rebit.network.dto.RecycleVO
 import retrofit2.http.GET
 import retrofit2.Call
+import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface RetrofitService {
@@ -18,6 +19,8 @@ interface RetrofitService {
     @GET("/recycle/region/{region}")
     fun getRecycleDetailByRegion(@Path("region") region : String) : Call<ApiResponse<RecycleDetailVO>>
 
+    @POST("/recycle/{id}")
+    fun postUserPointByRecycle(@Path("id") id : Long) : Call<ApiResponse<Int>>
 
 
 }

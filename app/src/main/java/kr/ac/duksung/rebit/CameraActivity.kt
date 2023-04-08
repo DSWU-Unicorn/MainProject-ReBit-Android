@@ -89,8 +89,6 @@ class CameraActivity : AppCompatActivity() {
 
         })
 
-
-
         //객체 생성
         imageView = findViewById(R.id.imageView)
         // 촬영버튼
@@ -122,9 +120,14 @@ class CameraActivity : AppCompatActivity() {
 
                 val okButton = mDialogView.findViewById<Button>(R.id.successButton)
                 okButton.setOnClickListener {
+                    postUserPointByRecycle(1L)
 
                     Toast.makeText(this, "포인트 획득했습니다!", Toast.LENGTH_SHORT).show()
                     mAlertDialog.dismiss()
+
+                    /**
+                     * 포인트 획득 버튼 누르면 Unity로 돌아가게끔 수정 !
+                     */
                 }
 
                 val noButton = mDialogView.findViewById<Button>(R.id.AgainButton)
@@ -192,12 +195,41 @@ class CameraActivity : AppCompatActivity() {
     }
 
 
-    //서버 연결
+    // 서버 연결
     private fun initRetrofit() {
         retrofit = RetofitClient.getInstance()
         retrofitService = retrofit.create(RetrofitService::class.java)
     }
 
+    // 포인트 획득 통신
+    private fun postUserPointByRecycle(id : Long) {
+        retrofitService.postUserPointByRecycle(id).enqueue(object :
+            Callback<ApiResponse<Int>> {
+            override fun onResponse(
+                call: Call<ApiResponse<Int>>,
+                response: Response<ApiResponse<Int>>
+            ) {
+                if(response.isSuccessful) {
+                    //정상적으로 통신 성공
+                    val result : ApiResponse<Int>? = response.body();
+                    val data = result?.getResult()
+
+                    Log.d("RecyclePoint" ,"onresponse 성공: "+ result?.toString() )
+                    Log.d("RecyclePoint", "data : "+ data)
+
+                } else {
+                    //통신 실패(응답코드 3xx, 4xx 등)
+                    Log.d("YMC", "onResponse 실패" + response.errorBody().toString())
+                }
+            }
+
+            override fun onFailure(call: Call<ApiResponse<Int>>, t: Throwable) {
+                //통신 실패(인터넷 끊김, 예외 발생 등 시스템적인 이유)
+                Log.d("YMC", "onFailure 에러: " + t.message.toString());
+            }
+
+        })
+    }
 
 }
 
