@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
 import android.os.Build
@@ -36,6 +37,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import com.google.android.gms.location.*
+import java.util.*
 
 
 class CameraActivity : AppCompatActivity() {
@@ -55,6 +57,7 @@ class CameraActivity : AppCompatActivity() {
 
     private lateinit var textView : TextView
     private lateinit var textView2 : TextView
+    private lateinit var geocoder: Geocoder
 
     private lateinit var binding: ActivityCameraBinding
 
@@ -68,8 +71,10 @@ class CameraActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_camera)
 
+        geocoder = Geocoder(this)
+
         // dataLabel 설정
-        dataLabel = "플라스틱"
+        dataLabel = "종이팩"
 
         // 서버 연결
         initRetrofit()
@@ -156,8 +161,33 @@ class CameraActivity : AppCompatActivity() {
                 }
                  */
 
+                val okButton = mDialogView.findViewById<Button>(R.id.successButton)
+                okButton.setOnClickListener {
+                    val mDialogView2 =
+                        LayoutInflater.from(this).inflate(R.layout.after_recycle_dialog, null)
+                    val mBuilder2 = AlertDialog.Builder(this).create()
+                    mBuilder2.setView(mDialogView2)
+
+                    mAlertDialog.dismiss()
+                    val mAlertDialog2 = mBuilder2.show()
+                    mBuilder2.window?.setLayout(900, WindowManager.LayoutParams.WRAP_CONTENT)
+                    textView = mBuilder2.findViewById<TextView>(R.id.text1)!!
+                    textView2 = mBuilder2.findViewById<TextView>(R.id.text2)!!
+
+                    // 현재 위치 찾기
+                    if (checkPermissionForLocation(this)) {
+                        startLocationUpdates()
+                    }
 
 
+
+                }
+
+
+                val noButton = mDialogView.findViewById<Button>(R.id.AgainButton)
+                noButton.setOnClickListener {
+                    CallCamera()
+                }
             } //setOnClickListener
         }
     }//onCreate
@@ -296,6 +326,9 @@ class CameraActivity : AppCompatActivity() {
         Log.d("latitude", mLastLocation.latitude.toString())
         textView2.text = "위도 : " + mLastLocation.latitude // 갱신 된 위도
         textView.text = "경도 : " + mLastLocation.longitude // 갱신 된 경도
+        val address = geocoder.getFromLocation(mLastLocation.latitude,mLastLocation.longitude, 1)
+        val nowAddr = address.get(0).getAddressLine(0).toString();
+        Log.d("latitude", nowAddr)
 
     }
 
@@ -315,5 +348,22 @@ class CameraActivity : AppCompatActivity() {
         }
     }
 
-}
+    //위도 경도로 주소 구하는 Reverse-GeoCoding
+    private fun getAddress(location: Location): String {
+        return try {
+            with(Geocoder(applicationContext, Locale.KOREA).getFromLocation(location.latitude, location.longitude, 1).first()){
+                getAddressLine(0)   //주소
+                countryName     //국가이름 (대한민국)
+                countryCode     //국가코드
+                adminArea       //행정구역 (서울특별시)
+                locality        //관할구역 (중구)
+                thoroughfare    //상세구역 (봉래동2가)
+                featureName     //상세주소 (122-21)
+            }
+        } catch (e: Exception){
+            e.printStackTrace()
+            getAddress(location)
+        }
+    }
 
+}
