@@ -14,3 +14,10 @@ dependencyResolutionManagement {
 }
 rootProject.name = "Rebit"
 include ':app'
+
+// unity
+include ':unityLibrary'
+// 위치 변경
+project(':unityLibrary').projectDir=new File("C:\\CookAndroid\\Project\\UnityTest\\unityLibrary")
+//project(':unityLibrary').projectDir=new File("C:\\Users\\pebis\\Desktop\\unity_real\\unityLibrary")
+//project(':unityLibrary').projectDir=new File("C:\\Rebit\\export-unity\\unityLibrary")

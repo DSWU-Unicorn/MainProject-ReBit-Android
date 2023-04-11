@@ -1,17 +1,13 @@
 package kr.ac.duksung.rebit
 
 import android.content.Intent
-import android.content.pm.PackageInfo
-import android.content.pm.PackageManager
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
-import android.util.Base64
 import android.util.Log
 import android.widget.Button
 import android.widget.Toast
-import java.security.MessageDigest
-import java.security.NoSuchAlgorithmException
+import androidx.appcompat.app.AppCompatActivity
+import com.unity3d.player.UnityPlayerActivity
 
 class MainActivity : AppCompatActivity() {
     // 뒤로 가기
@@ -24,6 +20,9 @@ class MainActivity : AppCompatActivity() {
         val recycle_btn = findViewById<Button>(R.id.recycle_btn)
         val todo_btn = findViewById<Button>(R.id.todo_btn)
 
+        //== unity 연결 버튼
+        val unity_btn = findViewById<Button>(R.id.unity_btn)
+
         recycle_btn.setOnClickListener{
             val intent = Intent(this, RecycleActivity::class.java)
             startActivity(intent)
@@ -33,8 +32,12 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-
-
+//        //== unity 버튼 연결
+        unity_btn.setOnClickListener {
+//            val intent = Intent(this, UnityPlayerActivity::class.java)
+            val intent = Intent(this, UnityPlayerActivity::class.java)
+            startActivity(intent)
+        }
     }
     override fun onBackPressed() {
         Log.d("MainActivity", "backbutton")
