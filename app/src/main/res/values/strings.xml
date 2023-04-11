@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Rebit</string>
+    <string name="title_activity_unity_handler">UnityHandlerActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <!--unity-->
+    <string name="game_view_content_description">Game View</string>
 </resources>

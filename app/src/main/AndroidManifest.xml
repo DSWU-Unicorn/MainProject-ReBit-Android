@@ -11,11 +11,9 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.CAMERA" />
-    <!--    Location    -->
-    <!--    정확한 위치    -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <!--    대략적인 위치    -->
+    <uses-permission android:name="android.permission.CAMERA" /> <!-- Location -->
+    <!-- 정확한 위치 -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- 대략적인 위치 -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <uses-feature
@@ -38,8 +36,12 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".UnityHandlerActivity"
+            android:exported="true"
+            android:label="@string/title_activity_unity_handler" />
+        <activity
             android:name=".StoreDetailActivity"
-            android:exported="false" />
+            android:exported="true" />
 
         <meta-data
             android:name="com.kakao.sdk.AppKey"

@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId "kr.ac.duksung.rebit"
-        minSdk 16
+        minSdk 22 // minSdk 22 이상으로 안하면 error
         targetSdk 32
         versionCode 1
         versionName "1.0"
@@ -37,6 +37,9 @@ android {
     viewBinding{
         enabled=true
     }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
 }
 
 dependencies {
@@ -51,6 +54,11 @@ dependencies {
 
     // Glide
     implementation 'com.github.bumptech.glide:glide:4.9.0'
+    implementation 'androidx.vectordrawable:vectordrawable:1.1.0'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.4.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.4.1'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.4.1'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'
 
     // GPS
@@ -60,5 +68,9 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
     implementation 'com.github.bumptech.glide:glide:4.11.0'
+
+    // unity
+    implementation project(':unityLibrary')
+    implementation fileTree(dir: project(':unityLibrary').getProjectDir().toString() + ('\\libs'), include: ['*.jar'])
 
 }
