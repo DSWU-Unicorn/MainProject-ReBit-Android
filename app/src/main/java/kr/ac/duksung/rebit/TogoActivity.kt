@@ -6,16 +6,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.*
-import android.widget.AdapterView.OnItemClickListener
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat.startActivity
-import androidx.core.view.contains
-import androidx.databinding.DataBindingUtil.setContentView
-import kotlinx.android.synthetic.main.activity_togo.*
 import kr.ac.duksung.rebit.databinding.ActivityTogoBinding
 import kr.ac.duksung.rebit.datas.Store
+import net.daum.mf.map.api.MapPOIItem
+import net.daum.mf.map.api.MapPoint
 import net.daum.mf.map.api.MapView
-import kotlin.collections.contains as contains
+
 
 class TogoActivity : AppCompatActivity() {
     private lateinit var binding: ActivityTogoBinding
@@ -42,6 +39,12 @@ class TogoActivity : AppCompatActivity() {
         "Vladimir"
     )
 
+//    private val GPS_ENABLE_REQUEST_CODE = 2001
+//    private val PERMISSIONS_REQUEST_CODE = 100
+//    var REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
+var mMapView: MapView? = null
+    var mMapViewContainer: ViewGroup? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityTogoBinding.inflate(layoutInflater)
@@ -51,7 +54,6 @@ class TogoActivity : AppCompatActivity() {
         setupEvents()
         // 목록 값 지정
         setValues()
-
 //        val userAdapter: ArrayAdapter<String> = ArrayAdapter(
 //            this, android.R.layout.simple_list_item_1,
 //            user
@@ -123,12 +125,47 @@ class TogoActivity : AppCompatActivity() {
         val mMapViewContainer = findViewById(R.id.map_mv_mapcontainer) as ViewGroup
         mMapViewContainer.addView(mMapView)
 
+        // 중심점 변경 - 덕성여대 차관
+        mMapView.setMapCenterPoint(MapPoint.mapPointWithGeoCoord(37.65320737529757, 127.01615398831316), true)
+
+        // 줌 레벨 변경
+        mMapView.setZoomLevel(1, true)
+
+        // 줌 인
+        mMapView.zoomIn(true)
+
+        // 줌 아웃
+        mMapView.zoomOut(true)
+
+        //마커 찍기 (덕성여대)
+        val MARKER_POINT1 = MapPoint.mapPointWithGeoCoord(37.65320737529757, 127.01615398831316)
+
+        // 마커 아이콘 추가하는 함수
+        val marker1 = MapPOIItem()
+
+        // 클릭 했을 때 나오는 호출 값
+        marker1.itemName = "여기 있음!"
+
+        // 왜 있는지 잘 모르겠음
+        marker1.tag = 0
+
+        // 좌표를 입력받아 현 위치로 출력
+        marker1.mapPoint = MARKER_POINT1
+
+        //  (클릭 전)기본으로 제공하는 BluePin 마커 모양의 색.
+        marker1.markerType = MapPOIItem.MarkerType.BluePin
+        // (클릭 후) 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
+        marker1.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin);
+
+        // 지도화면 위에 추가되는 아이콘을 추가하기 위한 호출(말풍선 모양)
+        mMapView.addPOIItem(marker1);
         // 리스너 등록
         mMapView.setMapViewEventListener(this) // this에 MapView.MapViewEventListener 구현.
         mMapView.setPOIItemEventListener(this)
         mMapView.setOpenAPIKeyAuthenticationResultListener(this)
 
-    }//OnCreate()
+
+        }//OnCreate()
 
     fun setupEvents() {
         // 메인화면의 이벤트관련 코드를 모아두는 장소
@@ -161,21 +198,22 @@ class TogoActivity : AppCompatActivity() {
         //storeAdapter = StoreAdapter(this, android.R.layout.simple_list_item_1, storeList)
         //binding.searchView.adapter = storeAdapter
     }
+
+}
+private fun MapView.setOpenAPIKeyAuthenticationResultListener(togoActivity: TogoActivity) {
+
+}
+private fun MapView.setPOIItemEventListener(togoActivity: TogoActivity) {
+
+}
+private fun MapView.setMapViewEventListener(togoActivity: TogoActivity) {
+
+}
+
+private fun MapView.setCurrentLocationEventListener(togoActivity: TogoActivity) {
+
 }
 
 private fun ListView.contains(view: String?): Boolean {
     return true
 }
-
-private fun MapView.setOpenAPIKeyAuthenticationResultListener(togoActivity: TogoActivity) {
-
-}
-
-private fun MapView.setPOIItemEventListener(togoActivity: TogoActivity) {
-
-}
-
-private fun MapView.setMapViewEventListener(togoActivity: TogoActivity) {
-
-}
-
