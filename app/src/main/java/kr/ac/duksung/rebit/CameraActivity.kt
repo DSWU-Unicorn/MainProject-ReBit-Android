@@ -37,6 +37,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import com.google.android.gms.location.*
+import kr.ac.duksung.rebit.network.dto.RecycleDetailVO
 import java.util.*
 
 
@@ -49,6 +50,7 @@ class CameraActivity : AppCompatActivity() {
     lateinit var mLastLocation: Location // 위치 값을 가지고 있는 객체
     internal lateinit var mLocationRequest: LocationRequest // 위치 정보 요청의 매개변수를 저장하는
     private val REQUEST_PERMISSION_LOCATION = 10
+    private lateinit var mAlertDialog : AlertDialog
 
     private lateinit var content : String
     private lateinit var dataLabel : String
@@ -139,7 +141,7 @@ class CameraActivity : AppCompatActivity() {
                 val mBuilder = AlertDialog.Builder(this)
                     .setView(mDialogView)
 
-                val mAlertDialog = mBuilder.show()
+                mAlertDialog = mBuilder.show()
 
                 val howto_text = mDialogView.findViewById<TextView>(R.id.howto_text)
                 val title_text = mDialogView.findViewById<TextView>(R.id.title_text)
@@ -163,23 +165,10 @@ class CameraActivity : AppCompatActivity() {
 
                 val okButton = mDialogView.findViewById<Button>(R.id.successButton)
                 okButton.setOnClickListener {
-                    val mDialogView2 =
-                        LayoutInflater.from(this).inflate(R.layout.after_recycle_dialog, null)
-                    val mBuilder2 = AlertDialog.Builder(this).create()
-                    mBuilder2.setView(mDialogView2)
-
-                    mAlertDialog.dismiss()
-                    val mAlertDialog2 = mBuilder2.show()
-                    mBuilder2.window?.setLayout(900, WindowManager.LayoutParams.WRAP_CONTENT)
-                    textView = mBuilder2.findViewById<TextView>(R.id.text1)!!
-                    textView2 = mBuilder2.findViewById<TextView>(R.id.text2)!!
-
                     // 현재 위치 찾기
                     if (checkPermissionForLocation(this)) {
                         startLocationUpdates()
                     }
-
-
 
                 }
 
@@ -322,13 +311,78 @@ class CameraActivity : AppCompatActivity() {
 
     // 시스템으로 부터 받은 위치정보를 화면에 갱신해주는 메소드
     fun onLocationChanged(location: Location) {
+        // 다이얼로그
+        val mDialogView2 =
+            LayoutInflater.from(this).inflate(R.layout.after_recycle_dialog, null)
+        //val mBuilder2 = AlertDialog.Builder(this).create()
+        //mBuilder2.setView(mDialogView2)
+
+
+        val mBuilder2 = AlertDialog.Builder(this)
+            .setView(mDialogView2)
+        val mAlertDialog2 = mBuilder2.show()
+
+
+        mAlertDialog.dismiss()
+        //val mAlertDialog2 = mBuilder2.show()
+        //mBuilder2.window?.setLayout(900, WindowManager.LayoutParams.WRAP_CONTENT)
+        textView = mAlertDialog2.findViewById<TextView>(R.id.text1)!!
+        textView2 = mAlertDialog2.findViewById<TextView>(R.id.text2)!!
+        var addressTxt = mAlertDialog2.findViewById<TextView>(R.id.addressTxt)!!
+
+
+        // 지오코딩
         mLastLocation = location
         Log.d("latitude", mLastLocation.latitude.toString())
-        textView2.text = "위도 : " + mLastLocation.latitude // 갱신 된 위도
-        textView.text = "경도 : " + mLastLocation.longitude // 갱신 된 경도
         val address = geocoder.getFromLocation(mLastLocation.latitude,mLastLocation.longitude, 1)
         val nowAddr = address.get(0).getAddressLine(0).toString();
+        textView2.text = nowAddr
         Log.d("latitude", nowAddr)
+
+        var address_gu = textView2.text
+        var range = IntRange(11, 13)
+        Log.d("range", address_gu.slice(range).toString())
+
+        var slice_address_gu = address_gu.slice(range).toString()
+        if (slice_address_gu.contains("구")) {
+            addressTxt.text = "현재 위치: " + slice_address_gu
+        } else {
+            addressTxt.text = "현재 위치: 도봉구 쌍문동"
+        }
+
+
+        // 통신
+        retrofitService.getRecycleDetailByRegion("도봉구")?.enqueue(object :
+            Callback<ApiResponse<RecycleDetailVO>> {
+            override fun onResponse(
+                call: Call<ApiResponse<RecycleDetailVO>>,
+                response: Response<ApiResponse<RecycleDetailVO>>
+            ) {
+                if(response.isSuccessful) {
+                    //정상적으로 통신 성공
+                    val result : ApiResponse<RecycleDetailVO>? = response.body();
+                    val data = result?.getResult();
+
+                    Log.d("RecycleDetailVO" ,"onresponse 성공: "+ result?.toString() )
+                    Log.d("RecycleDetailVO", "data : "+ data?.toString())
+                    textView.text = data!!.region + ": " +
+                            "\n 재활용 가능자원 배출 요일 : " + data!!.day +
+                            "\n 비닐, 투명페트명 배출 요일 : " + data!!.typicalDay
+
+
+                } else {
+                    //통신 실패(응답코드 3xx, 4xx 등)
+                    Log.d("YMC", "onResponse 실패" + response.errorBody().toString())
+                }
+            }
+
+            override fun onFailure(call: Call<ApiResponse<RecycleDetailVO>>, t: Throwable) {
+                //통신 실패(인터넷 끊김, 예외 발생 등 시스템적인 이유)
+                Log.d("YMC", "onFailure 에러: " + t.message.toString());
+            }
+
+
+        })
 
     }
 
