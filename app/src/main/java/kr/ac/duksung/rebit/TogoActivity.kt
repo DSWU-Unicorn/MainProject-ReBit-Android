@@ -26,7 +26,6 @@ import net.daum.mf.map.api.MapPoint
 import net.daum.mf.map.api.MapView
 
 
-
 class TogoActivity : AppCompatActivity() {
     private lateinit var binding: ActivityTogoBinding
     private lateinit var mMapView: MapView // Declare the mMapView variable
@@ -66,10 +65,7 @@ class TogoActivity : AppCompatActivity() {
         setupEvents()
         // 목록 값 지정
         setValues()
-//        val userAdapter: ArrayAdapter<String> = ArrayAdapter(
-//            this, android.R.layout.simple_list_item_1,
-//            user
-//        )
+
         var storeAdapter: ArrayAdapter<String> = ArrayAdapter(
             this, android.R.layout.simple_list_item_1,
             user
@@ -143,7 +139,19 @@ class TogoActivity : AppCompatActivity() {
         } else {
             // GPS가 꺼져있을 경우
             Toast.makeText(this, "GPS를 켜주세요", Toast.LENGTH_SHORT).show()
+            // 위도, 경도 하드코딩한 마커
+            setMakerHardCoding()
         }
+
+        // 리스너 등록
+        mMapView.setMapViewEventListener(this) // this에 MapView.MapViewEventListener 구현.
+        mMapView.setPOIItemEventListener(this)
+        mMapView.setOpenAPIKeyAuthenticationResultListener(this)
+
+
+    }//OnCreate()
+
+    fun setMakerHardCoding() {
         // 중심점 변경 - 덕성여대 차관
         mMapView.setMapCenterPoint(
             MapPoint.mapPointWithGeoCoord(
@@ -183,13 +191,7 @@ class TogoActivity : AppCompatActivity() {
 
         // 지도화면 위에 추가되는 아이콘을 추가하기 위한 호출(말풍선 모양)
         mMapView.addPOIItem(marker1);
-        // 리스너 등록
-        mMapView.setMapViewEventListener(this) // this에 MapView.MapViewEventListener 구현.
-        mMapView.setPOIItemEventListener(this)
-        mMapView.setOpenAPIKeyAuthenticationResultListener(this)
-
-
-    }//OnCreate()
+    }
 
     fun setupEvents() {
         // 메인화면의 이벤트관련 코드를 모아두는 장소
@@ -207,7 +209,6 @@ class TogoActivity : AppCompatActivity() {
             } catch (e: IndexOutOfBoundsException) {
                 Toast.makeText(this, "Oops. 더이상의 가게 정보가 없어요", Toast.LENGTH_SHORT).show()
             }
-
         }
     }// setupEvents
 
