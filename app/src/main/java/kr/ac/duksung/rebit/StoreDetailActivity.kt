@@ -31,7 +31,7 @@ class StoreDetailActivity : AppCompatActivity() {
         // review view
         val goto_review_btn = findViewById<Button>(R.id.goto_review_btn)
         goto_review_btn.setOnClickListener {
-            Toast.makeText(this, "더 많은 리뷰 보러 가기", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "생생한 후기가 궁금하나요? 리뷰 보러 가기", Toast.LENGTH_SHORT).show()
             val intent = Intent(this, ReviewActivity::class.java)
             startActivity(intent)
         }
