@@ -31,14 +31,8 @@ class RecycleActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_recycle)
 
-
-        //val image_view = findViewById<ImageView>(R.id.cardnews_view)
-        val next_btn = findViewById<Button>(R.id.right_btn)
-        val before_btn = findViewById<Button>(R.id.left_btn)
         val camera_btn = findViewById<Button>(R.id.camera_btn)
         val tip_button = findViewById<Button>(R.id.tip_button)
-        val guide_button = findViewById<Button>(R.id.guide_btn)
-        val close_btn = findViewById<Button>(R.id.close_btn)
 
         //서버 연결
         initRetrofit()
@@ -46,35 +40,9 @@ class RecycleActivity : AppCompatActivity() {
         //통신
         getCardNews()
 
-
-        /*
-        next_btn.setOnClickListener {
-            Toast.makeText(this, "다음 클릭 완료", Toast.LENGTH_LONG).show()
-            image_view.setImageResource(R.drawable.cardnews_1)
-        }
-
-        before_btn.setOnClickListener {
-            Toast.makeText(this, "이전 클릭 완료", Toast.LENGTH_LONG).show()
-            image_view.setImageResource(R.drawable.cardnews_0)
-        }
-
-         */
-
-        /*
-        image_view.setOnClickListener {
-            var intent =
-                Intent(Intent.ACTION_VIEW, Uri.parse("https://www.instagram.com/p/CpjvrxZrkTP/"))
-            startActivity(intent)
-        }
-
-         */
-
+        // 카메라
         camera_btn.setOnClickListener {
             var intent = Intent(this, CameraActivity::class.java)
-            startActivity(intent)
-        }
-        guide_button.setOnClickListener {
-            var intent = Intent(this, GuideActivity::class.java)
             startActivity(intent)
         }
 
@@ -95,18 +63,22 @@ class RecycleActivity : AppCompatActivity() {
             // 포인트 획득 버튼 클릭시
             val okButton = mDialogView.findViewById<Button>(R.id.successButton)
             okButton.setOnClickListener {
-
                 Toast.makeText(this, "포인트를 획득했습니다!", Toast.LENGTH_SHORT).show()
                 mAlertDialog.dismiss()
             }
         }
 
 
-        close_btn.setOnClickListener {
-            var intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-        }
+//        close_btn.setOnClickListener {
+//            var intent = Intent(this, MainActivity::class.java)
+//            startActivity(intent)
+//        }
 
+    }
+    // 뒤로가기
+    override fun onBackPressed() {
+        startActivity(Intent(this, MainActivity::class.java))
+        finish()
     }
 
     //서버 연결
