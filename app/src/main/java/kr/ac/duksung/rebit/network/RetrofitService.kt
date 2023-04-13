@@ -19,6 +19,8 @@ interface RetrofitService {
     @POST("/recycle/{id}")
     fun postUserPointByRecycle(@Path("id") id : Long) : Call<ApiResponse<Int>>
 
-    @GET("/store/mark/{search}")
-    fun getStoreMark(@Path("search") search: String):Call<ApiResponse<ArrayList<StoreMarkerVO>>>
+    @POST("/tip/{id}")
+    fun postUserWithPoint(@Path("id") id : Long) : Call<ApiResponse<Int>>
+
+
 }

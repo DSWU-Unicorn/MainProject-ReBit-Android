@@ -12,21 +12,32 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center"
+        android:layout_marginBottom="90dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/recycle_btn"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:background="@drawable/button_effect"
+            android:drawableLeft="@drawable/dagom"
+            android:fontFamily="@font/bmjua"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
             android:text="분리해"
             android:layout_marginRight="100dp"/>
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/todo_btn"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:background="@drawable/button_effect"
+            android:drawableLeft="@drawable/dagom"
+            android:fontFamily="@font/bmjua"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
             android:text="용기내"
             />
 <!--        <Button-->
@@ -37,11 +48,16 @@
 
     </LinearLayout>
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/unity_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Unity"
+        android:background="@drawable/button_effect"
+        android:drawableLeft="@drawable/dagom"
+        android:fontFamily="@font/bmjua"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

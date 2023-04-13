@@ -60,12 +60,43 @@ class RecycleActivity : AppCompatActivity() {
 
             val mAlertDialog = mBuilder.show()
 
+
             // 포인트 획득 버튼 클릭시
             val okButton = mDialogView.findViewById<Button>(R.id.successButton)
             okButton.setOnClickListener {
-                Toast.makeText(this, "포인트를 획득했습니다!", Toast.LENGTH_SHORT).show()
-                mAlertDialog.dismiss()
+                // 포인트 획득 통신
+                retrofitService.postUserWithPoint(1L)?.enqueue(object :
+                    Callback<ApiResponse<Int>> {
+                    override fun onResponse(
+                        call: Call<ApiResponse<Int>>,
+                        response: Response<ApiResponse<Int>>
+                    ) {
+                        if(response.isSuccessful) {
+                            //정상적으로 통신 성공
+                            val result : ApiResponse<Int>? = response.body();
+                            val data = result?.getResult();
+
+                            Log.d("tipPoint" ,"onresponse 성공: "+ result?.toString() )
+                            Log.d("tipPoint", "data : "+ data?.toString())
+                            val point = data.toString()
+
+                            // toast
+                            Toast.makeText(applicationContext, "회원 포인트 : " + point + "p", Toast.LENGTH_SHORT).show()
+                            mAlertDialog.dismiss()
+                        } else {
+                            //통신 실패(응답코드 3xx, 4xx 등)
+                            Log.d("YMC", "onResponse 실패" + response.errorBody().toString())
+                        }
+                    }
+
+                    override fun onFailure(call: Call<ApiResponse<Int>>, t: Throwable) {
+                        //통신 실패(인터넷 끊김, 예외 발생 등 시스템적인 이유)
+                        Log.d("YMC", "onFailure 에러: " + t.message.toString());
+                    }
+                })
             }
+
+
         }
 
 
