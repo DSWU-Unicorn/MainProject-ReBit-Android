@@ -76,7 +76,7 @@ class CameraActivity : AppCompatActivity() {
         geocoder = Geocoder(this)
 
         // dataLabel 설정
-        dataLabel = "종이팩"
+        dataLabel = "페트병"
 
         // 서버 연결
         initRetrofit()
@@ -256,37 +256,6 @@ class CameraActivity : AppCompatActivity() {
         retrofitService = retrofit.create(RetrofitService::class.java)
     }
 
-    // 포인트 획득 통신
-    private fun postUserPointByRecycle(id : Long) {
-        retrofitService.postUserPointByRecycle(id).enqueue(object :
-            Callback<ApiResponse<Int>> {
-            override fun onResponse(
-                call: Call<ApiResponse<Int>>,
-                response: Response<ApiResponse<Int>>
-            ) {
-                if(response.isSuccessful) {
-                    //정상적으로 통신 성공
-                    val result : ApiResponse<Int>? = response.body();
-                    val data = result?.getResult()
-
-                    Log.d("RecyclePoint" ,"onresponse 성공: "+ result?.toString() )
-                    Log.d("RecyclePoint", "data : "+ data)
-
-                } else {
-                    //통신 실패(응답코드 3xx, 4xx 등)
-                    Log.d("YMC", "onResponse 실패" + response.errorBody().toString())
-                }
-            }
-
-            override fun onFailure(call: Call<ApiResponse<Int>>, t: Throwable) {
-                //통신 실패(인터넷 끊김, 예외 발생 등 시스템적인 이유)
-                Log.d("YMC", "onFailure 에러: " + t.message.toString());
-            }
-
-        })
-    }
-
-
     private fun startLocationUpdates() {
 
         //FusedLocationProviderClient의 인스턴스를 생성.
@@ -329,6 +298,7 @@ class CameraActivity : AppCompatActivity() {
         textView = mAlertDialog2.findViewById<TextView>(R.id.text1)!!
         textView2 = mAlertDialog2.findViewById<TextView>(R.id.text2)!!
         var addressTxt = mAlertDialog2.findViewById<TextView>(R.id.addressTxt)!!
+        val successBtn = mAlertDialog2.findViewById<Button>(R.id.successButton)!!
 
 
         // 지오코딩
@@ -350,8 +320,7 @@ class CameraActivity : AppCompatActivity() {
             addressTxt.text = "현재 위치: 도봉구 쌍문동"
         }
 
-
-        // 통신
+        // 지역별 추가적 분리수거 정보 조회 통신
         retrofitService.getRecycleDetailByRegion("도봉구")?.enqueue(object :
             Callback<ApiResponse<RecycleDetailVO>> {
             override fun onResponse(
@@ -365,9 +334,8 @@ class CameraActivity : AppCompatActivity() {
 
                     Log.d("RecycleDetailVO" ,"onresponse 성공: "+ result?.toString() )
                     Log.d("RecycleDetailVO", "data : "+ data?.toString())
-                    textView.text = data!!.region + ": " +
-                            "\n 재활용 가능자원 배출 요일 : " + data!!.day +
-                            "\n 비닐, 투명페트명 배출 요일 : " + data!!.typicalDay
+                    textView.text = "[재활용 가능자원 배출 요일] \n" + data!!.day +
+                            "\n\n [비닐, 투명페트명 배출 요일]\n" + data!!.typicalDay
 
 
                 } else {
@@ -384,8 +352,48 @@ class CameraActivity : AppCompatActivity() {
 
         })
 
-    }
+        successBtn.setOnClickListener{
+            // 포인트 획득 통신
+            retrofitService.postUserPointByRecycle(1L)?.enqueue(object :
+                Callback<ApiResponse<Int>> {
+                override fun onResponse(
+                    call: Call<ApiResponse<Int>>,
+                    response: Response<ApiResponse<Int>>
+                ) {
+                    if(response.isSuccessful) {
+                        //정상적으로 통신 성공
+                        val result : ApiResponse<Int>? = response.body();
+                        val data = result?.getResult();
 
+                        Log.d("pointRecycle" ,"onresponse 성공: "+ result?.toString() )
+                        Log.d("pointRecycle", "data : "+ data?.toString())
+                        val point = data.toString()
+
+                        // 다이얼로그 종료
+                        mAlertDialog2.dismiss()
+
+                        // toast
+                        Toast.makeText(applicationContext, "회원 포인트 : " + point, Toast.LENGTH_SHORT).show()
+
+
+                    } else {
+                        //통신 실패(응답코드 3xx, 4xx 등)
+                        Log.d("YMC", "onResponse 실패" + response.errorBody().toString())
+                    }
+                }
+
+                override fun onFailure(call: Call<ApiResponse<Int>>, t: Throwable) {
+                    //통신 실패(인터넷 끊김, 예외 발생 등 시스템적인 이유)
+                    Log.d("YMC", "onFailure 에러: " + t.message.toString());
+                }
+            })
+            // 화면 이동
+            var intent = Intent(this, RecycleActivity::class.java)
+            startActivity(intent)
+        }
+
+
+    }
     // 위치 권한이 있는지 확인하는 메서드
     private fun checkPermissionForLocation(context: Context): Boolean {
         // Android 6.0 Marshmallow 이상에서는 위치 권한에 추가 런타임 권한이 필요
