@@ -5,70 +5,70 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/tip_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
+        android:layout_margin="20dp"
+        android:layout_marginTop="50dp"
+        android:background="@drawable/button_effect"
+        android:drawableLeft="@drawable/idea_icon"
         android:fontFamily="@font/bmjua"
+        android:paddingLeft="40dp"
+        android:paddingRight="40dp"
         android:text="오늘의 Tip! 장류 버리는 방법"
-        app:layout_constraintBottom_toTopOf="@+id/scrollView2"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.221" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ScrollView
         android:id="@+id/scrollView2"
-        android:layout_width="wrap_content"
-        android:layout_height="500dp"
-        android:layout_marginTop="74dp"
+        android:layout_width="320dp"
+        android:layout_height="700dp"
+        android:layout_marginTop="30dp"
+        android:fillViewport="true"
+        android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tip_button">
 
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="300dp"
-            android:layout_height="200dp"
-            android:layout_marginTop="10dp"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-            android:fontFamily="@font/bmjua"
-            android:text="-된장, 고추장, 쌈장, 춘장 등 되직한 장류는 비닐봉지에 담아 단단히 묶은 후 일반쓰레기(종량제봉투)로 버려요.
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/bmjua"
+                android:layout_marginTop="30dp"
+                android:text="- 된장, 고추장, 쌈장 등 되직한 장류는 비닐봉지에 담아 단단히 묶은 후 일반쓰레기 (종량제봉투)로 버려요. \n\n\n
 
--장류를 음식물 쓰레기로 헷갈리기 쉽지만 염분이 많아서 동물 사료 또는 경작용 비료로 재가공되는 음식물 쓰레기로 사용할 수 없어요.
--장류를 보관한 플라스틱 통이나 유리병 등은 세척 후 스티커, 라벨 등을 깨끗이 제거한 뒤 재질별로 분리배출해요.
+- 장류를 음식물 쓰레기로 헷갈리기 쉽지만 염분이 많아서 동물 사료 또는 경작용 비료로 재가공되는 음식물 쓰레기로 사용할 수 없어요. \n\n\n
+- 장류를 보관한 플라스틱 통이나 유리병 등은 세척 후 스티커, 라벨 등을 깨끗이 제거한 뒤 재질별로 분리배출해요. \n\n\n"
+                android:textSize="27sp" />
 
-알아두면 좋은 점
--음식물 쓰레기는 살균 처리와 고온 건조 과정을 거쳐 동물용 사료 또는 경작용 퇴비로 재활용됩니다. 그래서 염분이 많은 장류나 염도가 높은 음식물은 쓰일 수 없다고 해요.
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/successButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button_effect"
+                android:drawableLeft="@drawable/dagom"
+                android:fontFamily="@font/bmjua"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:text="포인트 획득!"
+                android:layout_marginTop="30dp"
+                android:layout_marginBottom="30dp"
+                android:layout_gravity="center_horizontal" />
 
--장류는 반드시 일반쓰레기로 버리고 염도가 높은 음식은 물로 한번 헹군 후 음식물 쓰레기로 버려주세요.
-
--장류, 국물, 음식물 등을 변기로 흘려보내면 건물 내 배수구를 막히게 할 뿐만 아니라 지역 하수 처리 시설에도 문제를 초래하게 되니 절대 삼가주세요."
-            android:textSize="30sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        </LinearLayout>
 
     </ScrollView>
 
-    <Button
-        android:id="@+id/successButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="139dp"
-        android:layout_marginLeft="139dp"
-        android:layout_marginTop="9dp"
-        android:layout_marginEnd="158dp"
-        android:layout_marginRight="158dp"
-        android:layout_marginBottom="16dp"
-        android:text="포인트 획득!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/scrollView2" />
+
 
     <!--    <Button-->
     <!--        android:id="@+id/closeButton"-->

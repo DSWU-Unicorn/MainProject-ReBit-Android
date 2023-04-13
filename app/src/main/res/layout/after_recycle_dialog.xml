@@ -1,19 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:paddingBottom="20dp">
 
     <TextView
         android:id="@+id/addressTxt"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="50dp"
-        android:background="#D9D9D9"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingTop="7dp"
+        android:paddingBottom="7dp"
+        android:drawableLeft="@drawable/marker"
+        android:fontFamily="@font/bmjua"
+        android:background="@drawable/button_effect"
         android:text="현재 위치: "
         android:textColor="@color/black"
         android:textSize="20sp"
+        android:gravity="center_vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -23,11 +32,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/black"
+        android:fontFamily="@font/bmjua"
         android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:gravity="center_vertical"
+        app:layout_constraintBottom_toTopOf="@+id/successButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/addressTxt" />
+        app:layout_constraintTop_toBottomOf="@+id/addressTxt"
+        android:padding="30dp"/>
 
     <TextView
         android:id="@+id/text2"
@@ -41,15 +53,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/text1" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/successButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@drawable/button_effect"
+        android:drawableLeft="@drawable/dagom"
+        android:fontFamily="@font/bmjua"
         android:text="포인트 획득!"
-        android:layout_marginTop="50dp"
         android:layout_marginRight="20dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="20dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text1" />
+        app:layout_constraintTop_toBottomOf="@+id/text1"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
