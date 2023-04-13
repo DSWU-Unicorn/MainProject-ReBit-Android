@@ -22,4 +22,4 @@ include ':unityLibrary'
 //project(':unityLibrary').projectDir=new File("C:\\Users\\pebis\\Desktop\\unity_real\\unityLibrary")
 //project(':unityLibrary').projectDir=new File("C:\\Rebit\\export-unity\\unityLibrary")
 
-project(':unityLibrary').projectDir=new File("/Users/dy/AndroidStudioProjects/UnityTest/unityLibrary")
+//project(':unityLibrary').projectDir=new File("/Users/kimyujeong/Downloads/UnityTest/unityLibrary")
