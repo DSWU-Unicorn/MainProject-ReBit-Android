@@ -1,9 +1,6 @@
 package kr.ac.duksung.rebit.network
 
-import kr.ac.duksung.rebit.network.dto.ApiResponse
-import kr.ac.duksung.rebit.network.dto.CardNewsVO
-import kr.ac.duksung.rebit.network.dto.RecycleDetailVO
-import kr.ac.duksung.rebit.network.dto.RecycleVO
+import kr.ac.duksung.rebit.network.dto.*
 import retrofit2.http.GET
 import retrofit2.Call
 import retrofit2.http.POST
@@ -22,5 +19,6 @@ interface RetrofitService {
     @POST("/recycle/{id}")
     fun postUserPointByRecycle(@Path("id") id : Long) : Call<ApiResponse<Int>>
 
-
+    @GET("/store/mark/{search}")
+    fun getStoreMark(@Path("search") search: String):Call<ApiResponse<ArrayList<StoreMarkerVO>>>
 }
