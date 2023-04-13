@@ -6,6 +6,7 @@ import android.os.Parcelable
 import java.io.Serializable
 
 class Store (
+    val id:Int,
     val storeName: String,
     // val address: String, // 식품접객업
     val category1: String,
@@ -13,6 +14,4 @@ class Store (
     val tel: String
     // 상속받는 것처럼 구현
    // ): Parcelable {
-):Serializable{
-
-}
+):Serializable

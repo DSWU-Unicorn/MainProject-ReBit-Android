@@ -1,10 +1,8 @@
 package kr.ac.duksung.rebit
 
 import android.Manifest
-import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.app.AlertDialog
 import android.content.Context
-import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.LocationManager
@@ -17,7 +15,6 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.startActivity
 import kotlinx.android.synthetic.main.activity_togo.*
 import kr.ac.duksung.rebit.databinding.ActivityTogoBinding
 import kr.ac.duksung.rebit.datas.Store
@@ -35,21 +32,11 @@ class TogoActivity : AppCompatActivity() {
     //lateinit var storeAdapter: StoreAdapter
 
     private val user = arrayOf(
-        "Abhay",
-        "Joseph",
-        "Maria",
-        "Avni",
-        "Apoorva",
-        "Chris",
-        "David",
-        "Kaira",
-        "Dwayne",
-        "Christopher",
-        "Jim",
-        "Russel",
-        "Donald",
-        "Brack",
-        "Vladimir"
+        "메가커피",
+        "커피드림",
+        "콩블랑제리",
+        "블랙다운커피",
+        "히피스 베이글",
     )
 
     private val ACCESS_FINE_LOCATION = 1000     // Request Code
@@ -136,6 +123,8 @@ class TogoActivity : AppCompatActivity() {
         if (checkLocationService()) {
             // GPS가 켜져있을 경우
             permissionCheck()
+            setMakerHardCoding()
+
         } else {
             // GPS가 꺼져있을 경우
             Toast.makeText(this, "GPS를 켜주세요", Toast.LENGTH_SHORT).show()
@@ -151,6 +140,7 @@ class TogoActivity : AppCompatActivity() {
 
     }//OnCreate()
 
+    // 하드코딩으로 마커찍기
     fun setMakerHardCoding() {
         // 중심점 변경 - 덕성여대 차관
         mMapView.setMapCenterPoint(
@@ -161,7 +151,7 @@ class TogoActivity : AppCompatActivity() {
         )
 
         // 줌 레벨 변경
-        mMapView.setZoomLevel(1, true)
+        mMapView.setZoomLevel(4, true)
 
         // 줌 인
         mMapView.zoomIn(true)
@@ -169,28 +159,79 @@ class TogoActivity : AppCompatActivity() {
         // 줌 아웃
         mMapView.zoomOut(true)
 
-        //마커 찍기 (덕성여대)
-        val MARKER_POINT1 = MapPoint.mapPointWithGeoCoord(37.65320737529757, 127.01615398831316)
+        val markerArr = ArrayList<MapPOIItem>()
+        //setMarkerValues()
+
+        // test 마커 찍기
+        val MARKER_POINT1 =
+            MapPoint.mapPointWithGeoCoord(37.64858331573457, 127.01432862276108) // 메가커피
+        val MARKER_POINT2 =
+            MapPoint.mapPointWithGeoCoord(37.65173675700233, 127.01432639564919) // 커피드림
+        val MARKER_POINT3 =
+            MapPoint.mapPointWithGeoCoord(37.65136960646743, 127.01432632511757) // 이요
+        val MARKER_POINT4 =
+            MapPoint.mapPointWithGeoCoord(37.65016688485748, 127.01355837181578) // 블랙다운커피
+        val MARKER_POINT5 =
+            MapPoint.mapPointWithGeoCoord(37.65006777280117, 127.01359234883397) // 히피스 베이글
+
 
         // 마커 아이콘 추가하는 함수
         val marker1 = MapPOIItem()
+        val marker2 = MapPOIItem()
+        val marker3 = MapPOIItem()
+        val marker4 = MapPOIItem()
+        val marker5 = MapPOIItem()
 
         // 클릭 했을 때 나오는 호출 값
-        marker1.itemName = "여기 있음!"
+        marker1.itemName =
+            "메가커피"
+        marker2.itemName =
+            "커피드림"
+        marker3.itemName =
+            "이요"
+        marker4.itemName =
+            "블랙다운커피"
+        marker5.itemName =
+            "히피스 베이글"
+
 
         // 왜 있는지 잘 모르겠음
         marker1.tag = 0
+        marker2.tag = 0
+        marker3.tag = 0
+        marker4.tag = 0
+        marker5.tag = 0
 
         // 좌표를 입력받아 현 위치로 출력
         marker1.mapPoint = MARKER_POINT1
+        marker2.mapPoint = MARKER_POINT2
+        marker3.mapPoint = MARKER_POINT3
+        marker4.mapPoint = MARKER_POINT4
+        marker5.mapPoint = MARKER_POINT5
+
 
         //  (클릭 전)기본으로 제공하는 BluePin 마커 모양의 색.
         marker1.markerType = MapPOIItem.MarkerType.BluePin
+        marker2.markerType = MapPOIItem.MarkerType.BluePin
+        marker3.markerType = MapPOIItem.MarkerType.BluePin
+        marker4.markerType = MapPOIItem.MarkerType.BluePin
+        marker5.markerType = MapPOIItem.MarkerType.BluePin
+
+
         // (클릭 후) 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
         marker1.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin);
+        marker2.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin);
+        marker3.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin);
+        marker4.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin);
+        marker5.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin);
 
         // 지도화면 위에 추가되는 아이콘을 추가하기 위한 호출(말풍선 모양)
         mMapView.addPOIItem(marker1);
+        mMapView.addPOIItem(marker2);
+        mMapView.addPOIItem(marker3);
+        mMapView.addPOIItem(marker4);
+        mMapView.addPOIItem(marker5);
+
     }
 
     fun setupEvents() {
@@ -214,11 +255,11 @@ class TogoActivity : AppCompatActivity() {
 
     fun setValues() {
         // test data 삽입
-        storeList.add(Store("Abhay", "휴게음식점", "경기 화성시 10용사1길 49 1층 아워시즌", "01022360284"))
-        storeList.add(Store("Apoorva", "휴게음식점", "경기 화성시 10용사1길 49 1층 아워시즌", "01022360284"))
-        storeList.add(Store("Avni", "휴게음식점", "경기 화성시 10용사1길 49 1층 아워시즌", "01022360284"))
-        storeList.add(Store("David", "휴게음식점", "경기 화성시 10용사1길 49 1층 아워시즌", "01022360284"))
-        storeList.add(Store("Chris", "휴게음식점", "경기 화성시 10용사1길 49 1층 아워시즌", "01022360284"))
+        storeList.add(Store(0,"메가MGC커피 4.19사거리점", "휴게음식점", "서울 강북구 삼양로 510 1층 메가커피", "02-900-1288"))
+        storeList.add(Store(1,"커피드림", "휴게음식점", "서울특별시 도봉구 삼양로144길 25", "01022360284"))
+        storeList.add(Store(2,"eeeyo", "휴게음식점", "서울 도봉구 삼양로142길 33 일층", "0507-1323-2307"))
+        storeList.add(Store(3,"블랙다운커피", "휴게음식점", "서울 강북구 삼양로 528-1 1층", "02-6338-0606"))
+        storeList.add(Store(4,"히피스 베이글", "휴게음식점", "서울 강북구 삼양로 528", "02-906-6778"))
 
         //storeAdapter = StoreAdapter(this, android.R.layout.simple_list_item_1, storeList)
         //binding.searchView.adapter = storeAdapter

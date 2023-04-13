@@ -30,7 +30,7 @@
                         android:id="@+id/storeImageArea"
                         android:layout_width="match_parent"
                         android:layout_height="250dp"
-                        android:src="@drawable/review_3"
+                        android:src="@drawable/megacoffee"
                         />
                     <LinearLayout
                         android:layout_width="match_parent"
