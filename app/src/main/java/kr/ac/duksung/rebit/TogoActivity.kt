@@ -150,8 +150,8 @@ class TogoActivity : AppCompatActivity() {
             ), true
         )
 
-        // 줌 레벨 변경
-        mMapView.setZoomLevel(4, true)
+        // 줌 레벨 변경 // 낮을수록 확대
+        mMapView.setZoomLevel(1, true)
 
         // 줌 인
         mMapView.zoomIn(true)
@@ -188,7 +188,7 @@ class TogoActivity : AppCompatActivity() {
         marker2.itemName =
             "커피드림"
         marker3.itemName =
-            "이요"
+            "eeeyo"
         marker4.itemName =
             "블랙다운커피"
         marker5.itemName =

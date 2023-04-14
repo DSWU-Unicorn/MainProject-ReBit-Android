@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.android.synthetic.main.activity_create_review.*
 
 class CreateReview() : AppCompatActivity() {
     private val TAG = "MultiImageActivity"
@@ -39,6 +40,12 @@ class CreateReview() : AppCompatActivity() {
 
         close_btn.setOnClickListener {
             finish()
+        }
+        val submit_btn=findViewById<Button>(R.id.submit_btn)
+        submit_btn.setOnClickListener{
+            Toast.makeText(this, "리뷰가 등록되었습니다!", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, ReviewActivity::class.java)
+            startActivity(intent)
         }
     }
 
