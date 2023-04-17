@@ -1,15 +1,11 @@
 ---
-name: Android_ISSUE_TEMPLATE
-about: Describe this issue template's purpose here.
-title: ''
+name: Android Part Issue Template
+about: 🦄 Android 이슈 템플릿입니다.
+title: 'Feat: 용기내 전체 레이아웃 구현'
 labels: ''
 assignees: ''
 
 ---
-
-|name|about|title|labels|assignees|
-|---|---|------|---|---|
-|Android Part Issue Template| 🦄 Android 이슈 템플릿입니다.|Feat: 용기내 전체 레이아웃 구현| | |
 
 ## 🌈 이슈 요약
 
