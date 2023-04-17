@@ -6,9 +6,6 @@ data class StoreMarkerVO(
     @SerializedName("id")
     val id : Long,
 
-    @SerializedName("dataLabel")
-    val dataLabel : String,
-
-    @SerializedName("content")
-    val content : String
+    @SerializedName("address")
+    val address : String,
 )
