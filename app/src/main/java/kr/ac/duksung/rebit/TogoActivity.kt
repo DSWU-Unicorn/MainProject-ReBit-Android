@@ -16,7 +16,6 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import kotlinx.android.synthetic.main.activity_togo.*
 import kr.ac.duksung.rebit.databinding.ActivityTogoBinding
 import kr.ac.duksung.rebit.datas.Store
 import kr.ac.duksung.rebit.network.RetofitClient
@@ -57,6 +56,11 @@ class TogoActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityTogoBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        //
+        getSupportActionBar()?.hide();      // 안 보이도록 합니다.
+
+
 
         //서버 연결
         initRetrofit()
@@ -115,6 +119,9 @@ class TogoActivity : AppCompatActivity() {
                 Toast.makeText(this, "내 용기가 맞을까? 확인하러 가기", Toast.LENGTH_SHORT).show()
                 val intent = Intent(this, CameraActivity::class.java)
                 startActivity(intent)
+                // action bar show
+                getSupportActionBar()?.show();
+
             }
             val goto_review_btn = mDialogView.findViewById<Button>(R.id.goto_review_btn)
 
@@ -129,7 +136,7 @@ class TogoActivity : AppCompatActivity() {
             todo_btn.setOnClickListener {
                 Toast.makeText(this, "이미 용기냈다면! 어땠는지 후기 작성하러 가기", Toast.LENGTH_SHORT).show()
 
-                val intent = Intent(this, CreateReview::class.java)
+                val intent = Intent(this, CreateReviewActivity::class.java)
                 startActivity(intent)
             }
         }

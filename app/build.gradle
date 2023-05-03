@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId "kr.ac.duksung.rebit"
-        minSdk 22 // minSdk 22 이상으로 안하면 error
+        minSdk 23 // minSdk 22 이상으로 안하면 error
         targetSdk 32
         versionCode 1
         versionName "1.0"
@@ -74,4 +74,6 @@ dependencies {
 //    implementation fileTree(dir: project(':unityLibrary').getProjectDir().toString() + ('\\libs'), include: ['*.jar'])
     implementation fileTree(dir: project(':unityLibrary').getProjectDir().toString() + File.separator+ 'libs', include: ['*.jar'])
 
+
+    implementation "land.sungbin:systemuicontroller:1.0.1"
 }

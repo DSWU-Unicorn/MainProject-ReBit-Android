@@ -56,9 +56,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".Toolbar"
-            android:exported="true" />
+<!--        <activity-->
+<!--            android:name=".Toolbar"-->
+<!--            android:exported="true" />-->
         <activity
             android:name=".TogoActivity"
             android:exported="true" />
@@ -78,7 +78,10 @@
             android:name=".CameraActivity"
             android:exported="true" />
         <activity
-            android:name=".CreateReview"
+            android:name=".CreateReviewActivity"
+            android:exported="true" />
+        <activity
+            android:name=".YonggiCameraActivity"
             android:exported="true" />
 
         <provider
