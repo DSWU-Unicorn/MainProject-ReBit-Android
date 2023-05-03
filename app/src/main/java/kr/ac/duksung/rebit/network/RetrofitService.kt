@@ -27,6 +27,6 @@ interface RetrofitService {
     fun getStoreMarker(@Path("search") search: String): Call<ApiResponse<ArrayList<StoreMarkerVO>>>
 
     @POST("/comments")
-    fun postReviewComments(@Body request: ReviewCommentsVO ): Call<ApiResponse<ReviewCommentsVO>>
+    fun postReviewComments(@Body review: ReviewCommentsVO ): Call<ApiResponse<ReviewCommentsVO>>
 
 }
