@@ -3,6 +3,7 @@ package kr.ac.duksung.rebit.network
 import kr.ac.duksung.rebit.network.dto.*
 import retrofit2.http.GET
 import retrofit2.Call
+import retrofit2.http.Body
 import retrofit2.http.POST
 import retrofit2.http.Path
 
@@ -25,5 +26,7 @@ interface RetrofitService {
     @GET("/store/mark/{search}")
     fun getStoreMarker(@Path("search") search: String): Call<ApiResponse<ArrayList<StoreMarkerVO>>>
 
+    @POST("/comments")
+    fun postReviewComments(@Body request: ReviewCommentsVO ): Call<ApiResponse<ReviewCommentsVO>>
 
 }
