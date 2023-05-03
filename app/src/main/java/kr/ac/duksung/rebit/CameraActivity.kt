@@ -8,29 +8,24 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.location.Geocoder
 import android.location.Location
-import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Looper
 import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.WindowManager
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.viewpager.widget.ViewPager
 import kr.ac.duksung.rebit.databinding.ActivityCameraBinding
 import kr.ac.duksung.rebit.network.RetofitClient
 import kr.ac.duksung.rebit.network.RetrofitService
 import kr.ac.duksung.rebit.network.dto.ApiResponse
-import kr.ac.duksung.rebit.network.dto.CardNewsVO
 import kr.ac.duksung.rebit.network.dto.RecycleVO
 import retrofit2.Call
 import retrofit2.Callback
@@ -137,7 +132,7 @@ class CameraActivity : AppCompatActivity() {
 
                 // Dialog만들기
                 val mDialogView =
-                    LayoutInflater.from(this).inflate(R.layout.after_model_dialog, null)
+                    LayoutInflater.from(this).inflate(R.layout.after_recycle_model_dialog, null)
                 val mBuilder = AlertDialog.Builder(this)
                     .setView(mDialogView)
 

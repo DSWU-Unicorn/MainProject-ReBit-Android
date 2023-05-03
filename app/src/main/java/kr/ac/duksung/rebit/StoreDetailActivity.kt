@@ -1,20 +1,13 @@
 package kr.ac.duksung.rebit
 
 import android.content.Intent
-import kr.ac.duksung.rebit.R
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.telephony.PhoneNumberFormattingTextWatcher
-import android.telephony.PhoneNumberUtils
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
-import androidx.databinding.DataBindingUtil.setContentView
-import androidx.viewbinding.ViewBinding
 import kotlinx.android.synthetic.main.activity_store_detail.*
-import kotlinx.android.synthetic.main.multi_image_item.view.*
 import kr.ac.duksung.rebit.databinding.ActivityStoreDetailBinding
-import kr.ac.duksung.rebit.databinding.ActivityTogoBinding
 import kr.ac.duksung.rebit.datas.Store
 import java.text.ParseException
 import java.util.regex.Pattern
@@ -47,7 +40,7 @@ class StoreDetailActivity : AppCompatActivity() {
         val pic_btn = findViewById<Button>(R.id.pic_btn)
         pic_btn.setOnClickListener {
             Toast.makeText(this, "내 용기가 맞을까? 확인하러 가기", Toast.LENGTH_SHORT).show()
-            val intent = Intent(this, CameraActivity::class.java)
+            val intent = Intent(this, YonggiCameraActivity::class.java)
             startActivity(intent)
         }
         // review view
@@ -62,7 +55,7 @@ class StoreDetailActivity : AppCompatActivity() {
         todo_btn.setOnClickListener {
             Toast.makeText(this, "이미 용기냈다면! 어땠는지 후기 작성하러 가기", Toast.LENGTH_SHORT).show()
 
-            val intent = Intent(this, CreateReview::class.java)
+            val intent = Intent(this, CreateReviewActivity::class.java)
             startActivity(intent)
         }
 

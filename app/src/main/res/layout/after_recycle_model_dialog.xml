@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="30dp">
+
+
+    <TextView
+        android:id="@+id/title_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_effect"
+        android:drawableLeft="@drawable/idea_icon"
+        android:drawablePadding="10dp"
+        android:fontFamily="@font/bmjua"
+        android:text="페트병-분리수거 방법"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingTop="9dp"
+        android:paddingBottom="9dp"
+        android:textSize="25sp"
+        app:layout_constraintBottom_toTopOf="@+id/howto_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+<!--    <ImageView-->
+<!--        android:id="@+id/imageView"-->
+<!--        android:layout_width="200dp"-->
+<!--        android:layout_height="200dp"-->
+<!--        android:layout_centerInParent="true"-->
+<!--        android:layout_marginStart="100dp"-->
+<!--        android:layout_marginLeft="100dp"-->
+<!--        android:layout_marginTop="50dp"-->
+<!--        android:layout_marginEnd="100dp"-->
+<!--        android:layout_marginRight="100dp"-->
+<!--        android:layout_marginBottom="20dp"-->
+<!--        android:scaleType="centerCrop"-->
+<!--        android:src="@mipmap/ic_launcher"-->
+<!--        app:layout_constraintBottom_toTopOf="@+id/title_text"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_bias="0.462"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent" />-->
+
+    <TextView
+        android:id="@+id/howto_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:fontFamily="@font/bmjua"
+        android:text="내용물을 깨끗이 비우고,
+ 뚜껑/부착상표 등을 제거한 후
+압착하여 배출합니다."
+        android:textSize="22sp"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:gravity="center_vertical"
+        android:padding="10dp"
+
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title_text" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/howto_text">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/AgainButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="9dp"
+            android:layout_marginBottom="16dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:text="추가 촬영"
+            android:background="@drawable/button_effect"
+            android:drawableLeft="@drawable/drawable_camera_icon_resize"
+            android:drawablePadding="7dp"
+            android:fontFamily="@font/bmjua"
+            android:textSize="20dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/successButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="20dp"
+            android:paddingRight="30dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginTop="9dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/button_effect"
+            android:text="다음"
+            android:drawableLeft="@drawable/drawable_dagom_icon_resize"
+            android:drawablePadding="7dp"
+            android:fontFamily="@font/bmjua"
+            android:textSize="20dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </LinearLayout>
+    <!--    <Button-->
+    <!--        android:id="@+id/closeButton"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginTop="16dp"-->
+    <!--        android:text="닫기!"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toBottomOf="@+id/successButton" />-->
+</androidx.constraintlayout.widget.ConstraintLayout>
