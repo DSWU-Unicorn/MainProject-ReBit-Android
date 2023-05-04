@@ -64,12 +64,19 @@ class CreateReviewActivity() : AppCompatActivity() {
 
         submitBtn.setOnClickListener {
             // 서버에 리뷰 데이터를 보내고 (post)
+            // Retrieve user input data from EditText views
+            val star:Int = ratingBar.rating.toInt()
+            val storeId:Long = 10
+            val userId:Long = 1
+            //val photo = photoUrlEditText.text.toString()
+            val photo:String = "http://s3.amazonaws.com/[bucket_name]/"
+            val comment:String = reviewEditText.text.toString()
 
-            val review = ReviewCommentsVO(10,
-                1,
-                1,
-                "photo",
-                "test")
+            val review = ReviewCommentsVO(storeId,
+                userId,
+                star,
+                photo,
+                comment)
 
             retrofitService.postReviewComments(review)
                 .enqueue(object : Callback<ApiResponse<Int>> {
@@ -105,99 +112,66 @@ class CreateReviewActivity() : AppCompatActivity() {
         retrofitService = retrofit.create(RetrofitService::class.java)
     }
 
-    // 통신
-//    fun postReviewComments() {
-//        //enqueue : 비동기식 통신을 할 때 사용/ execute: 동기식
-//        val reviewComment = ReviewCommentsVO(0, 20200848, 5, "photo", "앗살라말라이쿰")
-//
-//        retrofitService.postReviewComments(reviewComment).enqueue(object :
-//            Callback<ApiResponse<ReviewCommentsVO>> {
-//            override fun onResponse(
-//                call: Call<ApiResponse<ReviewCommentsVO>>,
-//                response: Response<ApiResponse<ReviewCommentsVO>>
-//            ) {
-//                if (response.isSuccessful) {
-//                    // 통신 성공시
-//                    val result: ApiResponse<ReviewCommentsVO>? = response.body()
-//                    val data = result?.getResult()
-//
-//                    Log.d("ReviewComments", "onResponse 성공: " + result?.toString())
-//                    Log.d("ReviewComments", "data : " + data?.toString())
-//                }
-//            }
-//
-//            override fun onFailure(
-//                call: Call<ApiResponse<ReviewCommentsVO>>,
-//                t: Throwable
-//            ) {
-//                Log.e("ReviewComments", "onFailure : ${t.message} ");
-//            }
-//        })
-//        // 화면 이동
-//        Toast.makeText(this, "리뷰가 등록되었습니다!", Toast.LENGTH_SHORT).show()
-//        val intent = Intent(this, ReviewActivity::class.java)
-//        startActivity(intent)
-//    }
 
 
-    // Method executed after returning from the photo album
-//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-//        super.onActivityResult(requestCode, resultCode, data)
-//
-//        data?.let {
-//            // No image selected
-//            if (it.data == null) {
-//                Toast.makeText(applicationContext, "No image selected.", Toast.LENGTH_LONG).show()
-//            } else {
-//                // Single image selected
-//                if (it.clipData == null) {
-//                    Log.e("single choice: ", it.data.toString())
-//                    val imageUri = it.data!!
-//                    uriList.add(imageUri)
-//
-//                    adapter = MultiImageAdapter(uriList, applicationContext)
-//                    recyclerView.adapter = adapter
-//                    recyclerView.layoutManager =
-//                        LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, true)
-//                }
-//                // Multiple images selected
-//                else {
-//                    val clipData = it.clipData!!
-//                    Log.e("clipData", clipData.itemCount.toString())
-//
-//                    if (clipData.itemCount > 10) {
-//                        Toast.makeText(
-//                            applicationContext,
-//                            "You can select up to 10 photos.",
-//                            Toast.LENGTH_LONG
-//                        ).show()
-//                    } else {
-//                        Log.e(TAG, "multiple choice")
-//
-//                        for (i in 0 until clipData.itemCount) {
-//                            val imageUri =
-//                                clipData.getItemAt(i).uri // Get the URIs of the selected images
-//                            try {
-//                                uriList.add(imageUri) // Add the URI to the list
-//
-//                            } catch (e: Exception) {
-//                                Log.e(TAG, "File select error", e)
-//                            }
-//                        }
-//
-//                        adapter = MultiImageAdapter(uriList, applicationContext)
-//                        recyclerView.adapter = adapter // Set the adapter to the RecyclerView
-//                        recyclerView.layoutManager = LinearLayoutManager(
-//                            this,
-//                            LinearLayoutManager.HORIZONTAL,
-//                            true
-//                        ) // Apply horizontal scrolling to the RecyclerView
-//                    }
-//                }
-//            }
-//        }
-//
-//    }
+     //Method executed after returning from the photo album
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        data?.let {
+            // No image selected
+            if (it.data == null) {
+                Toast.makeText(applicationContext, "No image selected.", Toast.LENGTH_LONG).show()
+            } else {
+                // Single image selected
+                if (it.clipData == null) {
+                    Log.e("single choice: ", it.data.toString())
+                    val imageUri = it.data!!
+                    uriList.add(imageUri)
+
+                    adapter = MultiImageAdapter(uriList, applicationContext)
+                    recyclerView.adapter = adapter
+                    recyclerView.layoutManager =
+                        LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, true)
+                }
+                // Multiple images selected
+                else {
+                    val clipData = it.clipData!!
+                    Log.e("clipData", clipData.itemCount.toString())
+
+                    if (clipData.itemCount > 10) {
+                        Toast.makeText(
+                            applicationContext,
+                            "You can select up to 10 photos.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    } else {
+                        Log.e(TAG, "multiple choice")
+
+                        for (i in 0 until clipData.itemCount) {
+                            val imageUri =
+                                clipData.getItemAt(i).uri // Get the URIs of the selected images
+                            try {
+                                uriList.add(imageUri) // Add the URI to the list
+
+                            } catch (e: Exception) {
+                                Log.e(TAG, "File select error", e)
+                            }
+                        }
+
+                        adapter = MultiImageAdapter(uriList, applicationContext)
+                        recyclerView.adapter = adapter // Set the adapter to the RecyclerView
+                        recyclerView.layoutManager = LinearLayoutManager(
+                            this,
+                            LinearLayoutManager.HORIZONTAL,
+                            true
+                        ) // Apply horizontal scrolling to the RecyclerView
+                    }
+                }
+            }
+        }
+
+    }
 
 
 }
