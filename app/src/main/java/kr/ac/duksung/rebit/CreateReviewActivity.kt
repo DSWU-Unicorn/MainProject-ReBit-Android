@@ -25,7 +25,7 @@ class CreateReviewActivity() : AppCompatActivity() {
     private lateinit var retrofit: Retrofit
     private lateinit var retrofitService: RetrofitService
 
-    private val TAG = "CreateReview"
+    private val TAG = "CommentsReview"
     private val uriList = ArrayList<Uri>() // ArrayList object to store URIs of selected images
 
     lateinit var recyclerView: RecyclerView // RecyclerView to display selected images
@@ -65,30 +65,30 @@ class CreateReviewActivity() : AppCompatActivity() {
         submitBtn.setOnClickListener {
             // 서버에 리뷰 데이터를 보내고 (post)
 
-            val review = ReviewCommentsVO(0,
-                0,
-                ratingBar.rating.toInt(),
+            val review = ReviewCommentsVO(10,
+                1,
+                1,
                 "photo",
-                reviewEditText.text.toString())
+                "test")
 
             retrofitService.postReviewComments(review)
-                .enqueue(object : Callback<ApiResponse<ReviewCommentsVO>> {
+                .enqueue(object : Callback<ApiResponse<Int>> {
                     override fun onResponse(
-                        call: Call<ApiResponse<ReviewCommentsVO>>,
-                        response: Response<ApiResponse<ReviewCommentsVO>>,
+                        call: Call<ApiResponse<Int>>,
+                        response: Response<ApiResponse<Int>>,
                     ) {
                         if (response.isSuccessful) {
-                            val result: ApiResponse<ReviewCommentsVO>? = response.body()
+                            val result: ApiResponse<Int>? = response.body()
                             val data = result?.getResult()
 
-                            Log.d(TAG, "onResponse success: " + result?.toString())
+                            Log.d(TAG, "onResponse success"+result?.toString())
                             Log.d(TAG, "data: " + data?.toString())
                         } else {
                             Log.d(TAG, "onResponse error: " + response.errorBody().toString())
                         }
                     }
 
-                    override fun onFailure(call: Call<ApiResponse<ReviewCommentsVO>>, t: Throwable) {
+                    override fun onFailure(call: Call<ApiResponse<Int>>, t: Throwable) {
                         Log.e(TAG, "onFailure: ${t.message}")
                     }
                 })
