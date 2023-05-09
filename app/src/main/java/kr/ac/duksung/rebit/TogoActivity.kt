@@ -439,6 +439,7 @@ class TogoActivity : AppCompatActivity() ,MapView.POIItemEventListener {
         val intent = Intent(this, StoreDetailActivity::class.java)
         intent.putExtra("store_id", p1?.itemName)
         startActivity(intent)
+
     }
 
     override fun onCalloutBalloonOfPOIItemTouched(p0: MapView?, p1: MapPOIItem?) {

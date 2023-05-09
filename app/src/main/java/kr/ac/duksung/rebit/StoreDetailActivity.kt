@@ -32,6 +32,7 @@ class StoreDetailActivity : AppCompatActivity() {
         val storeImageArea = findViewById<ImageView>(R.id.storeImageArea)
 
         //setValues()
+
         setupEvents()
 
         //val store = intent.getSerializableExtra("storeInfo") as Store
