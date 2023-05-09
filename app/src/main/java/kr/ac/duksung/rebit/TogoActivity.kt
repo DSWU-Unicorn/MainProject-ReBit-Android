@@ -1,10 +1,14 @@
+
+
 package kr.ac.duksung.rebit
 
 import android.Manifest
 import android.app.AlertDialog
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Geocoder
 import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
@@ -16,6 +20,9 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
+import kotlinx.android.synthetic.main.activity_togo.*
+import kotlinx.coroutines.launch
 import kr.ac.duksung.rebit.databinding.ActivityTogoBinding
 import kr.ac.duksung.rebit.datas.Store
 import kr.ac.duksung.rebit.network.RetofitClient
@@ -31,7 +38,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 
 
-class TogoActivity : AppCompatActivity() {
+class TogoActivity : AppCompatActivity() ,MapView.POIItemEventListener {
     private lateinit var retrofit : Retrofit
     private lateinit var retrofitService: RetrofitService
 
@@ -60,15 +67,11 @@ class TogoActivity : AppCompatActivity() {
         //
         getSupportActionBar()?.hide();      // 안 보이도록 합니다.
 
-
-
         //서버 연결
         initRetrofit()
 
-        //통신
-        getStoreMarker()
-
         mMapView = MapView(this)
+
 
         // 리스트 목록 클릭시
         setupEvents()
@@ -119,9 +122,9 @@ class TogoActivity : AppCompatActivity() {
                 Toast.makeText(this, "내 용기가 맞을까? 확인하러 가기", Toast.LENGTH_SHORT).show()
                 val intent = Intent(this, CameraActivity::class.java)
                 startActivity(intent)
+
                 // action bar show
                 getSupportActionBar()?.show();
-
             }
             val goto_review_btn = mDialogView.findViewById<Button>(R.id.goto_review_btn)
 
@@ -148,19 +151,58 @@ class TogoActivity : AppCompatActivity() {
         if (checkLocationService()) {
             // GPS가 켜져있을 경우
             permissionCheck()
-            setMakerHardCoding()
-
         } else {
             // GPS가 꺼져있을 경우
             Toast.makeText(this, "GPS를 켜주세요", Toast.LENGTH_SHORT).show()
-            // 위도, 경도 하드코딩한 마커
-            setMakerHardCoding()
         }
 
         // 리스너 등록
         mMapView.setMapViewEventListener(this) // this에 MapView.MapViewEventListener 구현.
         mMapView.setPOIItemEventListener(this)
         mMapView.setOpenAPIKeyAuthenticationResultListener(this)
+
+        lifecycleScope.launch {
+            try {
+                retrofitService.getStoreMarker("강남구")?.enqueue(object :
+                    Callback<ApiResponse<ArrayList<StoreMarkerVO>>> {
+                    override fun onResponse(
+                        call: Call<ApiResponse<ArrayList<StoreMarkerVO>>>,
+                        response: Response<ApiResponse<ArrayList<StoreMarkerVO>>>
+                    ){
+                        if(response.isSuccessful){
+                            // 통신 성공시
+                            val result: ApiResponse<ArrayList<StoreMarkerVO>>?=response.body()
+                            val datas = result?.getResult()
+
+                            var geocoder = Geocoder(applicationContext)
+
+                            for(data in datas!!) {
+                                var address = geocoder.getFromLocationName(data.address, 10).get(0)
+                                Log.d("ADDRESS" ,"onresponse 성공: "+ address.latitude)
+                                var marker = MapPOIItem()
+                                marker.mapPoint = MapPoint.mapPointWithGeoCoord(address.latitude, address.longitude)
+                                marker.itemName = data.id.toString()
+                                mMapView.addPOIItem(marker)
+                            }
+
+                            Log.d("StoreMarker" ,"onresponse 성공: "+ result?.toString() )
+                            Log.d("StoreMarker", "data : "+ datas?.toString())
+
+                        }
+                    }
+
+                    override fun onFailure(
+                        call: Call<ApiResponse<ArrayList<StoreMarkerVO>>>,
+                        t: Throwable
+                    ) {
+                        Log.e("StoreMarker","onFailure : ${t.message} ");
+                    }
+                })
+            } catch  (e: Exception) {
+                // Exception handling
+                Log.e(ContentValues.TAG, "Exception: ${e.message}", e)
+            }
+        }
 
 
     }//OnCreate()
@@ -171,34 +213,6 @@ class TogoActivity : AppCompatActivity() {
         retrofitService = retrofit.create(RetrofitService::class.java)
     }
 
-    // 통신
-    fun getStoreMarker(){
-        //enqueue : 비동기식 통신을 할 때 사용/ execute: 동기식
-        retrofitService.getStoreMarker("중구")?.enqueue(object :
-            Callback<ApiResponse<ArrayList<StoreMarkerVO>>> {
-            override fun onResponse(
-                call: Call<ApiResponse<ArrayList<StoreMarkerVO>>>,
-                response: Response<ApiResponse<ArrayList<StoreMarkerVO>>>
-            ){
-                if(response.isSuccessful){
-                    // 통신 성공시
-                    val result: ApiResponse<ArrayList<StoreMarkerVO>>?=response.body()
-                    val data = result?.getResult();
-
-                    Log.d("StoreMarker" ,"onresponse 성공: "+ result?.toString() )
-                    Log.d("StoreMarker", "data : "+ data?.toString())
-
-                }
-            }
-
-            override fun onFailure(
-                call: Call<ApiResponse<ArrayList<StoreMarkerVO>>>,
-                t: Throwable
-            ) {
-                Log.e("StoreMarker","onFailure : ${t.message} ");
-            }
-        })
-    }
 
     // 하드코딩으로 마커찍기
     fun setMakerHardCoding() {
@@ -234,7 +248,6 @@ class TogoActivity : AppCompatActivity() {
         val MARKER_POINT5 =
             MapPoint.mapPointWithGeoCoord(37.65006777280117, 127.01359234883397) // 히피스 베이글
 
-
         // 마커 아이콘 추가하는 함수
         val marker1 = MapPOIItem()
         val marker2 = MapPOIItem()
@@ -254,7 +267,6 @@ class TogoActivity : AppCompatActivity() {
         marker5.itemName =
             "히피스 베이글"
 
-
         // 왜 있는지 잘 모르겠음
         marker1.tag = 0
         marker2.tag = 0
@@ -268,7 +280,6 @@ class TogoActivity : AppCompatActivity() {
         marker3.mapPoint = MARKER_POINT3
         marker4.mapPoint = MARKER_POINT4
         marker5.mapPoint = MARKER_POINT5
-
 
         //  (클릭 전)기본으로 제공하는 BluePin 마커 모양의 색.
         marker1.markerType = MapPOIItem.MarkerType.BluePin
@@ -422,6 +433,28 @@ class TogoActivity : AppCompatActivity() {
     private fun stopTracking() {
         mMapView.currentLocationTrackingMode =
             MapView.CurrentLocationTrackingMode.TrackingModeOff
+    }
+
+    override fun onPOIItemSelected(p0: MapView?, p1: MapPOIItem?) {
+        val intent = Intent(this, StoreDetailActivity::class.java)
+        intent.putExtra("store_id", p1?.itemName)
+        startActivity(intent)
+    }
+
+    override fun onCalloutBalloonOfPOIItemTouched(p0: MapView?, p1: MapPOIItem?) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onCalloutBalloonOfPOIItemTouched(
+        p0: MapView?,
+        p1: MapPOIItem?,
+        p2: MapPOIItem.CalloutBalloonButtonType?
+    ) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onDraggablePOIItemMoved(p0: MapView?, p1: MapPOIItem?, p2: MapPoint?) {
+        TODO("Not yet implemented")
     }
 
 }

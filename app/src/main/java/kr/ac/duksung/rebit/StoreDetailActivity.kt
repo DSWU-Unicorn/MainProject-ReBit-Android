@@ -1,13 +1,21 @@
 package kr.ac.duksung.rebit
 
 import android.content.Intent
+import kr.ac.duksung.rebit.R
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.telephony.PhoneNumberFormattingTextWatcher
+import android.telephony.PhoneNumberUtils
+import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.databinding.DataBindingUtil.setContentView
+import androidx.viewbinding.ViewBinding
 import kotlinx.android.synthetic.main.activity_store_detail.*
+import kotlinx.android.synthetic.main.multi_image_item.view.*
 import kr.ac.duksung.rebit.databinding.ActivityStoreDetailBinding
+import kr.ac.duksung.rebit.databinding.ActivityTogoBinding
 import kr.ac.duksung.rebit.datas.Store
 import java.text.ParseException
 import java.util.regex.Pattern
@@ -23,24 +31,27 @@ class StoreDetailActivity : AppCompatActivity() {
         binding = ActivityStoreDetailBinding.inflate(layoutInflater)
         val storeImageArea = findViewById<ImageView>(R.id.storeImageArea)
 
-        setValues()
+        //setValues()
         setupEvents()
+
+        //val store = intent.getSerializableExtra("storeInfo") as Store
+        val data = intent.getStringExtra("store_id")
+        //val rand = "${store.id}"
+        val rand = Integer.parseInt(data)
+        Log.d("store_id", rand.toString())
 
         val imgId = intArrayOf(
             R.drawable.megacoffee1, R.drawable.coffeedream2,
             R.drawable.eeeyo3, R.drawable.blackdown4,
             R.drawable.bagle5
         )
-        val store = intent.getSerializableExtra("storeInfo") as Store
 
-        val rand = "${store.id}"
-
-        storeImageArea.setImageResource(imgId[rand.toInt()])
+        //storeImageArea.setImageResource(imgId[rand.toInt()])
 
         val pic_btn = findViewById<Button>(R.id.pic_btn)
         pic_btn.setOnClickListener {
             Toast.makeText(this, "내 용기가 맞을까? 확인하러 가기", Toast.LENGTH_SHORT).show()
-            val intent = Intent(this, YonggiCameraActivity::class.java)
+            val intent = Intent(this, CameraActivity::class.java)
             startActivity(intent)
         }
         // review view
