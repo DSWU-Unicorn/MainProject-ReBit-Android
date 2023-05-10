@@ -17,14 +17,27 @@ import kotlinx.android.synthetic.main.multi_image_item.view.*
 import kr.ac.duksung.rebit.databinding.ActivityStoreDetailBinding
 import kr.ac.duksung.rebit.databinding.ActivityTogoBinding
 import kr.ac.duksung.rebit.datas.Store
+import kr.ac.duksung.rebit.network.RetofitClient
+import kr.ac.duksung.rebit.network.RetrofitService
+import kr.ac.duksung.rebit.network.dto.ApiResponse
+import kr.ac.duksung.rebit.network.dto.StoreInfoVO
+import kr.ac.duksung.rebit.network.dto.StoreMarkerVO
+import retrofit2.Retrofit
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.text.ParseException
 import java.util.regex.Pattern
 
 class StoreDetailActivity : AppCompatActivity() {
     private lateinit var binding: ActivityStoreDetailBinding
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    // retrofit 사용해 통신 구현
+    private lateinit var retrofit: Retrofit
+    private lateinit var retrofitService: RetrofitService
 
+
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_store_detail)
 
@@ -34,8 +47,14 @@ class StoreDetailActivity : AppCompatActivity() {
         //setValues()
 
         setupEvents()
+        //서버 연결
+        initRetrofit()
+
+        // 통신
+        getStoreInfo()
 
         //val store = intent.getSerializableExtra("storeInfo") as Store
+        //
         val data = intent.getStringExtra("store_id")
         //val rand = "${store.id}"
         val rand = Integer.parseInt(data)
@@ -60,20 +79,59 @@ class StoreDetailActivity : AppCompatActivity() {
         goto_review_btn.setOnClickListener {
             Toast.makeText(this, "생생한 후기가 궁금하나요? 리뷰 보러 가기", Toast.LENGTH_SHORT).show()
             val intent = Intent(this, ReviewActivity::class.java)
+            intent.putExtra("store_id", rand) // store id 값 전달.
             startActivity(intent)
         }
         // review create
         val todo_btn = findViewById<Button>(R.id.todo_btn)
         todo_btn.setOnClickListener {
             Toast.makeText(this, "이미 용기냈다면! 어땠는지 후기 작성하러 가기", Toast.LENGTH_SHORT).show()
-
             val intent = Intent(this, CreateReviewActivity::class.java)
+            intent.putExtra("store_id", rand) // store id 값 전달.
+
             startActivity(intent)
         }
 
 
-    }
+    }// OnCreate
 
+
+    //서버 연결
+    private fun initRetrofit() {
+        retrofit = RetofitClient.getInstance()
+        retrofitService = retrofit.create(RetrofitService::class.java)
+    }
+    // 통신
+     fun getStoreInfo() {
+        //enqueue : 비동기식 통신을 할 때 사용/ execute: 동기식
+        val data = intent.getStringExtra("store_id")
+        //val rand = "${store.id}"
+        val rand = Integer.parseInt(data)
+        retrofitService.getStoreInfo(rand.toLong())?.enqueue(object :
+            Callback<ApiResponse<StoreInfoVO>> {
+            override fun onResponse(
+                call: Call<ApiResponse<StoreInfoVO>>,
+                response: Response<ApiResponse<StoreInfoVO>>
+            ){
+                if(response.isSuccessful){
+                    // 통신 성공시
+                    val result: ApiResponse<StoreInfoVO>?=response.body()
+                    val data = result?.getResult();
+
+                    Log.d("info" ,"onresponse 성공: "+ result?.toString() )
+                    Log.d("info", "data : "+ data?.toString())
+
+                }
+            }
+
+            override fun onFailure(
+                call: Call<ApiResponse<StoreInfoVO>>,
+                t: Throwable
+            ) {
+                Log.e("info","onFailure : ${t.message} ");
+            }
+        })
+    }
     fun setupEvents() {
     }
 

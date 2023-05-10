@@ -26,7 +26,10 @@ interface RetrofitService {
     @GET("/store/mark/{search}")
     fun getStoreMarker(@Path("search") search: String): Call<ApiResponse<ArrayList<StoreMarkerVO>>>
 
-    @POST("/comments")
+    @POST("/comments") // 작성한 리뷰를 서버에 저장
     fun postReviewComments(@Body review: ReviewCommentsVO ): Call<ApiResponse<Int>>
+
+    @GET("/store/info/{store_id}") // 가게 상세 정보 조회
+    fun getStoreInfo(@Path("store_id") search: Long): Call<ApiResponse<StoreInfoVO>>
 
 }
