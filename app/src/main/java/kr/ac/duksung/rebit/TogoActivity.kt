@@ -1,5 +1,3 @@
-
-
 package kr.ac.duksung.rebit
 
 import android.Manifest
@@ -15,13 +13,13 @@ import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import kotlinx.android.synthetic.main.activity_togo.*
 import kotlinx.coroutines.launch
 import kr.ac.duksung.rebit.databinding.ActivityTogoBinding
 import kr.ac.duksung.rebit.datas.Store
@@ -29,6 +27,7 @@ import kr.ac.duksung.rebit.network.RetofitClient
 import kr.ac.duksung.rebit.network.RetrofitService
 import kr.ac.duksung.rebit.network.dto.ApiResponse
 import kr.ac.duksung.rebit.network.dto.StoreMarkerVO
+import net.daum.mf.map.api.CalloutBalloonAdapter
 import net.daum.mf.map.api.MapPOIItem
 import net.daum.mf.map.api.MapPoint
 import net.daum.mf.map.api.MapView
@@ -38,18 +37,20 @@ import retrofit2.Response
 import retrofit2.Retrofit
 
 
-class TogoActivity : AppCompatActivity() ,MapView.POIItemEventListener {
-    private lateinit var retrofit : Retrofit
+class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // TogoActivity
+    private lateinit var retrofit: Retrofit
     private lateinit var retrofitService: RetrofitService
 
     private lateinit var binding: ActivityTogoBinding
     private lateinit var mMapView: MapView // Declare the mMapView variable
+
 
     // 정적인 arrayOf 대신 ArrayList 사용(4/8 토 14:30~15:44)
     val storeList = ArrayList<Store>();
     //lateinit var storeAdapter: StoreAdapter
 
     private val user = arrayOf(
+        // 통신한 후 가게이름으로 변경 필요.
         "메가커피",
         "커피드림",
         "콩블랑제리",
@@ -64,19 +65,23 @@ class TogoActivity : AppCompatActivity() ,MapView.POIItemEventListener {
         binding = ActivityTogoBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // 키해시 구하기
+        // getHashKey()
         //
-        getSupportActionBar()?.hide();      // 안 보이도록 합니다.
+        supportActionBar?.hide();      // 액션바가 안 보이도록 // 근데 안먹네;;
 
         //서버 연결
         initRetrofit()
 
-        mMapView = MapView(this)
+        mMapView = MapView(this) // 카카오 지도 뷰
+        // setCalloutBalloonAdapter: 마커를 추가하는 부분보다 앞에 있어야 커스텀 말풍선이 표시된다.
+        mMapView.setCalloutBalloonAdapter(CustomBalloonAdapter(layoutInflater))  // 커스텀 말풍선 등록
 
 
         // 리스트 목록 클릭시
         setupEvents()
         // 목록 값 지정
-        setValues()
+        // setValues()
 
         var storeAdapter: ArrayAdapter<String> = ArrayAdapter(
             this, android.R.layout.simple_list_item_1,
@@ -93,7 +98,7 @@ class TogoActivity : AppCompatActivity() ,MapView.POIItemEventListener {
                 binding.storeList.adapter = storeAdapter
             }
         }
-
+        // 가게명 검색 시 필터기능
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 binding.searchView.clearFocus()
@@ -109,40 +114,40 @@ class TogoActivity : AppCompatActivity() ,MapView.POIItemEventListener {
             }
         })
         // 검색돋보기 클릭시
-        binding.searchView.setOnClickListener {
-            // Dialog만들기
-            val mDialogView = LayoutInflater.from(this).inflate(R.layout.store_info_dialog, null)
-            val mBuilder = AlertDialog.Builder(this)
-                .setView(mDialogView)
-                .setTitle("가게 정보")
-            mBuilder.show()
-
-            val pic_btn = mDialogView.findViewById<Button>(R.id.pic_btn)
-            pic_btn.setOnClickListener {
-                Toast.makeText(this, "내 용기가 맞을까? 확인하러 가기", Toast.LENGTH_SHORT).show()
-                val intent = Intent(this, CameraActivity::class.java)
-                startActivity(intent)
-
-                // action bar show
-                getSupportActionBar()?.show();
-            }
-            val goto_review_btn = mDialogView.findViewById<Button>(R.id.goto_review_btn)
-
-            goto_review_btn.setOnClickListener {
-                Toast.makeText(this, "생생한 후기가 궁금하나요? 리뷰 보러 가기", Toast.LENGTH_SHORT).show()
-                val intent = Intent(this, ReviewActivity::class.java)
-                startActivity(intent)
-            }
-            // review create
-            val todo_btn = mDialogView.findViewById<Button>(R.id.todo_btn)
-
-            todo_btn.setOnClickListener {
-                Toast.makeText(this, "이미 용기냈다면! 어땠는지 후기 작성하러 가기", Toast.LENGTH_SHORT).show()
-
-                val intent = Intent(this, CreateReviewActivity::class.java)
-                startActivity(intent)
-            }
-        }
+//        binding.searchView.setOnClickListener {
+//            // Dialog만들기
+//            val mDialogView = LayoutInflater.from(this).inflate(R.layout.store_info_dialog, null)
+//            val mBuilder = AlertDialog.Builder(this)
+//                .setView(mDialogView)
+//                .setTitle("가게 정보")
+//            mBuilder.show()
+//
+//            val pic_btn = mDialogView.findViewById<Button>(R.id.pic_btn)
+//            pic_btn.setOnClickListener {
+//                Toast.makeText(this, "내 용기가 맞을까? 확인하러 가기", Toast.LENGTH_SHORT).show()
+//                val intent = Intent(this, CameraActivity::class.java)
+//                startActivity(intent)
+//
+//                // action bar show
+//                getSupportActionBar()?.show();
+//            }
+//            val goto_review_btn = mDialogView.findViewById<Button>(R.id.goto_review_btn)
+//
+//            goto_review_btn.setOnClickListener {
+//                Toast.makeText(this, "생생한 후기가 궁금하나요? 리뷰 보러 가기", Toast.LENGTH_SHORT).show()
+//                val intent = Intent(this, ReviewActivity::class.java)
+//                startActivity(intent)
+//            }
+//            // review create
+//            val todo_btn = mDialogView.findViewById<Button>(R.id.todo_btn)
+//
+//            todo_btn.setOnClickListener {
+//                Toast.makeText(this, "이미 용기냈다면! 어땠는지 후기 작성하러 가기", Toast.LENGTH_SHORT).show()
+//
+//                val intent = Intent(this, CreateReviewActivity::class.java)
+//                startActivity(intent)
+//            }
+//        }
 
         //지도
         val mMapViewContainer = findViewById(R.id.map_mv_mapcontainer) as ViewGroup
@@ -163,42 +168,59 @@ class TogoActivity : AppCompatActivity() ,MapView.POIItemEventListener {
 
         lifecycleScope.launch {
             try {
-                retrofitService.getStoreMarker("강남구")?.enqueue(object :
+                retrofitService.getStoreMarker("종로구")?.enqueue(object : // 임시적으로 줄여가게 많은 곳으로 변경
                     Callback<ApiResponse<ArrayList<StoreMarkerVO>>> {
                     override fun onResponse(
                         call: Call<ApiResponse<ArrayList<StoreMarkerVO>>>,
-                        response: Response<ApiResponse<ArrayList<StoreMarkerVO>>>
-                    ){
-                        if(response.isSuccessful){
+                        response: Response<ApiResponse<ArrayList<StoreMarkerVO>>>,
+                    ) {
+                        if (response.isSuccessful) {
                             // 통신 성공시
-                            val result: ApiResponse<ArrayList<StoreMarkerVO>>?=response.body()
+                            val result: ApiResponse<ArrayList<StoreMarkerVO>>? = response.body()
                             val datas = result?.getResult()
 
                             var geocoder = Geocoder(applicationContext)
 
-                            for(data in datas!!) {
+                            for (data in datas!!) {
                                 var address = geocoder.getFromLocationName(data.address, 10).get(0)
-                                Log.d("ADDRESS" ,"onresponse 성공: "+ address.latitude)
+                                Log.d("ADDRESS", "onresponse 성공: " + address.latitude)
+                                // 커스텀 마커
                                 var marker = MapPOIItem()
-                                marker.mapPoint = MapPoint.mapPointWithGeoCoord(address.latitude, address.longitude)
-                                marker.itemName = data.id.toString()
+                                marker.apply {
+                                    itemName = data.id.toString() // 마커 이름 // 통신후 이름 넣을 ㄱ예장
+                                    mapPoint = MapPoint.mapPointWithGeoCoord(address.latitude,
+                                        address.longitude)
+                                    markerType =
+                                        MapPOIItem.MarkerType.CustomImage          // 마커 모양 (커스텀)
+                                    customImageResourceId =
+                                        R.drawable.marker               // 커스텀 마커 이미지
+                                    selectedMarkerType =
+                                        MapPOIItem.MarkerType.CustomImage  // 클릭 시 마커 모양 (커스텀)
+                                    customSelectedImageResourceId =
+                                        R.drawable.map_maker       // 클릭 시 커스텀 마커 이미지
+                                    isCustomImageAutoscale = true      // 커스텀 마커 이미지 크기 자동 조정
+                                    setCustomImageAnchor(0.5f, 1.0f)    // 마커 이미지 기준점
+                                }
+//                                marker.mapPoint = MapPoint.mapPointWithGeoCoord(address.latitude,
+//                                    address.longitude)
+//                                marker.itemName = data.id.toString()
                                 mMapView.addPOIItem(marker)
                             }
 
-                            Log.d("StoreMarker" ,"onresponse 성공: "+ result?.toString() )
-                            Log.d("StoreMarker", "data : "+ datas?.toString())
+                            Log.d("StoreMarker", "onresponse 성공: " + result?.toString())
+                            Log.d("StoreMarker", "data : " + datas?.toString())
 
                         }
                     }
 
                     override fun onFailure(
                         call: Call<ApiResponse<ArrayList<StoreMarkerVO>>>,
-                        t: Throwable
+                        t: Throwable,
                     ) {
-                        Log.e("StoreMarker","onFailure : ${t.message} ");
+                        Log.e("StoreMarker", "onFailure : ${t.message} ");
                     }
                 })
-            } catch  (e: Exception) {
+            } catch (e: Exception) {
                 // Exception handling
                 Log.e(ContentValues.TAG, "Exception: ${e.message}", e)
             }
@@ -207,103 +229,31 @@ class TogoActivity : AppCompatActivity() ,MapView.POIItemEventListener {
 
     }//OnCreate()
 
+    // kakaoMap 앱 키 해시 얻어오는 메소드. // Logcat 에 KEY_HASH 입력 후 나오는 값 확인할 것!
+//    fun getHashKey(){
+//        var packageInfo : PackageInfo = PackageInfo()
+//        try {
+//            packageInfo = packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES)
+//        } catch (e: PackageManager.NameNotFoundException){
+//            e.printStackTrace()
+//        }
+//
+//        for (signature: Signature in packageInfo.signatures){
+//            try{
+//                var md: MessageDigest = MessageDigest.getInstance("SHA")
+//                md.update(signature.toByteArray())
+//                Log.e("KEY_HASH", Base64.encodeToString(md.digest(), Base64.DEFAULT))
+//            } catch(e: NoSuchAlgorithmException){
+//                Log.e("KEY_HASH", "Unable to get MessageDigest. signature = " + signature, e)
+//            }
+//        }
+//    }
     //서버 연결
     private fun initRetrofit() {
         retrofit = RetofitClient.getInstance()
         retrofitService = retrofit.create(RetrofitService::class.java)
     }
 
-
-    // 하드코딩으로 마커찍기
-    fun setMakerHardCoding() {
-        // 중심점 변경 - 덕성여대 차관
-        mMapView.setMapCenterPoint(
-            MapPoint.mapPointWithGeoCoord(
-                37.65320737529757,
-                127.01615398831316
-            ), true
-        )
-
-        // 줌 레벨 변경 // 낮을수록 확대
-        mMapView.setZoomLevel(1, true)
-
-        // 줌 인
-        mMapView.zoomIn(true)
-
-        // 줌 아웃
-        mMapView.zoomOut(true)
-
-        val markerArr = ArrayList<MapPOIItem>()
-        //setMarkerValues()
-
-        // test 마커 찍기
-        val MARKER_POINT1 =
-            MapPoint.mapPointWithGeoCoord(37.64858331573457, 127.01432862276108) // 메가커피
-        val MARKER_POINT2 =
-            MapPoint.mapPointWithGeoCoord(37.65173675700233, 127.01432639564919) // 커피드림
-        val MARKER_POINT3 =
-            MapPoint.mapPointWithGeoCoord(37.65136960646743, 127.01432632511757) // 이요
-        val MARKER_POINT4 =
-            MapPoint.mapPointWithGeoCoord(37.65016688485748, 127.01355837181578) // 블랙다운커피
-        val MARKER_POINT5 =
-            MapPoint.mapPointWithGeoCoord(37.65006777280117, 127.01359234883397) // 히피스 베이글
-
-        // 마커 아이콘 추가하는 함수
-        val marker1 = MapPOIItem()
-        val marker2 = MapPOIItem()
-        val marker3 = MapPOIItem()
-        val marker4 = MapPOIItem()
-        val marker5 = MapPOIItem()
-
-        // 클릭 했을 때 나오는 호출 값
-        marker1.itemName =
-            "메가커피"
-        marker2.itemName =
-            "커피드림"
-        marker3.itemName =
-            "eeeyo"
-        marker4.itemName =
-            "블랙다운커피"
-        marker5.itemName =
-            "히피스 베이글"
-
-        // 왜 있는지 잘 모르겠음
-        marker1.tag = 0
-        marker2.tag = 0
-        marker3.tag = 0
-        marker4.tag = 0
-        marker5.tag = 0
-
-        // 좌표를 입력받아 현 위치로 출력
-        marker1.mapPoint = MARKER_POINT1
-        marker2.mapPoint = MARKER_POINT2
-        marker3.mapPoint = MARKER_POINT3
-        marker4.mapPoint = MARKER_POINT4
-        marker5.mapPoint = MARKER_POINT5
-
-        //  (클릭 전)기본으로 제공하는 BluePin 마커 모양의 색.
-        marker1.markerType = MapPOIItem.MarkerType.BluePin
-        marker2.markerType = MapPOIItem.MarkerType.BluePin
-        marker3.markerType = MapPOIItem.MarkerType.BluePin
-        marker4.markerType = MapPOIItem.MarkerType.BluePin
-        marker5.markerType = MapPOIItem.MarkerType.BluePin
-
-
-        // (클릭 후) 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
-        marker1.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin);
-        marker2.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin);
-        marker3.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin);
-        marker4.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin);
-        marker5.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin);
-
-        // 지도화면 위에 추가되는 아이콘을 추가하기 위한 호출(말풍선 모양)
-        mMapView.addPOIItem(marker1);
-        mMapView.addPOIItem(marker2);
-        mMapView.addPOIItem(marker3);
-        mMapView.addPOIItem(marker4);
-        mMapView.addPOIItem(marker5);
-
-    }
 
     fun setupEvents() {
         // 메인화면의 이벤트관련 코드를 모아두는 장소
@@ -324,17 +274,21 @@ class TogoActivity : AppCompatActivity() ,MapView.POIItemEventListener {
         }
     }// setupEvents
 
-    fun setValues() {
-        // test data 삽입
-        storeList.add(Store(0,"메가MGC커피 4.19사거리점", "휴게음식점", "서울 강북구 삼양로 510 1층 메가커피", "02-900-1288"))
-        storeList.add(Store(1,"커피드림", "휴게음식점", "서울특별시 도봉구 삼양로144길 25", "01022360284"))
-        storeList.add(Store(2,"eeeyo", "휴게음식점", "서울 도봉구 삼양로142길 33 일층", "0507-1323-2307"))
-        storeList.add(Store(3,"블랙다운커피", "휴게음식점", "서울 강북구 삼양로 528-1 1층", "02-6338-0606"))
-        storeList.add(Store(4,"히피스 베이글", "휴게음식점", "서울 강북구 삼양로 528", "02-906-6778"))
-
-        //storeAdapter = StoreAdapter(this, android.R.layout.simple_list_item_1, storeList)
-        //binding.searchView.adapter = storeAdapter
-    }
+//    fun setValues() {
+//        // test data 삽입 // 통신 후 데이터로 변경 필요
+//        storeList.add(Store(0,
+//            "메가MGC커피 4.19사거리점",
+//            "휴게음식점",
+//            "서울 강북구 삼양로 510 1층 메가커피",
+//            "02-900-1288"))
+//        storeList.add(Store(1, "커피드림", "휴게음식점", "서울특별시 도봉구 삼양로144길 25", "01022360284"))
+//        storeList.add(Store(2, "eeeyo", "휴게음식점", "서울 도봉구 삼양로142길 33 일층", "0507-1323-2307"))
+//        storeList.add(Store(3, "블랙다운커피", "휴게음식점", "서울 강북구 삼양로 528-1 1층", "02-6338-0606"))
+//        storeList.add(Store(4, "히피스 베이글", "휴게음식점", "서울 강북구 삼양로 528", "02-906-6778"))
+//
+//        //storeAdapter = StoreAdapter(this, android.R.layout.simple_list_item_1, storeList)
+//        //binding.searchView.adapter = storeAdapter
+//    }
 
     // 위치 권한 확인
     private fun permissionCheck() {
@@ -401,7 +355,7 @@ class TogoActivity : AppCompatActivity() ,MapView.POIItemEventListener {
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
-        grantResults: IntArray
+        grantResults: IntArray,
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == ACCESS_FINE_LOCATION) {
@@ -435,27 +389,55 @@ class TogoActivity : AppCompatActivity() ,MapView.POIItemEventListener {
             MapView.CurrentLocationTrackingMode.TrackingModeOff
     }
 
-    override fun onPOIItemSelected(p0: MapView?, p1: MapPOIItem?) {
-        val intent = Intent(this, StoreDetailActivity::class.java)
-        intent.putExtra("store_id", p1?.itemName)
-        startActivity(intent)
 
+    override fun onPOIItemSelected(p0: MapView?, p1: MapPOIItem?) {
+        // 마커 클릭시 말풍선 띄우도록.
+//        val intent = Intent(this, StoreDetailActivity::class.java)
+//        intent.putExtra("store_id", p1?.itemName)
+//        startActivity(intent)
     }
 
     override fun onCalloutBalloonOfPOIItemTouched(p0: MapView?, p1: MapPOIItem?) {
-        TODO("Not yet implemented")
+        // 말풍선 클릭 시 (Deprecated)
+        // 이 함수도 작동하지만 그냥 아래 있는 함수에 작성하자
     }
 
     override fun onCalloutBalloonOfPOIItemTouched(
         p0: MapView?,
         p1: MapPOIItem?,
-        p2: MapPOIItem.CalloutBalloonButtonType?
+        p2: MapPOIItem.CalloutBalloonButtonType?,
     ) {
-        TODO("Not yet implemented")
+        // 해당 method 에 대해
+        val intent = Intent(this, StoreDetailActivity::class.java)
+        intent.putExtra("store_id", p1?.itemName)
+        startActivity(intent)
     }
 
     override fun onDraggablePOIItemMoved(p0: MapView?, p1: MapPOIItem?, p2: MapPoint?) {
         TODO("Not yet implemented")
+    }
+
+    // 커스텀 말풍선 클래스
+    class CustomBalloonAdapter(inflater: LayoutInflater) : CalloutBalloonAdapter {
+        val mCalloutBalloon: View = inflater.inflate(R.layout.custom_balloon_layout, null)
+        val name: TextView = mCalloutBalloon.findViewById(R.id.ball_tv_name)
+        val address: TextView = mCalloutBalloon.findViewById(R.id.ball_tv_address)
+
+        override fun getCalloutBalloon(poiItem: MapPOIItem?): View {
+            // 마커 클릭 시 나오는 말풍선
+            name.text = poiItem?.itemName   // 해당 마커의 정보 이용 가능
+            address.text = "getCalloutBalloon" // 통신후 가게 주소 띄울 예정
+            return mCalloutBalloon
+        }
+
+        override fun getPressedCalloutBalloon(poiItem: MapPOIItem?): View {
+            // 말풍선 클릭 시
+//            address.text = "getPressedCalloutBalloon"
+            return mCalloutBalloon
+
+        }
+
+
     }
 
 }
@@ -465,17 +447,17 @@ private fun MapView.setOpenAPIKeyAuthenticationResultListener(togoActivity: Togo
 
 }
 
-private fun MapView.setPOIItemEventListener(togoActivity: TogoActivity) {
-
-}
+//private fun MapView.setPOIItemEventListener(togoActivity: TogoActivity) {
+//
+//}
 
 private fun MapView.setMapViewEventListener(togoActivity: TogoActivity) {
 
 }
 
-private fun MapView.setCurrentLocationEventListener(togoActivity: TogoActivity) {
-
-}
+//private fun MapView.setCurrentLocationEventListener(togoActivity: TogoActivity) {
+//
+//}
 
 private fun ListView.contains(view: String?): Boolean {
     return true
