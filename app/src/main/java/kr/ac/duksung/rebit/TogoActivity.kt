@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Geocoder
+import android.location.Location
 import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
@@ -19,13 +20,16 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.contains
 import androidx.lifecycle.lifecycleScope
+import kotlinx.android.synthetic.main.activity_store_detail.*
 import kotlinx.coroutines.launch
 import kr.ac.duksung.rebit.databinding.ActivityTogoBinding
 import kr.ac.duksung.rebit.datas.Store
 import kr.ac.duksung.rebit.network.RetofitClient
 import kr.ac.duksung.rebit.network.RetrofitService
 import kr.ac.duksung.rebit.network.dto.ApiResponse
+import kr.ac.duksung.rebit.network.dto.StoreInfoVO
 import kr.ac.duksung.rebit.network.dto.StoreMarkerVO
 import net.daum.mf.map.api.CalloutBalloonAdapter
 import net.daum.mf.map.api.MapPOIItem
@@ -41,8 +45,8 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
     private lateinit var retrofit: Retrofit
     private lateinit var retrofitService: RetrofitService
 
-    private lateinit var binding: ActivityTogoBinding
-    private lateinit var mMapView: MapView // Declare the mMapView variable
+    private lateinit var binding: ActivityTogoBinding // 뷰 바인딩
+    private lateinit var mMapView: MapView // 카카오 지도 뷰
 
 
     // 정적인 arrayOf 대신 ArrayList 사용(4/8 토 14:30~15:44)
@@ -72,6 +76,9 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
 
         //서버 연결
         initRetrofit()
+
+        // 가게 이름 조회 통신
+        //getStoreInfo()
 
         mMapView = MapView(this) // 카카오 지도 뷰
         // setCalloutBalloonAdapter: 마커를 추가하는 부분보다 앞에 있어야 커스텀 말풍선이 표시된다.
@@ -168,58 +175,93 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
 
         lifecycleScope.launch {
             try {
-                retrofitService.getStoreMarker("종로구")?.enqueue(object : // 임시적으로 줄여가게 많은 곳으로 변경
-                    Callback<ApiResponse<ArrayList<StoreMarkerVO>>> {
-                    override fun onResponse(
-                        call: Call<ApiResponse<ArrayList<StoreMarkerVO>>>,
-                        response: Response<ApiResponse<ArrayList<StoreMarkerVO>>>,
-                    ) {
-                        if (response.isSuccessful) {
-                            // 통신 성공시
-                            val result: ApiResponse<ArrayList<StoreMarkerVO>>? = response.body()
-                            val datas = result?.getResult()
+                retrofitService.getStoreMarker("종로구")
+                    ?.enqueue(object : // 임시적으로 줄여가게 많은 곳으로 하드코딩해 변경
+                        Callback<ApiResponse<ArrayList<StoreMarkerVO>>> {
+                        override fun onResponse(
+                            call: Call<ApiResponse<ArrayList<StoreMarkerVO>>>,
+                            response: Response<ApiResponse<ArrayList<StoreMarkerVO>>>,
+                        ) {
+                            if (response.isSuccessful) {
+                                // 통신 성공시
+                                val result: ApiResponse<ArrayList<StoreMarkerVO>>? = response.body()
+                                val datas = result?.getResult()
 
-                            var geocoder = Geocoder(applicationContext)
+                                var geocoder = Geocoder(applicationContext)
 
-                            for (data in datas!!) {
-                                var address = geocoder.getFromLocationName(data.address, 10).get(0)
-                                Log.d("ADDRESS", "onresponse 성공: " + address.latitude)
-                                // 커스텀 마커
-                                var marker = MapPOIItem()
-                                marker.apply {
-                                    itemName = data.id.toString() // 마커 이름 // 통신후 이름 넣을 ㄱ예장
-                                    mapPoint = MapPoint.mapPointWithGeoCoord(address.latitude,
-                                        address.longitude)
-                                    markerType =
-                                        MapPOIItem.MarkerType.CustomImage          // 마커 모양 (커스텀)
-                                    customImageResourceId =
-                                        R.drawable.marker               // 커스텀 마커 이미지
-                                    selectedMarkerType =
-                                        MapPOIItem.MarkerType.CustomImage  // 클릭 시 마커 모양 (커스텀)
-                                    customSelectedImageResourceId =
-                                        R.drawable.map_maker       // 클릭 시 커스텀 마커 이미지
-                                    isCustomImageAutoscale = true      // 커스텀 마커 이미지 크기 자동 조정
-                                    setCustomImageAnchor(0.5f, 1.0f)    // 마커 이미지 기준점
-                                }
+                                for (data in datas!!) {
+                                    var address =
+                                        geocoder.getFromLocationName(data.address, 10).get(0)
+                                    Log.d("ADDRESS", "onresponse 성공: " + address.latitude)
+                                    // 커스텀 마커
+                                    var marker = MapPOIItem()
+                                    marker.apply {
+                                        //itemName = data.id.toString() // 마커 이름 // 통신후 이름 넣을 ㄱ예장
+                                        retrofitService.getStoreInfo(data.id.toLong())
+                                            ?.enqueue(object :
+                                                Callback<ApiResponse<StoreInfoVO>> {
+                                                override fun onResponse(
+                                                    call: Call<ApiResponse<StoreInfoVO>>,
+                                                    response: Response<ApiResponse<StoreInfoVO>>,
+                                                ) {
+                                                    if (response.isSuccessful) {
+                                                        // 통신 성공시
+                                                        val result: ApiResponse<StoreInfoVO>? =
+                                                            response.body()
+                                                        val data = result?.getResult()
+
+                                                        Log.d("name",
+                                                            "on response 성공: " + result?.toString())
+                                                        Log.d("name", "data : " + data?.toString())
+
+                                                        // 화면에 데이터 뿌린다. // activity_store_detail.xml에 설정했던 view에 따라 매핑
+                                                        // 가게 이름
+                                                        itemName =
+                                                            data?.storeName // Assign the storeName to itemName
+                                                    }
+                                                }
+
+                                                override fun onFailure(
+                                                    call: Call<ApiResponse<StoreInfoVO>>,
+                                                    t: Throwable,
+                                                ) {
+                                                    Log.e("name", "onFailure : ${t.message} ");
+                                                }
+                                            })
+
+                                        mapPoint = MapPoint.mapPointWithGeoCoord(address.latitude,
+                                            address.longitude)
+                                        markerType =
+                                            MapPOIItem.MarkerType.CustomImage          // 마커 모양 (커스텀)
+                                        customImageResourceId =
+                                            R.drawable.map_pin_blue            // 커스텀 마커 이미지
+                                        selectedMarkerType =
+                                            MapPOIItem.MarkerType.CustomImage  // 클릭 시 마커 모양 (커스텀)
+                                        customSelectedImageResourceId =
+                                            R.drawable.dagom     // 클릭 시 커스텀 마커 이미지
+                                        isCustomImageAutoscale = false      // 커스텀 마커 이미지 크기 자동 조정
+                                        setCustomImageAnchor(0.5f, 1.0f)    // 마커 이미지 기준점
+                                    }
+                                    // 기존 코드
 //                                marker.mapPoint = MapPoint.mapPointWithGeoCoord(address.latitude,
 //                                    address.longitude)
 //                                marker.itemName = data.id.toString()
-                                mMapView.addPOIItem(marker)
+                                    mMapView.addPOIItem(marker)
+                                }
+
+                                Log.d("StoreMarker", "onresponse 성공: " + result?.toString())
+                                Log.d("StoreMarker", "data : " + datas?.toString())
+
                             }
-
-                            Log.d("StoreMarker", "onresponse 성공: " + result?.toString())
-                            Log.d("StoreMarker", "data : " + datas?.toString())
-
                         }
-                    }
 
-                    override fun onFailure(
-                        call: Call<ApiResponse<ArrayList<StoreMarkerVO>>>,
-                        t: Throwable,
-                    ) {
-                        Log.e("StoreMarker", "onFailure : ${t.message} ");
-                    }
-                })
+                        override fun onFailure(
+                            call: Call<ApiResponse<ArrayList<StoreMarkerVO>>>,
+                            t: Throwable,
+                        ) {
+                            Log.e("StoreMarker", "onFailure : ${t.message} ");
+                        }
+                    })
             } catch (e: Exception) {
                 // Exception handling
                 Log.e(ContentValues.TAG, "Exception: ${e.message}", e)
@@ -248,12 +290,12 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
 //            }
 //        }
 //    }
+
     //서버 연결
     private fun initRetrofit() {
         retrofit = RetofitClient.getInstance()
         retrofitService = retrofit.create(RetrofitService::class.java)
     }
-
 
     fun setupEvents() {
         // 메인화면의 이벤트관련 코드를 모아두는 장소
@@ -381,6 +423,34 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
     private fun startTracking() {
         mMapView.currentLocationTrackingMode =
             MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading
+        mMapView.setCustomCurrentLocationMarkerTrackingImage(R.drawable.custom_poi_marker_start,
+            MapPOIItem.ImageOffset(16, 16))
+
+//        val lm: LocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+//         val userNowLocation: Location? = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+//        // 위도 , 경도
+//        val uLatitude = userNowLocation?.latitude
+//        val uLongitude = userNowLocation?.longitude
+//        val uNowPosition = MapPoint.mapPointWithGeoCoord(uLatitude!!, uLongitude!!)
+//
+//        // 현 위치에 마커 찍기
+//        val marker = MapPOIItem()
+//        marker.apply {
+//            // marker.itemName = "현재 위치"
+//            mapPoint = uNowPosition
+//            markerType =
+//                MapPOIItem.MarkerType.CustomImage          // 마커 모양 (커스텀)
+//            customImageResourceId =
+//                R.drawable.custom_poi_marker_start          // 커스텀 마커 이미지
+//            // 클릭 시 어떤 이벤트를 보여줘야 할지 고민.
+////            selectedMarkerType =
+////                MapPOIItem.MarkerType.CustomImage  // 클릭 시 마커 모양 (커스텀)
+////            customSelectedImageResourceId =
+////                R.drawable.custom_map_present_direction     // 클릭 시 커스텀 마커 이미지
+//            isCustomImageAutoscale = true      // 커스텀 마커 이미지 크기 자동 조정
+//            setCustomImageAnchor(0.5f, 1.0f)    // 마커 이미지 기준점
+//        }
+//        mMapView.addPOIItem(marker)
     }
 
     // 위치추적 중지
@@ -389,14 +459,12 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
             MapView.CurrentLocationTrackingMode.TrackingModeOff
     }
 
-
+    // 마커 클릭 이벤트
     override fun onPOIItemSelected(p0: MapView?, p1: MapPOIItem?) {
         // 마커 클릭시 말풍선 띄우도록.
-//        val intent = Intent(this, StoreDetailActivity::class.java)
-//        intent.putExtra("store_id", p1?.itemName)
-//        startActivity(intent)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onCalloutBalloonOfPOIItemTouched(p0: MapView?, p1: MapPOIItem?) {
         // 말풍선 클릭 시 (Deprecated)
         // 이 함수도 작동하지만 그냥 아래 있는 함수에 작성하자
@@ -432,7 +500,8 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
 
         override fun getPressedCalloutBalloon(poiItem: MapPOIItem?): View {
             // 말풍선 클릭 시
-//            address.text = "getPressedCalloutBalloon"
+            // address.text = "getPressedCalloutBalloon"
+            // 주석 해지하면 클릭시 위 text 보이는데, 바로 intent로 넘어가야 하니까 주석함.
             return mCalloutBalloon
 
         }
@@ -448,7 +517,6 @@ private fun MapView.setOpenAPIKeyAuthenticationResultListener(togoActivity: Togo
 }
 
 //private fun MapView.setPOIItemEventListener(togoActivity: TogoActivity) {
-//
 //}
 
 private fun MapView.setMapViewEventListener(togoActivity: TogoActivity) {
