@@ -1,33 +1,28 @@
 package kr.ac.duksung.rebit
 
 import android.content.Intent
-import kr.ac.duksung.rebit.R
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.telephony.PhoneNumberFormattingTextWatcher
-import android.telephony.PhoneNumberUtils
 import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
-import androidx.databinding.DataBindingUtil.setContentView
-import androidx.viewbinding.ViewBinding
+import androidx.appcompat.app.AppCompatActivity
+import com.bumptech.glide.Glide
+import com.unity3d.player.e
+import com.unity3d.player.i
 import kotlinx.android.synthetic.main.activity_store_detail.*
-import kotlinx.android.synthetic.main.multi_image_item.view.*
 import kr.ac.duksung.rebit.databinding.ActivityStoreDetailBinding
-import kr.ac.duksung.rebit.databinding.ActivityTogoBinding
-import kr.ac.duksung.rebit.datas.Store
 import kr.ac.duksung.rebit.network.RetofitClient
 import kr.ac.duksung.rebit.network.RetrofitService
 import kr.ac.duksung.rebit.network.dto.ApiResponse
 import kr.ac.duksung.rebit.network.dto.StoreInfoVO
-import kr.ac.duksung.rebit.network.dto.StoreMarkerVO
-import retrofit2.Retrofit
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import retrofit2.Retrofit
 import java.text.ParseException
 import java.util.regex.Pattern
+
 
 class StoreDetailActivity : AppCompatActivity() {
     private lateinit var binding: ActivityStoreDetailBinding
@@ -42,7 +37,6 @@ class StoreDetailActivity : AppCompatActivity() {
         setContentView(R.layout.activity_store_detail)
 
         binding = ActivityStoreDetailBinding.inflate(layoutInflater)
-        val storeImageArea = findViewById<ImageView>(R.id.storeImageArea)
 
         //setValues()
 
@@ -101,8 +95,9 @@ class StoreDetailActivity : AppCompatActivity() {
         retrofit = RetofitClient.getInstance()
         retrofitService = retrofit.create(RetrofitService::class.java)
     }
+
     // 통신
-     fun getStoreInfo() {
+    fun getStoreInfo() {
         //enqueue : 비동기식 통신을 할 때 사용/ execute: 동기식
         val data = intent.getStringExtra("store_id")
         //val rand = "${store.id}"
@@ -111,47 +106,73 @@ class StoreDetailActivity : AppCompatActivity() {
             Callback<ApiResponse<StoreInfoVO>> {
             override fun onResponse(
                 call: Call<ApiResponse<StoreInfoVO>>,
-                response: Response<ApiResponse<StoreInfoVO>>
-            ){
-                if(response.isSuccessful){
+                response: Response<ApiResponse<StoreInfoVO>>,
+            ) {
+                if (response.isSuccessful) {
                     // 통신 성공시
-                    val result: ApiResponse<StoreInfoVO>?=response.body()
-                    val data = result?.getResult();
+                    val result: ApiResponse<StoreInfoVO>? = response.body()
+                    val data = result?.getResult()
 
-                    Log.d("info" ,"onresponse 성공: "+ result?.toString() )
-                    Log.d("info", "data : "+ data?.toString())
+                    Log.d("info", "onresponse 성공: " + result?.toString())
+                    Log.d("info", "data : " + data?.toString())
+
+                    // 화면에 데이터 뿌린다. // activity_store_detail.xml에 설정했던 view에 따라 매핑
+                    // 가게 이름
+                    storeNameTextArea.text = data!!.storeName
+                    // 가게 주소
+                    addressTxt.text = data.address // data binding 으로 findViewById 안써도 접근 가능.
+                    // 가게 사진
+                    val photoUrl = data.store_photo
+                    //Glide.with(this@StoreDetailActivity).load(photoUrl).into(storeImageArea);
+                    Glide.with(this@StoreDetailActivity).load("https:$photoUrl")
+                        .error(R.drawable.sit_dagom_icon).into(storeImageArea);
+
+                    // 가게 카테고리
+                    storeKindTextArea.text = data.category
+                    // 가게 전화번호
+                    telText.text = (data.tel).convertNumberToPhoneNumber()
+                    // 가게 별점 평균, 가게 리뷰 수
+                    try {
+                        starAvgTv.text = (data.reviewList[0].toString())
+                        reviewNumTv.text = (data.reviewList[1].toString())
+                    } catch (e: IndexOutOfBoundsException) {
+                        e.printStackTrace()
+                        starAvgTv.text = "아직 등록된 별점이 없습니다. 첫번째 별점을 달아주세요!"
+                        reviewNumTv.text = "아직 등록된 리뷰가 없습니다. 첫번째 리뷰어가 되어주세요!"
+                    }
 
                 }
             }
 
             override fun onFailure(
                 call: Call<ApiResponse<StoreInfoVO>>,
-                t: Throwable
+                t: Throwable,
             ) {
-                Log.e("info","onFailure : ${t.message} ");
+                Log.e("info", "onFailure : ${t.message} ");
             }
         })
     }
+
     fun setupEvents() {
     }
 
-    fun setValues() {
-
-        // storeInfo를 serializable로 받는다
-        // 그냥 받은 채로 변수에 넣으면 오류가 나는데 이 때 Casting을 해줘야 한다
-        val store = intent.getSerializableExtra("storeInfo") as Store
-
-        // activity_store_detail.xml에 설정했던 view에 따라 매핑
-        storeNameTextArea.text = "${store.storeName}"
-        storeKindTextArea.text = "${store.category1}"
-        addressTxt.text = store.category2
-        telText.text = (store.tel).convertNumberToPhoneNumber()
-    }
+//    fun setValues() {
+//
+//        // storeInfo를 serializable로 받는다
+//        // 그냥 받은 채로 변수에 넣으면 오류가 나는데 이 때 Casting을 해줘야 한다
+//        val store = intent.getSerializableExtra("storeInfo") as Store
+//        storeImageArea
+//        // activity_store_detail.xml에 설정했던 view에 따라 매핑
+//        storeNameTextArea.text = "${store.storeName}"
+//        storeKindTextArea.text = "${store.category1}"
+//        addressTxt.text = store.category2
+//        telText.text = (store.tel).convertNumberToPhoneNumber()
+//    }
 
     // 전화번호 하이픈 추가
     fun String.convertNumberToPhoneNumber(): String {     // 코틀린의 확장함수 사용
         return try {
-            val regexString = "(\\d{3})(\\d{3,4})(\\d{4})"
+            val regexString = "(\\d{2})(\\d{3,4})(\\d{4})"
             return if (!Pattern.matches(regexString, this)) this else Regex(regexString).replace(
                 this,
                 "$1-$2-$3"
@@ -162,3 +183,14 @@ class StoreDetailActivity : AppCompatActivity() {
         }
     }
 }
+
+
+private fun Any.error(s: String) {
+
+}
+
+private fun Any.into(storeImageArea: ImageView?) {
+
+}
+
+
