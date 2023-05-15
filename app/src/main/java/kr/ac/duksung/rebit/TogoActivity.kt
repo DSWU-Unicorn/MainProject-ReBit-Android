@@ -1,11 +1,9 @@
 package kr.ac.duksung.rebit
 
 import android.Manifest
-import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.app.AlertDialog
 import android.content.ContentValues
 import android.content.Context
-import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Geocoder
@@ -45,13 +43,21 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 
+interface StoreMarkerCallback {
+    fun onStoreMarkerReceived(storeId: Long)
+}
 
-class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // TogoActivity
+class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener,
+    StoreMarkerCallback { // TogoActivity
     private lateinit var retrofit: Retrofit
     private lateinit var retrofitService: RetrofitService
 
     private lateinit var binding: ActivityTogoBinding // 뷰 바인딩
     private lateinit var mMapView: MapView // 카카오 지도 뷰
+
+    // store_id 반환해 사용하기 위한 코드
+    private var storeMarkerCallback: StoreMarkerCallback? = null
+    private var storeMarkerId: Long = 0 // Variable to hold the data.id value
 
 
     // 정적인 arrayOf 대신 ArrayList 사용(4/8 토 14:30~15:44)
@@ -85,10 +91,17 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
         // 가게 이름 조회 통신
         //getStoreInfo()
 
+
         mMapView = MapView(this) // 카카오 지도 뷰
         // setCalloutBalloonAdapter: 마커를 추가하는 부분보다 앞에 있어야 커스텀 말풍선이 표시된다.
-        mMapView.setCalloutBalloonAdapter(CustomBalloonAdapter(layoutInflater))  // 커스텀 말풍선 등록
+        val storeId =         fetchStoreMarkers()
 
+//        mMapView.setCalloutBalloonAdapter(CustomBalloonAdapter(layoutInflater, storeId))  // 커스텀 말풍선 등록
+
+        // Set the storeMarkerCallback to the activity
+        storeMarkerCallback = this
+        // Call the function that contains the API communication code
+        fetchStoreMarkers()
 
         // 리스트 목록 클릭시
         setupEvents()
@@ -178,10 +191,15 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
         mMapView.setPOIItemEventListener(this)
         mMapView.setOpenAPIKeyAuthenticationResultListener(this)
 
+
+    }//OnCreate()
+
+    // Function to fetch store markers
+    private fun fetchStoreMarkers() {
         lifecycleScope.launch {
             try {
-                retrofitService.getStoreMarker("종로구")
-                    ?.enqueue(object : // 임시적으로 줄여가게 많은 곳으로 하드코딩해 변경
+                retrofitService.getStoreMarker("도봉구")
+                    ?.enqueue(object :
                         Callback<ApiResponse<ArrayList<StoreMarkerVO>>> {
                         override fun onResponse(
                             call: Call<ApiResponse<ArrayList<StoreMarkerVO>>>,
@@ -189,7 +207,8 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
                         ) {
                             if (response.isSuccessful) {
                                 // 통신 성공시
-                                val result: ApiResponse<ArrayList<StoreMarkerVO>>? = response.body()
+                                val result: ApiResponse<ArrayList<StoreMarkerVO>>? =
+                                    response.body()
                                 val datas = result?.getResult()
 
                                 var geocoder = Geocoder(applicationContext)
@@ -199,6 +218,10 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
                                         geocoder.getFromLocationName(data.address, 10).get(0)
                                     Log.d("ADDRESS", "on response 성공: " + address.latitude)
 
+                                    // callback with storeId
+                                    storeMarkerCallback?.onStoreMarkerReceived(
+                                        data.id ?: 0)
+                                    // getStoreInfo 통신
                                     retrofitService.getStoreInfo(data.id.toLong())
                                         ?.enqueue(object :
                                             Callback<ApiResponse<StoreInfoVO>> {
@@ -246,6 +269,8 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
                                                         setCustomImageAnchor(0.5f, 1.0f)
                                                     }
                                                     mMapView.addPOIItem(marker)
+
+
                                                 }
                                             }
 
@@ -295,29 +320,7 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
                 Log.e(ContentValues.TAG, "Exception: ${e.message}", e)
             }
         }
-
-
-    }//OnCreate()
-
-    // kakaoMap 앱 키 해시 얻어오는 메소드. // Logcat 에 KEY_HASH 입력 후 나오는 값 확인할 것!
-//    fun getHashKey(){
-//        var packageInfo : PackageInfo = PackageInfo()
-//        try {
-//            packageInfo = packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES)
-//        } catch (e: PackageManager.NameNotFoundException){
-//            e.printStackTrace()
-//        }
-//
-//        for (signature: Signature in packageInfo.signatures){
-//            try{
-//                var md: MessageDigest = MessageDigest.getInstance("SHA")
-//                md.update(signature.toByteArray())
-//                Log.e("KEY_HASH", Base64.encodeToString(md.digest(), Base64.DEFAULT))
-//            } catch(e: NoSuchAlgorithmException){
-//                Log.e("KEY_HASH", "Unable to get MessageDigest. signature = " + signature, e)
-//            }
-//        }
-//    }
+    }
 
     //서버 연결
     private fun initRetrofit() {
@@ -505,7 +508,8 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
     ) {
         // 해당 method 에 대해
         val intent = Intent(this, StoreDetailActivity::class.java)
-        intent.putExtra("store_id", p1?.itemName)
+        intent.putExtra("store_id",
+            p1?.itemName) // id를 넘길때 말풍선 이름으로 해놨구나.. -> 현재는 이름으로 변경해서 예외 발생함.
         startActivity(intent)
     }
 
@@ -514,7 +518,7 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
     }
 
     // 커스텀 말풍선 클래스
-    class CustomBalloonAdapter(inflater: LayoutInflater) : CalloutBalloonAdapter {
+    class CustomBalloonAdapter(inflater: LayoutInflater, private val context: Context) : CalloutBalloonAdapter {
         val mCalloutBalloon: View = inflater.inflate(R.layout.custom_balloon_layout, null)
         val name: TextView = mCalloutBalloon.findViewById(R.id.ball_tv_name)
         val address: TextView = mCalloutBalloon.findViewById(R.id.ball_tv_address)
@@ -523,19 +527,74 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
             // 마커 클릭 시 나오는 말풍선
             name.text = poiItem?.itemName   // 해당 마커의 정보 이용 가능
             address.text = "getCalloutBalloon" // 통신후 가게 주소 띄울 예정
+
             return mCalloutBalloon
         }
 
-        override fun getPressedCalloutBalloon(poiItem: MapPOIItem?): View {
+        override fun getPressedCalloutBalloon(p0: MapPOIItem?): View {
+            TODO("Not yet implemented")
+        }
+
+        fun getPressedCalloutBalloon(): View {
             // 말풍선 클릭 시
-            // address.text = "getPressedCalloutBalloon"
-            // 주석 해지하면 클릭시 위 text 보이는데, 바로 intent로 넘어가야 하니까 주석함.
-            return mCalloutBalloon
+//            val storeId = poiItem?.itemName?.toLongOrNull()
+            val storeId = storeMarkerId
 
+            if (storeId != null) {
+                val intent = Intent(context, StoreDetailActivity::class.java)
+                intent.putExtra("store_id", storeId)
+                context.startActivity(intent)
+            }
+
+            return mCalloutBalloon
         }
 
-
+        companion object {
+            var storeMarkerId: Long? = null
+        }
+//        fun getPressedCalloutBalloon(storeId: Long): View {
+//            // 말풍선 클릭 시
+//            // address.text = "getPressedCalloutBalloon"
+//            // 주석 해지하면 클릭시 위 text 보이는데, 바로 intent로 넘어가야 하니까 주석함.
+//
+//
+//            val intent = Intent(this, StoreDetailActivity::class.java)
+////            intent.putExtra("store_id", poiItem?.itemName) // id를 넘길때 말풍선 이름으로 해놨구나.. -> 현재는 이름으로 변경해서 예외 발생함.
+//            intent.putExtra("store_id", storeId) // id를 넘길때 말풍선 이름으로 해놨구나.. -> 현재는 이름으로 변경해서 예외 발생함.
+//            startActivity(intent)
+//
+//            return mCalloutBalloon
+//
+//        }
     }
+
+    override fun onStoreMarkerReceived(storeId: Long) {
+        // Assign the received storeId to the storeMarkerId variable
+        CustomBalloonAdapter.storeMarkerId = storeId
+
+        // Get the instance of CustomBalloonAdapter and call getPressedCalloutBalloon()
+        val balloonAdapter = CustomBalloonAdapter(layoutInflater, this)
+        balloonAdapter?.getPressedCalloutBalloon()
+    }
+    // kakaoMap 앱 키 해시 얻어오는 메소드. // Logcat 에 KEY_HASH 입력 후 나오는 값 확인할 것!
+//    fun getHashKey(){
+//        var packageInfo : PackageInfo = PackageInfo()
+//        try {
+//            packageInfo = packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES)
+//        } catch (e: PackageManager.NameNotFoundException){
+//            e.printStackTrace()
+//        }
+//
+//        for (signature: Signature in packageInfo.signatures){
+//            try{
+//                var md: MessageDigest = MessageDigest.getInstance("SHA")
+//                md.update(signature.toByteArray())
+//                Log.e("KEY_HASH", Base64.encodeToString(md.digest(), Base64.DEFAULT))
+//            } catch(e: NoSuchAlgorithmException){
+//                Log.e("KEY_HASH", "Unable to get MessageDigest. signature = " + signature, e)
+//            }
+//        }
+//    }
 
 }
 
@@ -558,3 +617,4 @@ private fun MapView.setMapViewEventListener(togoActivity: TogoActivity) {
 private fun ListView.contains(view: String?): Boolean {
     return true
 }
+
