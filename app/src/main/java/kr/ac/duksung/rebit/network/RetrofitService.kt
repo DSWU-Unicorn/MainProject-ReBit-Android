@@ -36,4 +36,7 @@ interface RetrofitService {
     @GET("/store/markInfo/{search}") // 가게 상세 정보 조회
     fun getMarkerInfo(@Path("search") search: String): Call<ApiResponse<MarkerInfoVO>>
 
+    @GET("/store")
+    fun getStoreAll() : Call<ApiResponse<ArrayList<StoreNameVO>>>
+
 }
