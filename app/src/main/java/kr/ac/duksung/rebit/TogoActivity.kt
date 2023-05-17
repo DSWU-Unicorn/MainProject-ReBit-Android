@@ -25,10 +25,7 @@ import kr.ac.duksung.rebit.databinding.ActivityTogoBinding
 import kr.ac.duksung.rebit.datas.Store
 import kr.ac.duksung.rebit.network.RetofitClient
 import kr.ac.duksung.rebit.network.RetrofitService
-import kr.ac.duksung.rebit.network.dto.ApiResponse
-import kr.ac.duksung.rebit.network.dto.MarkerInfoVO
-import kr.ac.duksung.rebit.network.dto.StoreInfoVO
-import kr.ac.duksung.rebit.network.dto.StoreMarkerVO
+import kr.ac.duksung.rebit.network.dto.*
 import net.daum.mf.map.api.CalloutBalloonAdapter
 import net.daum.mf.map.api.MapPOIItem
 import net.daum.mf.map.api.MapPoint
@@ -46,10 +43,13 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
     private lateinit var binding: ActivityTogoBinding // 뷰 바인딩
     private lateinit var mMapView: MapView // 카카오 지도 뷰
 
+    val storeList = ArrayList<StoreNameVO>();
+    private val storeNameList = ArrayList<String>()
+
     var storeId: String = ""
 
     // 정적인 arrayOf 대신 ArrayList 사용(4/8 토 14:30~15:44)
-    val storeList = ArrayList<Store>();
+    //val storeList = ArrayList<Store>();
     //lateinit var storeAdapter: StoreAdapter
 
     private val user = arrayOf(
@@ -90,9 +90,49 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
         // 목록 값 지정
         // setValues()
 
+        /**
+         * 검색
+         */
+        lifecycleScope.launch {
+            try {
+                retrofitService.getStoreAll()?.enqueue(object :
+                    Callback<ApiResponse<ArrayList<StoreNameVO>>> {
+                    override fun onResponse(
+                        call: Call<ApiResponse<ArrayList<StoreNameVO>>>,
+                        response: Response<ApiResponse<ArrayList<StoreNameVO>>>
+                    ){
+                        if(response.isSuccessful){
+                            // 통신 성공시
+                            val result: ApiResponse<ArrayList<StoreNameVO>>?=response.body()
+                            val datas = result?.getResult()
+
+                            Log.d("StoreName" ,"onresponse 성공: "+ result?.toString())
+                            Log.d("StoreName", "data : "+ datas?.toString())
+
+                            for(data in datas!!) {
+                                storeNameList.add(data.storeName)
+                                storeList.add(data)
+                                Log.d("storeList", "storeList : "+ storeList)
+                            }
+
+                        }
+                    }
+                    override fun onFailure(
+                        call: Call<ApiResponse<ArrayList<StoreNameVO>>>,
+                        t: Throwable
+                    ) {
+                        Log.e("StoreMarker","onFailure : ${t.message} ");
+                    }
+                })
+            } catch  (e: Exception) {
+                // Exception handling
+                Log.e(ContentValues.TAG, "Exception: ${e.message}", e)
+            }
+        }
+
         var storeAdapter: ArrayAdapter<String> = ArrayAdapter(
             this, android.R.layout.simple_list_item_1,
-            user
+            storeNameList
         )
 
         binding.searchView.isSubmitButtonEnabled = true
@@ -316,13 +356,10 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
         binding.storeList.setOnItemClickListener { userAdapter, view, i, l ->
             // 눌린 위치에 해당하는 목록이 어떤 목록인지 가져오기
             try {
-                val clickedStore = storeList[i]
-                // 선택된 목록정보를 가져왔으면 이제 화면 이동
-                val myIntent = Intent(this, StoreDetailActivity::class.java)
-                // 정보를 담아주기
-                myIntent.putExtra("storeInfo", clickedStore)
-                // 화면 전환
-                startActivity(myIntent)
+                Log.d("클릭", storeList[i].storeId.toString())
+                val intent = Intent(this, StoreDetailActivity::class.java)
+                intent.putExtra("store_id", storeList[i].storeId.toString())
+                startActivity(intent)
             } catch (e: IndexOutOfBoundsException) {
                 Toast.makeText(this, "Oops. 더이상의 가게 정보가 없어요", Toast.LENGTH_SHORT).show()
             }
