@@ -1,15 +1,12 @@
 package kr.ac.duksung.rebit
 
 import android.Manifest
-import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.app.AlertDialog
 import android.content.ContentValues
 import android.content.Context
-import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Geocoder
-import android.location.Location
 import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
@@ -22,18 +19,14 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
-import androidx.core.content.ContextCompat.startActivity
-import androidx.core.view.contains
 import androidx.lifecycle.lifecycleScope
-import com.unity3d.player.e
-import kotlinx.android.synthetic.main.activity_store_detail.*
 import kotlinx.coroutines.launch
 import kr.ac.duksung.rebit.databinding.ActivityTogoBinding
 import kr.ac.duksung.rebit.datas.Store
 import kr.ac.duksung.rebit.network.RetofitClient
 import kr.ac.duksung.rebit.network.RetrofitService
 import kr.ac.duksung.rebit.network.dto.ApiResponse
+import kr.ac.duksung.rebit.network.dto.MarkerInfoVO
 import kr.ac.duksung.rebit.network.dto.StoreInfoVO
 import kr.ac.duksung.rebit.network.dto.StoreMarkerVO
 import net.daum.mf.map.api.CalloutBalloonAdapter
@@ -53,6 +46,7 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
     private lateinit var binding: ActivityTogoBinding // 뷰 바인딩
     private lateinit var mMapView: MapView // 카카오 지도 뷰
 
+    var storeId: String = ""
 
     // 정적인 arrayOf 대신 ArrayList 사용(4/8 토 14:30~15:44)
     val storeList = ArrayList<Store>();
@@ -87,7 +81,8 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
 
         mMapView = MapView(this) // 카카오 지도 뷰
         // setCalloutBalloonAdapter: 마커를 추가하는 부분보다 앞에 있어야 커스텀 말풍선이 표시된다.
-        mMapView.setCalloutBalloonAdapter(CustomBalloonAdapter(layoutInflater))  // 커스텀 말풍선 등록
+        mMapView.setCalloutBalloonAdapter(CustomBalloonAdapter(layoutInflater,
+            retrofitService))  // 커스텀 말풍선 등록
 
 
         // 리스트 목록 클릭시
@@ -180,7 +175,7 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
 
         lifecycleScope.launch {
             try {
-                retrofitService.getStoreMarker("종로구")
+                retrofitService.getStoreMarker("도봉구")
                     ?.enqueue(object : // 임시적으로 줄여가게 많은 곳으로 하드코딩해 변경
                         Callback<ApiResponse<ArrayList<StoreMarkerVO>>> {
                         override fun onResponse(
@@ -230,6 +225,7 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
                                                         // 가게 이름
 //                                                        itemName =
 //                                                            data?.storeName.toString() // Assign the storeName to itemName
+                                                        // exception
                                                         itemName = storeName
                                                             ?: "" // Assign the storeName to itemName, or empty string if null
 
@@ -246,6 +242,7 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
                                                         setCustomImageAnchor(0.5f, 1.0f)
                                                     }
                                                     mMapView.addPOIItem(marker)
+
                                                 }
                                             }
 
@@ -257,18 +254,6 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
                                             }
                                         })
 
-//                                        mapPoint = MapPoint.mapPointWithGeoCoord(address.latitude,
-//                                            address.longitude)
-//                                        markerType =
-//                                            MapPOIItem.MarkerType.CustomImage          // 마커 모양 (커스텀)
-//                                        customImageResourceId =
-//                                            R.drawable.map_pin_blue            // 커스텀 마커 이미지
-//                                        selectedMarkerType =
-//                                            MapPOIItem.MarkerType.CustomImage  // 클릭 시 마커 모양 (커스텀)
-//                                        customSelectedImageResourceId =
-//                                            R.drawable.dagom     // 클릭 시 커스텀 마커 이미지
-//                                        isCustomImageAutoscale = false      // 커스텀 마커 이미지 크기 자동 조정
-//                                        setCustomImageAnchor(0.5f, 1.0f)    // 마커 이미지 기준점
                                 }
                                 // 기존 코드
 //                                marker.mapPoint = MapPoint.mapPointWithGeoCoord(address.latitude,
@@ -294,8 +279,8 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
                 // Exception handling
                 Log.e(ContentValues.TAG, "Exception: ${e.message}", e)
             }
-        }
 
+        }
 
     }//OnCreate()
 
@@ -499,22 +484,110 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
     }
 
     override fun onCalloutBalloonOfPOIItemTouched(
-        p0: MapView?,
-        p1: MapPOIItem?,
-        p2: MapPOIItem.CalloutBalloonButtonType?,
+        mapView: MapView?,
+        marker: MapPOIItem?,
+        calloutBalloonButtonType: MapPOIItem.CalloutBalloonButtonType?,
     ) {
-        // 해당 method 에 대해
-        val intent = Intent(this, StoreDetailActivity::class.java)
-        intent.putExtra("store_id", p1?.itemName)
-        startActivity(intent)
+        val storeName = marker?.itemName // Get the storeId from the clicked marker's itemName
+        Log.d("storeName 잘 뽑히는지 확인", "storeName: ${storeName}")
+
+        if (storeName != null) {
+            retrofitService.getMarkerInfo(storeName)
+                ?.enqueue(object : Callback<ApiResponse<MarkerInfoVO>> {
+                    override fun onResponse(
+                        call: Call<ApiResponse<MarkerInfoVO>>,
+                        response: Response<ApiResponse<MarkerInfoVO>>,
+                    ) {
+                        if (response.isSuccessful) {
+                            // success
+                            val result: ApiResponse<MarkerInfoVO>? = response.body()
+                            val data = result?.getResult()
+
+                            Log.d("getMarkerInfo", "onresponse 성공: " + result?.toString())
+                            Log.d("getMarkerInfo", "data : " + data?.toString())
+
+                            if (data != null) {
+                                storeId = data.id.toString()
+                            }
+
+                            val intent = Intent(this@TogoActivity, StoreDetailActivity::class.java)
+                            intent.putExtra("store_id", storeId)
+                            this@TogoActivity.startActivity(intent) // Use the TogoActivity context to start the activity
+                        }
+                    }
+
+                    override fun onFailure(call: Call<ApiResponse<MarkerInfoVO>>, t: Throwable) {
+                        Log.e("getMarkerInfo", "onFailure : ${t.message} ");
+                    }
+
+                })
+        }
+
+
+//        retrofitService.getStoreMarker("도봉구")
+//            ?.enqueue(object : // 임시적으로 줄여가게 많은 곳으로 하드코딩해 변경
+//                Callback<ApiResponse<ArrayList<StoreMarkerVO>>> {
+//                override fun onResponse(
+//                    call: Call<ApiResponse<ArrayList<StoreMarkerVO>>>,
+//                    response: Response<ApiResponse<ArrayList<StoreMarkerVO>>>,
+//                ) {
+//                    if (response.isSuccessful) {
+//                        // 통신 성공시
+//                        val result: ApiResponse<ArrayList<StoreMarkerVO>>? = response.body()
+//                        val datas = result?.getResult()
+//                        var geocoder = Geocoder(applicationContext)
+//
+//
+//                        for (data in datas!!) {
+//                            var address =
+//                                geocoder.getFromLocationName(data.address, 10).get(0)
+//                            Log.d("ADDRESS", "on response 성공: " + address.latitude)
+//
+//                            // data.id.toLong()
+//
+//                            // Define a variable to access data within the inner function
+//                            storeId = data.id.toString()
+//
+//                            Log.d("storeId", "storeId : ${storeId} ");
+//
+//                            val intent = Intent(this@TogoActivity, StoreDetailActivity::class.java)
+//                            intent.putExtra("store_id", storeId)
+//                            this@TogoActivity.startActivity(intent) // Use the TogoActivity context to start the activity
+//                        }
+//                    }
+//                }
+//
+//                override fun onFailure(
+//                    call: Call<ApiResponse<ArrayList<StoreMarkerVO>>>,
+//                    t: Throwable,
+//                ) {
+//                    Log.e("StoreMarker", "onFailure : ${t.message} ");
+//                }
+//            })
     }
+
+//    override fun onCalloutBalloonOfPOIItemTouched(
+//        p0: MapView?,
+//        p1: MapPOIItem?,
+//        p2: MapPOIItem.CalloutBalloonButtonType?,
+//    ) {
+//        // 해당 method 에 대해
+//        val intent = Intent(this, StoreDetailActivity::class.java)
+//        intent.putExtra("store_id", data.id.toLong()) // ============exception
+//        applicationContext.startActivity(intent)
+//
+//
+//    }
 
     override fun onDraggablePOIItemMoved(p0: MapView?, p1: MapPOIItem?, p2: MapPoint?) {
         TODO("Not yet implemented")
     }
 
     // 커스텀 말풍선 클래스
-    class CustomBalloonAdapter(inflater: LayoutInflater) : CalloutBalloonAdapter {
+    class CustomBalloonAdapter(
+        inflater: LayoutInflater,
+        private val retrofitService: RetrofitService, // Replace YourRetrofitService with your actual Retrofit service class
+    ) : CalloutBalloonAdapter {
         val mCalloutBalloon: View = inflater.inflate(R.layout.custom_balloon_layout, null)
         val name: TextView = mCalloutBalloon.findViewById(R.id.ball_tv_name)
         val address: TextView = mCalloutBalloon.findViewById(R.id.ball_tv_address)
@@ -522,20 +595,54 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
         override fun getCalloutBalloon(poiItem: MapPOIItem?): View {
             // 마커 클릭 시 나오는 말풍선
             name.text = poiItem?.itemName   // 해당 마커의 정보 이용 가능
-            address.text = "getCalloutBalloon" // 통신후 가게 주소 띄울 예정
+
+            //address.text = "가나다라마바사" // 통신후 가게 주소 띄울 예정
+
+            retrofitService.getMarkerInfo(poiItem?.itemName.toString())
+                ?.enqueue(object : Callback<ApiResponse<MarkerInfoVO>> {
+                    override fun onResponse(
+                        call: Call<ApiResponse<MarkerInfoVO>>,
+                        response: Response<ApiResponse<MarkerInfoVO>>,
+                    ) {
+                        if (response.isSuccessful) {
+                            // success
+                            val result: ApiResponse<MarkerInfoVO>? = response.body()
+                            val data = result?.getResult()
+
+                            Log.d("getCalloutBalloon", "onresponse 성공: " + result?.toString())
+                            Log.d("getCalloutBalloon", "data : " + data?.toString())
+
+                            if (data != null) {
+                                address.text = data.address.toString()
+                            }
+                        }
+                    }
+
+                    override fun onFailure(call: Call<ApiResponse<MarkerInfoVO>>, t: Throwable) {
+                        Log.e("getCalloutBalloon", "onFailure : ${t.message} ");
+                    }
+
+                })
             return mCalloutBalloon
         }
 
-        override fun getPressedCalloutBalloon(poiItem: MapPOIItem?): View {
-            // 말풍선 클릭 시
-            // address.text = "getPressedCalloutBalloon"
-            // 주석 해지하면 클릭시 위 text 보이는데, 바로 intent로 넘어가야 하니까 주석함.
+        override fun getPressedCalloutBalloon(p0: MapPOIItem?): View {
             return mCalloutBalloon
-
         }
-
-
     }
+
+
+//        override fun getPressedCalloutBalloon(poiItem: MapPOIItem?): View {
+//            // 말풍선 클릭 시
+//            //address.text = "getPressedCalloutBalloon"
+//            // 주석 해지하면 클릭시 위 text 보이는데, 바로 intent로 넘어가야 하니까 주석함.
+//
+//
+//
+//            return mCalloutBalloon
+//
+//        }
+
 
 }
 
