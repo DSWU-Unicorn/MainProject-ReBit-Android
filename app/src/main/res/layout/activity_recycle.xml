@@ -83,7 +83,7 @@
 
         android:padding="10dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-        android:drawableTop="@drawable/camera_icon"
+        android:drawableTop="@drawable/drawable_camera_icon_resize_sizeup"
         android:background="@drawable/button_effect"
         android:drawablePadding="5dp"
         android:textSize="24sp"
