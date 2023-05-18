@@ -13,5 +13,4 @@ data class ReviewCommentsVO(
     var photo: String,
     @SerializedName("commentDetail")
     var comment: String
-
 )
