@@ -8,6 +8,7 @@ import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.widget.Button
 import android.widget.ImageView
@@ -34,6 +35,11 @@ class YonggiCameraActivity : AppCompatActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_camera)
+
+        //
+        val data = intent.getStringExtra("store_id")
+        val store_id = Integer.parseInt(data)
+        Log.d("YONGGICAMERA_STORE_ID", store_id.toString())
 
         //객체 생성
         imageView = findViewById(R.id.imageView)
@@ -77,7 +83,10 @@ class YonggiCameraActivity : AppCompatActivity(){
                     mAlertDialog.dismiss()
 
                     // 포장하러가기 누르면.. 용기내 main 화면으로 이동해 지도에 포장하러가기 상태바 띄움.
-                    val intent = Intent(this, TogoActivity::class.java)
+                    //
+                    val intent = Intent(this, MainActivity::class.java)
+                    intent.putExtra("status", "true")
+                    intent.putExtra("store_id", store_id.toString())
                     startActivity(intent)
                 }
 

@@ -39,4 +39,12 @@ interface RetrofitService {
     @GET("/store")
     fun getStoreAll() : Call<ApiResponse<ArrayList<StoreNameVO>>>
 
+    @GET("/store/takeout/{store_id}")
+    fun getStoreAddressTogo(@Path("store_id") search: Int) : Call<ApiResponse<StoreAddressVO>>
+
+    @POST("/store/takeout/{user_id}")
+    fun postUserWithPointAfterYonggi(@Path("user_id") id: Int): Call<ApiResponse<Int>>
+
+    @GET("/store/searchName/{search}")
+    fun searchStoreByName(@Path("search") search: String) : Call<ApiResponse<ArrayList<StoreNameVO2>>>
 }
