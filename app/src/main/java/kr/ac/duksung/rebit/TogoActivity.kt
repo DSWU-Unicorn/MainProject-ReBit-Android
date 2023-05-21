@@ -34,7 +34,8 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
-
+import android.os.Handler
+import android.os.Looper
 
 class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // TogoActivity
     private lateinit var retrofit: Retrofit
@@ -47,6 +48,7 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
     private val storeNameList = ArrayList<String>()
 
     var storeId: String = ""
+
 
     // 정적인 arrayOf 대신 ArrayList 사용(4/8 토 14:30~15:44)
     //val storeList = ArrayList<Store>();
@@ -99,32 +101,33 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
                     Callback<ApiResponse<ArrayList<StoreNameVO>>> {
                     override fun onResponse(
                         call: Call<ApiResponse<ArrayList<StoreNameVO>>>,
-                        response: Response<ApiResponse<ArrayList<StoreNameVO>>>
-                    ){
-                        if(response.isSuccessful){
+                        response: Response<ApiResponse<ArrayList<StoreNameVO>>>,
+                    ) {
+                        if (response.isSuccessful) {
                             // 통신 성공시
-                            val result: ApiResponse<ArrayList<StoreNameVO>>?=response.body()
+                            val result: ApiResponse<ArrayList<StoreNameVO>>? = response.body()
                             val datas = result?.getResult()
 
-                            Log.d("StoreName" ,"onresponse 성공: "+ result?.toString())
-                            Log.d("StoreName", "data : "+ datas?.toString())
+                            Log.d("StoreName", "onresponse 성공: " + result?.toString())
+                            Log.d("StoreName", "data : " + datas?.toString())
 
-                            for(data in datas!!) {
+                            for (data in datas!!) {
                                 storeNameList.add(data.storeName)
                                 storeList.add(data)
-                                Log.d("storeList", "storeList : "+ storeList)
+                                Log.d("storeList", "storeList : " + storeList)
                             }
 
                         }
                     }
+
                     override fun onFailure(
                         call: Call<ApiResponse<ArrayList<StoreNameVO>>>,
-                        t: Throwable
+                        t: Throwable,
                     ) {
-                        Log.e("StoreMarker","onFailure : ${t.message} ");
+                        Log.e("StoreMarker", "onFailure : ${t.message} ");
                     }
                 })
-            } catch  (e: Exception) {
+            } catch (e: Exception) {
                 // Exception handling
                 Log.e(ContentValues.TAG, "Exception: ${e.message}", e)
             }
@@ -521,13 +524,12 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
     }
 
     override fun onCalloutBalloonOfPOIItemTouched(
+        // 말풍선 클릭시 - 더 많은 정보 보러가기
         mapView: MapView?,
         marker: MapPOIItem?,
         calloutBalloonButtonType: MapPOIItem.CalloutBalloonButtonType?,
     ) {
         val storeName = marker?.itemName // Get the storeId from the clicked marker's itemName
-        Log.d("storeName 잘 뽑히는지 확인", "storeName: ${storeName}")
-
         if (storeName != null) {
             retrofitService.getMarkerInfo(storeName)
                 ?.enqueue(object : Callback<ApiResponse<MarkerInfoVO>> {
@@ -540,13 +542,12 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
                             val result: ApiResponse<MarkerInfoVO>? = response.body()
                             val data = result?.getResult()
 
-                            Log.d("getMarkerInfo", "onresponse 성공: " + result?.toString())
+                            Log.d("getMarkerInfo", "on response 성공: " + result?.toString())
                             Log.d("getMarkerInfo", "data : " + data?.toString())
 
                             if (data != null) {
                                 storeId = data.id.toString()
                             }
-
                             val intent = Intent(this@TogoActivity, StoreDetailActivity::class.java)
                             intent.putExtra("store_id", storeId)
                             this@TogoActivity.startActivity(intent) // Use the TogoActivity context to start the activity
@@ -559,65 +560,6 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
 
                 })
         }
-
-
-//        retrofitService.getStoreMarker("도봉구")
-//            ?.enqueue(object : // 임시적으로 줄여가게 많은 곳으로 하드코딩해 변경
-//                Callback<ApiResponse<ArrayList<StoreMarkerVO>>> {
-//                override fun onResponse(
-//                    call: Call<ApiResponse<ArrayList<StoreMarkerVO>>>,
-//                    response: Response<ApiResponse<ArrayList<StoreMarkerVO>>>,
-//                ) {
-//                    if (response.isSuccessful) {
-//                        // 통신 성공시
-//                        val result: ApiResponse<ArrayList<StoreMarkerVO>>? = response.body()
-//                        val datas = result?.getResult()
-//                        var geocoder = Geocoder(applicationContext)
-//
-//
-//                        for (data in datas!!) {
-//                            var address =
-//                                geocoder.getFromLocationName(data.address, 10).get(0)
-//                            Log.d("ADDRESS", "on response 성공: " + address.latitude)
-//
-//                            // data.id.toLong()
-//
-//                            // Define a variable to access data within the inner function
-//                            storeId = data.id.toString()
-//
-//                            Log.d("storeId", "storeId : ${storeId} ");
-//
-//                            val intent = Intent(this@TogoActivity, StoreDetailActivity::class.java)
-//                            intent.putExtra("store_id", storeId)
-//                            this@TogoActivity.startActivity(intent) // Use the TogoActivity context to start the activity
-//                        }
-//                    }
-//                }
-//
-//                override fun onFailure(
-//                    call: Call<ApiResponse<ArrayList<StoreMarkerVO>>>,
-//                    t: Throwable,
-//                ) {
-//                    Log.e("StoreMarker", "onFailure : ${t.message} ");
-//                }
-//            })
-    }
-
-//    override fun onCalloutBalloonOfPOIItemTouched(
-//        p0: MapView?,
-//        p1: MapPOIItem?,
-//        p2: MapPOIItem.CalloutBalloonButtonType?,
-//    ) {
-//        // 해당 method 에 대해
-//        val intent = Intent(this, StoreDetailActivity::class.java)
-//        intent.putExtra("store_id", data.id.toLong()) // ============exception
-//        applicationContext.startActivity(intent)
-//
-//
-//    }
-
-    override fun onDraggablePOIItemMoved(p0: MapView?, p1: MapPOIItem?, p2: MapPoint?) {
-        TODO("Not yet implemented")
     }
 
     // 커스텀 말풍선 클래스
@@ -633,8 +575,7 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
             // 마커 클릭 시 나오는 말풍선
             name.text = poiItem?.itemName   // 해당 마커의 정보 이용 가능
 
-            //address.text = "가나다라마바사" // 통신후 가게 주소 띄울 예정
-
+            // address.text = "가나다라마바사" // 통신후 가게 주소 띄울 예정
             retrofitService.getMarkerInfo(poiItem?.itemName.toString())
                 ?.enqueue(object : Callback<ApiResponse<MarkerInfoVO>> {
                     override fun onResponse(
@@ -651,11 +592,14 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
 
                             if (data != null) {
                                 address.text = data.address.toString()
+                                Log.d("address.text", "msg: " + address.text) // log로는 주소 맞게 잘 나오는데, 왜 marker 말풍선 상으로는 안 나오는 것인가...
                             }
                         }
                     }
-
-                    override fun onFailure(call: Call<ApiResponse<MarkerInfoVO>>, t: Throwable) {
+                    override fun onFailure(
+                        call: Call<ApiResponse<MarkerInfoVO>>,
+                        t: Throwable,
+                    ) {
                         Log.e("getCalloutBalloon", "onFailure : ${t.message} ");
                     }
 
@@ -664,23 +608,14 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
         }
 
         override fun getPressedCalloutBalloon(p0: MapPOIItem?): View {
+
             return mCalloutBalloon
         }
     }
 
-
-//        override fun getPressedCalloutBalloon(poiItem: MapPOIItem?): View {
-//            // 말풍선 클릭 시
-//            //address.text = "getPressedCalloutBalloon"
-//            // 주석 해지하면 클릭시 위 text 보이는데, 바로 intent로 넘어가야 하니까 주석함.
-//
-//
-//
-//            return mCalloutBalloon
-//
-//        }
-
-
+    override fun onDraggablePOIItemMoved(p0: MapView?, p1: MapPOIItem?, p2: MapPoint?) {
+        TODO("Not yet implemented")
+    }
 }
 
 

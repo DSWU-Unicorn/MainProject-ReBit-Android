@@ -47,4 +47,9 @@ interface RetrofitService {
 
     @GET("/store/searchName/{search}")
     fun searchStoreByName(@Path("search") search: String) : Call<ApiResponse<ArrayList<StoreNameVO2>>>
+
+    // 가게 review 가져옴
+    @GET("/store/reviews/{store_id}")
+    fun getReviewComments(@Path("store_id") store_id: Long): Call<ApiResponse<ArrayList<GetReviewCommentsVO>>>
+
 }

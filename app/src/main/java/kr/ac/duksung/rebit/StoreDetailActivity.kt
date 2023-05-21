@@ -8,8 +8,6 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
-import com.unity3d.player.e
-import com.unity3d.player.i
 import kotlinx.android.synthetic.main.activity_store_detail.*
 import kr.ac.duksung.rebit.databinding.ActivityStoreDetailBinding
 import kr.ac.duksung.rebit.network.RetofitClient
@@ -31,11 +29,14 @@ class StoreDetailActivity : AppCompatActivity() {
     private lateinit var retrofit: Retrofit
     private lateinit var retrofitService: RetrofitService
 
+    // goto_review_btn
+    // 버튼 클릭시 store_id intent로 넘기기 필요.
+    //====================================
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_store_detail)
-
+        // activity_store_detail.xml에 설정했던 id 값 사용가능
         binding = ActivityStoreDetailBinding.inflate(layoutInflater)
 
         //setValues()
@@ -44,7 +45,7 @@ class StoreDetailActivity : AppCompatActivity() {
         //서버 연결
         initRetrofit()
 
-        // 통신
+        // 통신-가게 상세 정보
         getStoreInfo()
 
         //val store = intent.getSerializableExtra("storeInfo") as Store
@@ -54,15 +55,15 @@ class StoreDetailActivity : AppCompatActivity() {
         val rand = Integer.parseInt(data)
         Log.d("STOREDETAIL_STORE_ID", rand.toString())
 
-        val imgId = intArrayOf(
-            R.drawable.megacoffee1, R.drawable.coffeedream2,
-            R.drawable.eeeyo3, R.drawable.blackdown4,
-            R.drawable.bagle5
-        )
+//        val imgId = intArrayOf(
+//            R.drawable.megacoffee1, R.drawable.coffeedream2,
+//            R.drawable.eeeyo3, R.drawable.blackdown4,
+//            R.drawable.bagle5
+//        )
 
         //storeImageArea.setImageResource(imgId[rand.toInt()])
 
-        val pic_btn = findViewById<Button>(R.id.pic_btn)
+        // val pic_btn = findViewById<Button>(R.id.pic_btn)
         pic_btn.setOnClickListener {
             Toast.makeText(this, "내 용기가 맞을까? 확인하러 가기", Toast.LENGTH_SHORT).show()
             //
@@ -70,27 +71,25 @@ class StoreDetailActivity : AppCompatActivity() {
             intent.putExtra("store_id", data)
             startActivity(intent)
         }
-        // review view
+//        // review view
         val goto_review_btn = findViewById<Button>(R.id.goto_review_btn)
-        goto_review_btn.setOnClickListener {
-            Toast.makeText(this, "생생한 후기가 궁금하나요? 리뷰 보러 가기", Toast.LENGTH_SHORT).show()
-            val intent = Intent(this, ReviewActivity::class.java)
-            intent.putExtra("store_id", rand) // store id 값 전달.
-            startActivity(intent)
-        }
-        // review create
+//        goto_review_btn.setOnClickListener {
+//            Toast.makeText(this, "생생한 후기가 궁금하나요? 리뷰 보러 가기", Toast.LENGTH_SHORT).show()
+//            val intent = Intent(this, ReviewActivity::class.java)
+//            intent.putExtra("store_id", data) // store id 값 전달.
+//            startActivity(intent)
+//        }
+//        // review create
         val todo_btn = findViewById<Button>(R.id.todo_btn)
-        todo_btn.setOnClickListener {
-            Toast.makeText(this, "이미 용기냈다면! 어땠는지 후기 작성하러 가기", Toast.LENGTH_SHORT).show()
-            val intent = Intent(this, CreateReviewActivity::class.java)
-            intent.putExtra("store_id", rand) // store id 값 전달.
-
-            startActivity(intent)
-        }
+//        todo_btn.setOnClickListener {
+//            Toast.makeText(this, "이미 용기냈다면! 어땠는지 후기 작성하러 가기", Toast.LENGTH_SHORT).show()
+//            val intent = Intent(this, CreateReviewActivity::class.java)
+//            intent.putExtra("store_id", data) // store id 값 전달.
+//            startActivity(intent)
+//        }
 
 
     }// OnCreate
-
 
     //서버 연결
     private fun initRetrofit() {
@@ -104,6 +103,24 @@ class StoreDetailActivity : AppCompatActivity() {
         val data = intent.getStringExtra("store_id")
         //val rand = "${store.id}"
         val rand = Integer.parseInt(data)
+
+        // store_id 값을 review 로 intent 처리
+        val goto_review_btn = findViewById<Button>(R.id.goto_review_btn)
+
+        goto_review_btn.setOnClickListener {
+            val intent = Intent(this, ReviewDetailActivity::class.java) // 리뷰 보러 가기
+            intent.putExtra("store_id", data)
+            startActivity(intent)
+        }
+        val todo_btn = findViewById<Button>(R.id.todo_btn)
+
+        todo_btn.setOnClickListener {
+            val intent = Intent(this, CreateReviewActivity::class.java) // 리뷰 작성
+            intent.putExtra("store_id", data)
+            startActivity(intent)
+        }
+
+
         retrofitService.getStoreInfo(rand.toLong())?.enqueue(object :
             Callback<ApiResponse<StoreInfoVO>> {
             override fun onResponse(
@@ -118,7 +135,7 @@ class StoreDetailActivity : AppCompatActivity() {
                     Log.d("info", "onresponse 성공: " + result?.toString())
                     Log.d("info", "data : " + data?.toString())
 
-                    // 화면에 데이터 뿌린다. // activity_store_detail.xml에 설정했던 view에 따라 매핑
+                    // 화면에 데이터 뿌린다.
                     // 가게 이름
                     storeNameTextArea.text = data!!.storeName
                     // 가게 주소
