@@ -53,7 +53,7 @@ class StoreDetailActivity : AppCompatActivity() {
         val data = intent.getStringExtra("store_id")
         //val rand = "${store.id}"
         val rand = Integer.parseInt(data)
-        Log.d("store_id", rand.toString())
+        Log.d("STOREDETAIL_STORE_ID", rand.toString())
 
 //        val imgId = intArrayOf(
 //            R.drawable.megacoffee1, R.drawable.coffeedream2,
@@ -66,7 +66,9 @@ class StoreDetailActivity : AppCompatActivity() {
         // val pic_btn = findViewById<Button>(R.id.pic_btn)
         pic_btn.setOnClickListener {
             Toast.makeText(this, "내 용기가 맞을까? 확인하러 가기", Toast.LENGTH_SHORT).show()
-            val intent = Intent(this, CameraActivity::class.java)
+            //
+            val intent = Intent(this, YonggiCameraActivity::class.java)
+            intent.putExtra("store_id", data)
             startActivity(intent)
         }
 //        // review view

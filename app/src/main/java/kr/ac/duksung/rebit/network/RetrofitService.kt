@@ -39,7 +39,17 @@ interface RetrofitService {
     @GET("/store")
     fun getStoreAll() : Call<ApiResponse<ArrayList<StoreNameVO>>>
 
+    @GET("/store/takeout/{store_id}")
+    fun getStoreAddressTogo(@Path("store_id") search: Int) : Call<ApiResponse<StoreAddressVO>>
+
+    @POST("/store/takeout/{user_id}")
+    fun postUserWithPointAfterYonggi(@Path("user_id") id: Int): Call<ApiResponse<Int>>
+
+    @GET("/store/searchName/{search}")
+    fun searchStoreByName(@Path("search") search: String) : Call<ApiResponse<ArrayList<StoreNameVO2>>>
+
     // 가게 review 가져옴
     @GET("/store/reviews/{store_id}")
     fun getReviewComments(@Path("store_id") store_id: Long): Call<ApiResponse<ArrayList<GetReviewCommentsVO>>>
+
 }
