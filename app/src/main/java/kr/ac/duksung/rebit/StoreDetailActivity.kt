@@ -14,6 +14,7 @@ import kr.ac.duksung.rebit.network.RetofitClient
 import kr.ac.duksung.rebit.network.RetrofitService
 import kr.ac.duksung.rebit.network.dto.ApiResponse
 import kr.ac.duksung.rebit.network.dto.StoreInfoVO
+import kr.ac.duksung.rebit.network.dto.StoreMenuVO
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -117,8 +118,6 @@ class StoreDetailActivity : AppCompatActivity() {
             intent.putExtra("store_id", data)
             startActivity(intent)
         }
-
-
         retrofitService.getStoreInfo(rand.toLong())?.enqueue(object :
             Callback<ApiResponse<StoreInfoVO>> {
             override fun onResponse(
@@ -158,6 +157,7 @@ class StoreDetailActivity : AppCompatActivity() {
                         reviewNumTv.text = "아직 등록된 리뷰가 없습니다. 첫번째 리뷰어가 되어주세요!"
                     }
 
+
                 }
             }
 
@@ -166,6 +166,29 @@ class StoreDetailActivity : AppCompatActivity() {
                 t: Throwable,
             ) {
                 Log.e("info", "onFailure : ${t.message} ");
+            }
+        })
+        retrofitService.getStoreMenu(rand.toLong())?.enqueue(object: Callback<ApiResponse<StoreMenuVO>>{
+            override fun onResponse(
+                call: Call<ApiResponse<StoreMenuVO>>,
+                response: Response<ApiResponse<StoreMenuVO>>,) {
+                if (response.isSuccessful) {
+                    // 통신 성공시
+                    val result: ApiResponse<StoreMenuVO>? = response.body()
+                    val data = result?.getResult()
+
+                    Log.d("getStoreMenu", "onresponse 성공: " + result?.toString())
+                    Log.d("getStoreMenu", "data : " + data?.toString())
+                    Log.d("getStoreMenu", "store id: "+rand.toLong())
+
+                    // 화면에 데이터 뿌린다.
+                    // 가게 메뉴판
+                    menuTv.text = data?.menu
+                }
+            }
+
+            override fun onFailure(call: Call<ApiResponse<StoreMenuVO>>, t: Throwable) {
+                Log.e("getStoreMenu", "onFailure : ${t.message} ");
             }
         })
     }
