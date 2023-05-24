@@ -101,7 +101,7 @@ class StoreDetailActivity : AppCompatActivity() {
                     val photoUrl = storeInfoVO.store_photo
                     // 만약 사진이 없거나, error 시 dagom 사진 보이도록
                     Glide.with(this@StoreDetailActivity).load("https:$photoUrl")
-                        .error(R.drawable.sit_dagom_icon).into(storeImageArea)
+                        .error(R.drawable.store_error_dagom_icon).into(storeImageArea)
                     // 가게 카테고리
                     storeKindTextArea.text = storeInfoVO.category
                     // 가게 전화번호
