@@ -22,7 +22,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import kr.ac.duksung.rebit.databinding.ActivityTogoBinding
-import kr.ac.duksung.rebit.datas.Store
 import kr.ac.duksung.rebit.network.RetofitClient
 import kr.ac.duksung.rebit.network.RetrofitService
 import kr.ac.duksung.rebit.network.dto.*
@@ -34,8 +33,6 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
-import android.os.Handler
-import android.os.Looper
 
 class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // TogoActivity
     private lateinit var retrofit: Retrofit
@@ -279,7 +276,7 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
                                                         selectedMarkerType =
                                                             MapPOIItem.MarkerType.CustomImage  // 클릭 시 마커 모양 (커스텀)
                                                         customSelectedImageResourceId =
-                                                            R.drawable.dagom     // 클릭 시 커스텀 마커 이미지
+                                                            R.drawable.map_maker_dagom_icon     // 클릭 시 커스텀 마커 이미지
                                                         isCustomImageAutoscale =
                                                             false      // 커스텀 마커 이미지 크기 자동 조정
                                                         setCustomImageAnchor(0.5f, 1.0f)
@@ -606,9 +603,7 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
                 })
             return mCalloutBalloon
         }
-
-        override fun getPressedCalloutBalloon(p0: MapPOIItem?): View {
-
+        override fun getPressedCalloutBalloon(p0: MapPOIItem?): View? {
             return mCalloutBalloon
         }
     }
