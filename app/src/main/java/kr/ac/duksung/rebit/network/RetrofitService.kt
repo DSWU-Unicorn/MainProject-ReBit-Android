@@ -33,7 +33,7 @@ interface RetrofitService {
     fun getStoreInfo(@Path("store_id") search: Long): Call<ApiResponse<StoreInfoVO>>
 
 
-    @GET("/store/markInfo/{search}") // 가게 상세 정보 조회
+    @GET("/store/markInfo/{search}") // 가게 마커 클릭시 말풍선 정보 조회
     fun getMarkerInfo(@Path("search") search: String): Call<ApiResponse<MarkerInfoVO>>
 
     @GET("/store")
@@ -52,6 +52,8 @@ interface RetrofitService {
     @GET("/store/reviews/{store_id}")
     fun getReviewComments(@Path("store_id") store_id: Long): Call<ApiResponse<ArrayList<GetReviewCommentsVO>>>
 
-    @GET("/menu/{store_id}") // 가게 메뉴 정보 조회
+    // 가게 메뉴판 조회
+    @GET("/menu/{store_id}")
+
     fun getStoreMenu(@Path("store_id") store_id: Long): Call<ApiResponse<StoreMenuVO>>
 }

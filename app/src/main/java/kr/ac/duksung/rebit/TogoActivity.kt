@@ -325,7 +325,7 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
                                                         selectedMarkerType =
                                                             MapPOIItem.MarkerType.CustomImage  // 클릭 시 마커 모양 (커스텀)
                                                         customSelectedImageResourceId =
-                                                            R.drawable.dagom     // 클릭 시 커스텀 마커 이미지
+                                                            R.drawable.map_maker_dagom_burgundy     // 클릭 시 커스텀 마커 이미지
                                                         isCustomImageAutoscale =
                                                             false      // 커스텀 마커 이미지 크기 자동 조정
                                                         setCustomImageAnchor(0.5f, 1.0f)
@@ -514,7 +514,7 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
 
     // GPS가 켜져있는지 확인
     private fun checkLocationService(): Boolean {
-        val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
     }
 
