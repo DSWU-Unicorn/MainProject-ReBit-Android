@@ -15,112 +15,42 @@
             android:gravity="center"
             android:orientation="vertical">
 
+
             <LinearLayout
-                android:id="@+id/listView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
                 android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/storeImageArea"
+                    android:layout_width="match_parent"
+                    android:layout_height="250dp"
+                    android:contentDescription="@string/store_image" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <ImageView
-                        android:id="@+id/storeImageArea"
-                        android:layout_width="match_parent"
-                        android:layout_height="250dp"
-                        android:contentDescription="@string/store_image" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:padding="10dp">
-
-                        <TextView
-                            android:id="@+id/storeNameTextArea"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/store_name"
-                            android:textSize="32sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/storeKindTextArea"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="5dp"
-                            android:text="@string/store_category" />
-
-                    </LinearLayout>
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:padding="10dp">
 
                     <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#DFDFDF" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                        android:id="@+id/storeNameTextArea"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:padding="10dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/store_address_tv" />
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1" />
-
-                        <TextView
-                            android:id="@+id/addressTxt"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/store_address"
-                            android:textColor="#000000" />
-
-                    </LinearLayout>
+                        android:text="@string/store_name"
+                        android:textSize="32sp"
+                        android:textStyle="bold" />
 
                     <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#DFDFDF" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                        android:id="@+id/storeKindTextArea"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:padding="10dp">
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="3dp"
+                        android:text="@string/store_category" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/store_tel_tv" />
 
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1" />
-
-                        <TextView
-                            android:id="@+id/telText"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/store_tel"
-                            android:textColor="#000000" />
-
-                    </LinearLayout>
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#DFDFDF" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -132,53 +62,119 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/store_star_tv" />
-
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1" />
-
+                        android:layout_marginStart="100dp"
+                        android:text="@string/store_star_avg_tv"
+                        android:textColor="#000000" />
                     <TextView
                         android:id="@+id/starAvgTv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/store_star_avg_tv"
-                        android:textColor="#000000" />
-
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#DFDFDF" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="10dp">
+                        android:layout_marginStart="5dp"
+                        android:text="@string/store_star_tv"
+                        android:textColor="#000000"
+                        />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/store_review_tv" />
-
+                        android:layout_marginStart="5dp"
+                        android:text="@string/store_star_avg_total_tv" />
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1" />
+                        android:layout_weight="1"
+                        />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:text="@string/store_review_num_tv"
+                        android:textColor="#000000" />
 
                     <TextView
                         android:id="@+id/reviewNumTv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/store_review_num_tv"
+                        android:layout_marginStart="5dp"
+                        android:text="@string/store_review_tv"
+                        android:textColor="#000000" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginEnd="100dp"
+                        android:text="@string/store_review_count"
                         android:textColor="#000000" />
 
                 </LinearLayout>
 
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#DFDFDF" />
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:contentDescription="@string/store_address"
+                        android:src="@drawable/store_address_icon">
+
+                    </ImageView>
+
+                    <TextView
+                        android:id="@+id/addressTxt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="5dp"
+                        android:text="@string/store_address"
+                        android:textColor="#000000" />
+
+                </LinearLayout>
+
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#DFDFDF" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="30dp"
+                        android:layout_marginStart="6dp"
+                        android:contentDescription="@string/store_address"
+                        android:src="@drawable/store_telephone_icon">
+                    </ImageView>
+
+                    <TextView
+                        android:id="@+id/telText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="5dp"
+                        android:text="@string/store_tel"
+                        android:textColor="#000000" />
+                </LinearLayout>
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
@@ -187,55 +183,73 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:orientation="vertical">
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:orientation="horizontal">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:text="@string/store_menu_tv" />
-
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="30dp"
+                        android:layout_marginStart="6dp"
+                        android:contentDescription="@string/store_address"
+                        android:src="@drawable/store_menu_icon">
+                    </ImageView>
                     <TextView
                         android:id="@+id/menuTv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="5dp"
                         android:text="@string/store_menu"
                         android:textColor="#000000" />
+
                 </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/linearLayout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:orientation="horizontal">
-
-                    <Button
-                        android:id="@+id/pic_btn"
-                        style="?android:attr/buttonBarButtonStyle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="100dp"
-                        android:text="@string/store_pic_button" />
-
-                    <Button
-                        android:id="@+id/todo_btn"
-                        style="?android:attr/buttonBarButtonStyle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/store_review_button" />
-                </LinearLayout>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="10dp"
+                    android:background="#DFDFDF" />
             </LinearLayout>
 
+            <LinearLayout
+                android:id="@+id/linearLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:layout_marginTop="50dp">
+
+                <Button
+                    android:id="@+id/pic_btn"
+                    android:drawableLeft="@drawable/drawable_camera_icon_resize"
+                    android:drawablePadding="7dp"
+                    android:fontFamily="@font/bmjua"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="100dp"
+                    android:background="@drawable/button_effect"
+                    android:text="@string/store_pic_button" />
+
+                <Button
+                    android:id="@+id/todo_btn"
+                    android:drawableLeft="@drawable/store_review_icon_resize"
+                    android:fontFamily="@font/bmjua"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/button_effect"
+                    android:text="@string/store_review_button" />
+            </LinearLayout>
             <Button
                 android:id="@+id/gotoReviewBtn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="50dp"
+                android:background="@drawable/button_effect"
                 android:text="@string/store_show_review_button" />
+
+
         </LinearLayout>
     </ScrollView>
 

@@ -14,11 +14,11 @@
     <string name="store_tel_tv">전화번호</string>
     <string name="store_tel">1234-5678</string>
     <string name="store_star_tv">별점</string>
-    <string name="store_star_avg_tv">⭐️ 별점 평균</string>
+    <string name="store_star_avg_tv">⭐️</string>
     <string name="store_review_tv">리뷰</string>
     <string name="store_review_icon">리뷰 아이콘</string>
 
-    <string name="store_review_num_tv">❤️ 리뷰 수</string>
+    <string name="store_review_num_tv">❤️</string>
     <string name="store_menu_tv">메뉴</string>
     <string name="store_menu">메뉴판</string>
     <string name="store_pic_button">사진촬영</string>
@@ -27,5 +27,10 @@
     <string name="review_date_tv">2023.3.23</string>
     <string name="review_user_name_tv">홍길동</string>
     <string name="review_user_name_iv">유저 이미지</string>
+    <string name="store_review_count">개</string>
+    <string name="togo_model_text">해당 다회용기는 \n사용이 적합합니다.</string>
+    <string name="store_star_avg_total_tv">/5</string>
+    <string name="togo_goto_tv">용기내러\n가기!</string>
+    <string name="togo_extra_shot_tv">추가 촬영</string>
 
 </resources>

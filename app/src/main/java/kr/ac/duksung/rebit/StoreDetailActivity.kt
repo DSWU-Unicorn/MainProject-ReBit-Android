@@ -8,11 +8,14 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
+import com.unity3d.player.e
 import kotlinx.android.synthetic.main.activity_store_detail.*
 import kr.ac.duksung.rebit.databinding.ActivityStoreDetailBinding
+import kr.ac.duksung.rebit.databinding.ReviewDetailItemBinding
 import kr.ac.duksung.rebit.network.RetofitClient
 import kr.ac.duksung.rebit.network.RetrofitService
 import kr.ac.duksung.rebit.network.dto.ApiResponse
+import kr.ac.duksung.rebit.network.dto.GetReviewCommentsVO
 import kr.ac.duksung.rebit.network.dto.StoreInfoVO
 import kr.ac.duksung.rebit.network.dto.StoreMenuVO
 import retrofit2.Call
@@ -73,7 +76,6 @@ class StoreDetailActivity : AppCompatActivity() {
 //        }
 
 
-
         //val rand = "${store.id}"
         //val rand = Integer.parseInt(data)
         //Log.d("STOREDETAIL_STORE_ID", rand.toString())
@@ -87,13 +89,13 @@ class StoreDetailActivity : AppCompatActivity() {
         //storeImageArea.setImageResource(imgId[rand.toInt()])
 
         // val pic_btn = findViewById<Button>(R.id.pic_btn)
-       // pic_btn.setOnClickListener {
+        // pic_btn.setOnClickListener {
         //    Toast.makeText(this, "내 용기가 맞을까? 확인하러 가기", Toast.LENGTH_SHORT).show()
-            //
-          //  val intent = Intent(this, YonggiCameraActivity::class.java)
-           // intent.putExtra("store_id", data)
-           // startActivity(intent)
-       // }
+        //
+        //  val intent = Intent(this, YonggiCameraActivity::class.java)
+        // intent.putExtra("store_id", data)
+        // startActivity(intent)
+        // }
 //        // review view
         val goto_review_btn = findViewById<Button>(R.id.goto_review_btn)
 //        goto_review_btn.setOnClickListener {
@@ -154,7 +156,8 @@ class StoreDetailActivity : AppCompatActivity() {
 
                     // 화면에 데이터 뿌린다.
                     // 가게 이름
-                    storeNameTextArea.text = storeInfoVO!!.storeName // data binding 으로 findViewById 안써도 접근 가능.
+                    storeNameTextArea.text =
+                        storeInfoVO!!.storeName // data binding 으로 findViewById 안써도 접근 가능.
                     // 가게 주소
                     addressTxt.text = storeInfoVO.address
                     // 가게 사진
@@ -168,8 +171,40 @@ class StoreDetailActivity : AppCompatActivity() {
                     telText.text = (storeInfoVO.tel).convertNumberToPhoneNumber()
                     // 가게 별점 평균, 가게 리뷰 수
                     try {
-                        starAvgTv.text = (storeInfoVO.reviewList[0].toString())
-                        reviewNumTv.text = (storeInfoVO.reviewList[1].toString())
+                        // starAvgTv.text = (storeInfoVO.reviewList[0].toString()) // 프론트단에서 별점 평균 구함
+                        //Log.d("storeInfoVO","starAvg: ${starAvgTv.text}")
+                        // 리뷰 데이터 통신
+                        getReviewComments()
+//
+//                        retrofitService.getReviewComments(rand.toLong()).enqueue(object :
+//                            Callback<ArrayList<GetReviewCommentsVO>> {
+//                            override fun onResponse(
+//                                call: Call<ApiResponse<ArrayList<GetReviewCommentsVO>>>,
+//                                response: Response<ArrayList<GetReviewCommentsVO>>,
+//                            ) {
+//                                if (response.isSuccessful) {
+//                                    // 통신 성공시
+//                                    val result: ApiResponse<StoreInfoVO>? = response.body()
+//                                    val storeInfoVO = result?.getResult()
+//
+//                                    Log.d("getReviewComments", "onresponse 성공: " + result?.toString())
+//                                    Log.d("getReviewComments", "data : " + storeInfoVO?.toString())
+//
+//                                    // 화면에 데이터 뿌린다.
+//
+//                                }
+//                            }
+//
+//                            override fun onFailure(
+//                                call: Call<ArrayList<GetReviewCommentsVO>>,
+//                                t: Throwable,
+//                            ) {
+//                                Log.e("getReviewComments", "onFailure : ${t.message} ")
+//                            }
+//                        })
+
+                        // reviewNumTv.text = (storeInfoVO.reviewList[1].toString()) // 프론트단에서 리뷰 수 조회
+                        //Log.d("storeInfoVO","reviewNum: ${reviewNumTv.text}")
 
                     } catch (e: IndexOutOfBoundsException) {
                         // e.printStackTrace()
@@ -219,7 +254,8 @@ class StoreDetailActivity : AppCompatActivity() {
                         val menuText = storeMenuVO?.menu
                         // 받아온 데이터 조작
                         // 메뉴 가격의 콤마(,)뒤에 숫자까지 감지해서 연속한 숫자가 끝날때 한줄 break
-                        val regex = Regex("(\\D+)(\\d{1,3}(?:,\\d{3})*)") // 메뉴와 가격 패턴을 찾기 위한 정규식입니다.
+                        val regex =
+                            Regex("(\\D+)(\\d{1,3}(?:,\\d{3})*)") // 메뉴와 가격 패턴을 찾기 위한 정규식입니다.
                         val modifiedText = menuText?.replace(regex) { matchResult ->
                             val menu = matchResult.groupValues[1].trim() // 앞, 뒤 공백 제거
                             val price = matchResult.groupValues[2]
@@ -251,6 +287,66 @@ class StoreDetailActivity : AppCompatActivity() {
             this
         }
     }
+
+    // 리뷰 정보
+    fun getReviewComments() {
+        //enqueue : 비동기식 통신을 할 때 사용/ execute: 동기식
+//        val data = intent.getStringExtra("store_id")
+//        val storeId = Integer.parseInt(data)
+        val data = intent.getStringExtra("store_id")
+        val rand = Integer.parseInt(data.toString())
+
+        if (intent.hasExtra("store_id")) {
+//            val storeId = intent.getLongExtra("store_id", 357)
+            //val photoUrl = intent.getStringExtra("photo_url")
+
+            retrofitService.getReviewComments(rand.toLong()).enqueue(object :
+                Callback<ApiResponse<ArrayList<GetReviewCommentsVO>>> {
+                override fun onResponse(
+                    call: Call<ApiResponse<ArrayList<GetReviewCommentsVO>>>,
+                    response: Response<ApiResponse<ArrayList<GetReviewCommentsVO>>>,
+                ) {
+                    if (response.isSuccessful) {
+                        // 통신 성공시
+                        val result: ApiResponse<ArrayList<GetReviewCommentsVO>>? = response.body()
+                        val reviews = result?.getResult()
+
+                        Log.d("getReviewComments", "on response 성공: " + result?.toString())
+                        Log.d("getReviewComments", "data : " + reviews?.toString())
+
+
+                        if (reviews != null && reviews.isNotEmpty()) {
+                            val reviewsCount = reviews.size.toInt()
+                            // 리뷰 수 구하기
+                            reviewNumTv.text = reviewsCount.toString()
+                            var reviewsSumOfStar = 0
+
+                            for (review in reviews) {
+                                // 별점 평균 구하기
+                                reviewsSumOfStar += review.star.toInt()
+                            }
+                            starAvgTv.text = (reviewsSumOfStar / reviewsCount).toString()
+                        }
+                    }
+
+                }
+                override fun onFailure(
+                    call: Call<ApiResponse<ArrayList<GetReviewCommentsVO>>>,
+                    t: Throwable,
+                ) {
+                    Log.e("getReviewComments", "onFailure : ${t.message} ")
+                }
+            })
+        } else {
+            Toast.makeText(this, "store_id 값이 전달되지 않았습니다.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+
+}
+
+private operator fun Int.div(reviewsCount: String) {
+
 }
 
 private fun Any.error(s: String) {
