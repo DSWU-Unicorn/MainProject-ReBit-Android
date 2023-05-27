@@ -18,6 +18,9 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.amazonaws.auth.BasicAWSCredentials
+import com.amazonaws.services.s3.AmazonS3Client
+import com.amazonaws.services.s3.model.PutObjectRequest
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.unity3d.player.e
@@ -54,9 +57,20 @@ class CreateReviewActivity() : AppCompatActivity() {
     private lateinit var imageResult: ActivityResultLauncher<Intent>
 
 
+    fun uploadFileToS3(file: File, bucketName: String, accessKey: String, secretKey: String) {
+        val credentials = BasicAWSCredentials(accessKey, secretKey)
+        val s3Client = AmazonS3Client(credentials)
+
+        val putObjectRequest = PutObjectRequest(bucketName, file.name, file)
+        val putObject = s3Client.putObject(putObjectRequest)
+        Log.d("S3_CHECK: " , putObject.toString())
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_review)
+
 
         val ratingBar = findViewById<RatingBar>(R.id.ratingBar)
         val reviewEditText = findViewById<EditText>(R.id.reviewEditText)
@@ -91,12 +105,16 @@ class CreateReviewActivity() : AppCompatActivity() {
                     imageUri?.let {
                         //서버 업로드를 위해 파일 형태로 변환한다
                         var imageFile = File(getRealPathFromURI(it))
+
                         //이미지를 불러온다
                         Glide.with(this)
                             .load(imageUri)
                             .fitCenter()
                             .apply(RequestOptions().override(500, 500))
                             .into(ReviewImageArea)
+
+                        val uploadTask = UploadTask(imageFile, BuildConfig.bucketName, BuildConfig.accessKey, BuildConfig.secretKey)
+                        uploadTask.execute()
                     }
                     // 여기서 할당
                     photo = imageUri.toString()
