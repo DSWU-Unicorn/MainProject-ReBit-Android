@@ -6,4 +6,26 @@
     <string name="title_notifications">Notifications</string>
     <!--unity-->
     <string name="game_view_content_description">Game View</string>
+    <string name="store_image">가게 이미지</string>
+    <string name="store_name">상점</string>
+    <string name="store_category">일반음식</string>
+    <string name="store_address">주소</string>
+    <string name="store_address_tv">주소</string>
+    <string name="store_tel_tv">전화번호</string>
+    <string name="store_tel">1234-5678</string>
+    <string name="store_star_tv">별점</string>
+    <string name="store_star_avg_tv">⭐️ 별점 평균</string>
+    <string name="store_review_tv">리뷰</string>
+    <string name="store_review_icon">리뷰 아이콘</string>
+
+    <string name="store_review_num_tv">❤️ 리뷰 수</string>
+    <string name="store_menu_tv">메뉴</string>
+    <string name="store_menu">메뉴판</string>
+    <string name="store_pic_button">사진촬영</string>
+    <string name="store_review_button">리뷰작성</string>
+    <string name="store_show_review_button">리뷰 보러가기</string>
+    <string name="review_date_tv">2023.3.23</string>
+    <string name="review_user_name_tv">홍길동</string>
+    <string name="review_user_name_iv">유저 이미지</string>
+
 </resources>

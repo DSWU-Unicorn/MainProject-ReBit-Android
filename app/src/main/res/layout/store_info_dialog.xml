@@ -27,7 +27,6 @@
                     android:id="@+id/storeImageArea"
                     android:layout_width="300dp"
                     android:layout_height="300dp"
-                    android:src="@drawable/megacoffee"
                     android:layout_gravity="center"
                     />
                 <LinearLayout
@@ -126,7 +125,7 @@
                 android:layout_margin="10dp">
 
                 <TextView
-                    android:id="@+id/reviewTextArea"
+                    android:id="@+id/reviewEditText"
                     android:layout_width="match_parent"
                     android:layout_height="100dp"
                     android:layout_marginTop="10dp"

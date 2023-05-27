@@ -7,14 +7,17 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" /> <!-- Location -->
     <!-- 정확한 위치 -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- 대략적인 위치 -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <!--갤러리 권한-->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -56,9 +59,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-<!--        <activity-->
-<!--            android:name=".Toolbar"-->
-<!--            android:exported="true" />-->
+        <!--        <activity-->
+        <!--            android:name=".Toolbar"-->
+        <!--            android:exported="true" />-->
         <activity
             android:name=".TogoActivity"
             android:exported="true" />

@@ -8,4 +8,4 @@ import java.util.Arrays.toString
 //val date = dataFormat.format(currentTime).toString()
 
 // 클래스 모델 객체
-class Review(val image:Int, val name: String, val date: String, val review_text: String)
+class Review(val image:String, val name: String, val date: String, val review_text: String)
