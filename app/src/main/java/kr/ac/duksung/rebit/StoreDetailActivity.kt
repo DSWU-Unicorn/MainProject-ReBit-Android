@@ -53,6 +53,46 @@ class StoreDetailActivity : AppCompatActivity() {
         val rand = data?.let { Integer.parseInt(it) }
         Log.d("store_id", rand.toString())
 
+=======
+
+        //val rand = "${store.id}"
+        //val rand = Integer.parseInt(data)
+        //Log.d("STOREDETAIL_STORE_ID", rand.toString())
+
+//        val imgId = intArrayOf(
+//            R.drawable.megacoffee1, R.drawable.coffeedream2,
+//            R.drawable.eeeyo3, R.drawable.blackdown4,
+//            R.drawable.bagle5
+//        )
+
+        //storeImageArea.setImageResource(imgId[rand.toInt()])
+
+        // val pic_btn = findViewById<Button>(R.id.pic_btn)
+       // pic_btn.setOnClickListener {
+        //    Toast.makeText(this, "내 용기가 맞을까? 확인하러 가기", Toast.LENGTH_SHORT).show()
+            //
+          //  val intent = Intent(this, YonggiCameraActivity::class.java)
+           // intent.putExtra("store_id", data)
+           // startActivity(intent)
+       // }
+//        // review view
+        val goto_review_btn = findViewById<Button>(R.id.goto_review_btn)
+//        goto_review_btn.setOnClickListener {
+//            Toast.makeText(this, "생생한 후기가 궁금하나요? 리뷰 보러 가기", Toast.LENGTH_SHORT).show()
+//            val intent = Intent(this, ReviewActivity::class.java)
+//            intent.putExtra("store_id", data) // store id 값 전달.
+//            startActivity(intent)
+//        }
+//        // review create
+        val todo_btn = findViewById<Button>(R.id.todo_btn)
+//        todo_btn.setOnClickListener {
+//            Toast.makeText(this, "이미 용기냈다면! 어땠는지 후기 작성하러 가기", Toast.LENGTH_SHORT).show()
+//            val intent = Intent(this, CreateReviewActivity::class.java)
+//            intent.putExtra("store_id", data) // store id 값 전달.
+//            startActivity(intent)
+//        }
+
+
     }// OnCreate
 
     //서버 연결
