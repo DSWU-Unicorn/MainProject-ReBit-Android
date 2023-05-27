@@ -76,4 +76,8 @@ dependencies {
 
 
     implementation "land.sungbin:systemuicontroller:1.0.1"
+
+    // tensoorflow-lite
+    implementation 'org.tensorflow:tensorflow-lite:2.4.0'
+    implementation 'org.tensorflow:tensorflow-lite-support:0.1.0'
 }
