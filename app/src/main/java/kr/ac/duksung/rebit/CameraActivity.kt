@@ -2,6 +2,7 @@ package kr.ac.duksung.rebit
 
 import android.Manifest
 import android.app.Activity
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -22,6 +23,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import kr.ac.duksung.rebit.databinding.ActivityCameraBinding
 import kr.ac.duksung.rebit.network.RetofitClient
 import kr.ac.duksung.rebit.network.RetrofitService
@@ -32,7 +34,10 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import com.google.android.gms.location.*
+import kotlinx.coroutines.launch
+import kr.ac.duksung.rebit.model.Classifier
 import kr.ac.duksung.rebit.network.dto.RecycleDetailVO
+import java.io.IOException
 import java.util.*
 
 
@@ -48,13 +53,16 @@ class CameraActivity : AppCompatActivity() {
     private lateinit var mAlertDialog : AlertDialog
 
     private lateinit var content : String
-    private lateinit var dataLabel : String
     lateinit var bitmap: Bitmap
     lateinit var imageView: ImageView
 
     private lateinit var textView : TextView
     private lateinit var textView2 : TextView
     private lateinit var geocoder: Geocoder
+
+    // 모델 연결
+    private lateinit var classifier: Classifier
+    private var dataLabel : String = ""
 
     private lateinit var binding: ActivityCameraBinding
 
@@ -70,8 +78,9 @@ class CameraActivity : AppCompatActivity() {
 
         geocoder = Geocoder(this)
 
-        // dataLabel 설정
-        dataLabel = "페트병"
+
+        // 모델 연결
+        initClassifier()
 
         // 서버 연결
         initRetrofit()
@@ -85,38 +94,6 @@ class CameraActivity : AppCompatActivity() {
 
 
 
-        // 분리수거 방법 통신
-        retrofitService.getRecycle(dataLabel)?.enqueue(object :
-            Callback<ApiResponse<RecycleVO>> {
-            override fun onResponse(
-                call: Call<ApiResponse<RecycleVO>>,
-                response: Response<ApiResponse<RecycleVO>>
-            ) {
-                if(response.isSuccessful) {
-                    //정상적으로 통신 성공
-                    val result : ApiResponse<RecycleVO>? = response.body();
-                    val data = result?.getResult();
-
-                    Log.d("Recycle" ,"onresponse 성공: "+ result?.toString() )
-                    Log.d("Recycle", "data : "+ data)
-                    Log.d("Recycle", "content : "+ data?.content)
-                    content = data!!.content
-                    Log.d("content", "content1 : "+ content)
-
-
-                } else {
-                    //통신 실패(응답코드 3xx, 4xx 등)
-                    Log.d("YMC", "onResponse 실패" + response.errorBody().toString())
-                }
-            }
-
-            override fun onFailure(call: Call<ApiResponse<RecycleVO>>, t: Throwable) {
-                //통신 실패(인터넷 끊김, 예외 발생 등 시스템적인 이유)
-                Log.d("YMC", "onFailure 에러: " + t.message.toString());
-            }
-
-        })
-
         //객체 생성
         imageView = findViewById(R.id.imageView)
         // 촬영버튼
@@ -128,53 +105,69 @@ class CameraActivity : AppCompatActivity() {
 
         binding.picBtn.setOnClickListener() {
             CallCamera()
-            binding.startButton.setOnClickListener {
-
-                // Dialog만들기
-                val mDialogView =
-                    LayoutInflater.from(this).inflate(R.layout.after_recycle_model_dialog, null)
-                val mBuilder = AlertDialog.Builder(this)
-                    .setView(mDialogView)
-
-                mAlertDialog = mBuilder.show()
-
-                val howto_text = mDialogView.findViewById<TextView>(R.id.howto_text)
-                val title_text = mDialogView.findViewById<TextView>(R.id.title_text)
-                howto_text.text = content
-                title_text.text = dataLabel + "-분리수거 방법"
-                Log.d("content", "content1 : "+ howto_text)
-
-                /*
-                val okButton = mDialogView.findViewById<Button>(R.id.successButton)
-                okButton.setOnClickListener {
-                    postUserPointByRecycle(1L)
-
-                    Toast.makeText(this, "포인트 획득했습니다!", Toast.LENGTH_SHORT).show()
-                    mAlertDialog.dismiss()
-
-                    /**
-                     * 포인트 획득 버튼 누르면 Unity로 돌아가게끔 수정 !
-                     */
-                }
-                 */
-
-                val okButton = mDialogView.findViewById<Button>(R.id.successButton)
-                okButton.setOnClickListener {
-                    // 현재 위치 찾기
-                    if (checkPermissionForLocation(this)) {
-                        startLocationUpdates()
-                    }
-
-                }
-
-
-                val noButton = mDialogView.findViewById<Button>(R.id.AgainButton)
-                noButton.setOnClickListener {
-                    CallCamera()
-                }
-            } //setOnClickListener
         }
+
+        binding.startButton.setOnClickListener {
+            // Dialog만들기
+            val mDialogView =
+                LayoutInflater.from(this).inflate(R.layout.after_recycle_model_dialog, null)
+            val mBuilder = AlertDialog.Builder(this)
+                .setView(mDialogView)
+
+            mAlertDialog = mBuilder.show()
+
+            val howto_text = mDialogView.findViewById<TextView>(R.id.howto_text)
+            val title_text = mDialogView.findViewById<TextView>(R.id.title_text)
+            howto_text.text = content
+            title_text.text = dataLabel + "-분리수거 방법"
+            Log.d("content", "content1 : "+ howto_text)
+
+            /*
+            val okButton = mDialogView.findViewById<Button>(R.id.successButton)
+            okButton.setOnClickListener {
+                postUserPointByRecycle(1L)
+
+                Toast.makeText(this, "포인트 획득했습니다!", Toast.LENGTH_SHORT).show()
+                mAlertDialog.dismiss()
+
+                /**
+                 * 포인트 획득 버튼 누르면 Unity로 돌아가게끔 수정 !
+                 */
+            }
+             */
+
+            val okButton = mDialogView.findViewById<Button>(R.id.successButton)
+            okButton.setOnClickListener {
+                // 현재 위치 찾기
+                if (checkPermissionForLocation(this)) {
+                    startLocationUpdates()
+                }
+
+            }
+
+
+            val noButton = mDialogView.findViewById<Button>(R.id.AgainButton)
+            noButton.setOnClickListener {
+                CallCamera()
+            }
+        } //setOnClickListener
+
+
     }//onCreate
+
+    private fun initClassifier() {
+        classifier = Classifier(this, Classifier.IMAGENET_CLASSIFY_MODEL)
+        try {
+            classifier.init()
+        } catch (exception: IOException) {
+            Toast.makeText(this, "Can not init Classifier!!", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun onDestroy() {
+        classifier.finish()
+        super.onDestroy()
+    }
 
     fun checkPermission(permissions: Array<out String>): Boolean {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -231,13 +224,22 @@ class CameraActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
+        // 모델 연결
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 CAMERA_CODE -> {
                     if (data?.extras?.get("data") != null) {
                         val img = data?.extras?.get("data") as Bitmap
-                        binding.imageView.setImageBitmap(img)
+                        val output = classifier.classify(img)
+                        val resultStr =
+                            String.format(Locale.ENGLISH, "class : %s", output.first)
+                        binding.run {
+                            binding.textResult.text = resultStr
+                            Log.d("MODEL_RESLT: " , resultStr)
+                            dataLabel = resultStr
+                            binding.imageView.setImageBitmap(img)
+                            getRecycle()
+                        }
                     }
                 }
             }
@@ -249,6 +251,48 @@ class CameraActivity : AppCompatActivity() {
     private fun initRetrofit() {
         retrofit = RetofitClient.getInstance()
         retrofitService = retrofit.create(RetrofitService::class.java)
+    }
+
+    private fun getRecycle() {
+        // 분리수거 방법 통신
+        lifecycleScope.launch {
+            try {
+                Log.d("RECYCLE_DATA_LABEL: ", dataLabel)
+                retrofitService.getRecycle("Plastic")?.enqueue(object :
+                    Callback<ApiResponse<RecycleVO>> {
+                    override fun onResponse(
+                        call: Call<ApiResponse<RecycleVO>>,
+                        response: Response<ApiResponse<RecycleVO>>
+                    ) {
+                        if(response.isSuccessful) {
+                            //정상적으로 통신 성공
+                            val result : ApiResponse<RecycleVO>? = response.body();
+                            val data = result?.getResult();
+
+                            Log.d("RECYCLE_CAMERA" ,"onresponse 성공: "+ result?.toString() )
+                            Log.d("RECYCLE_CAMERA", "data : "+ data)
+                            Log.d("RECYCLE_CAMERA", "content : "+ data?.content)
+                            content = data!!.content
+                            Log.d("RECYCLE_CAMERA_CONTENT", "content1 : "+ content)
+
+
+                        } else {
+                            //통신 실패(응답코드 3xx, 4xx 등)
+                            Log.d("YMC", "onResponse 실패" + response.errorBody().toString())
+                        }
+                    }
+
+                    override fun onFailure(call: Call<ApiResponse<RecycleVO>>, t: Throwable) {
+                        //통신 실패(인터넷 끊김, 예외 발생 등 시스템적인 이유)
+                        Log.d("YMC", "onFailure 에러: " + t.message.toString());
+                    }
+
+                })
+            } catch  (e: Exception) {
+                // Exception handling
+                Log.e(ContentValues.TAG, "Exception: ${e.message}", e)
+            }
+        }
     }
 
     private fun startLocationUpdates() {
