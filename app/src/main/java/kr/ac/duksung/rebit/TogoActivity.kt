@@ -160,6 +160,52 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
 
             override fun onQueryTextChange(newText: String?): Boolean {
                 storeAdapter.filter.filter(newText)
+                lifecycleScope.launch {
+                    try {
+                        retrofitService.searchStoreByName(newText!!)?.enqueue(object :
+                            Callback<ApiResponse<ArrayList<StoreNameVO2>>> {
+                            override fun onResponse(
+                                call: Call<ApiResponse<ArrayList<StoreNameVO2>>>,
+                                response: Response<ApiResponse<ArrayList<StoreNameVO2>>>
+                            ){
+                                if(response.isSuccessful) {
+                                    // 통신 성공시
+                                    val result: ApiResponse<ArrayList<StoreNameVO2>>? =
+                                        response.body()
+                                    val datas = result?.getResult()
+
+                                    Log.d(
+                                        "SEARCH_STORE_NAME",
+                                        "onresponse 성공: " + result?.toString()
+                                    )
+                                    Log.d("SEARCH_STORE_NAME", "data : " + datas?.toString())
+
+                                    storeList.clear()
+                                    storeNameList.clear()
+                                    Log.d("SEARCH_STORE_NAME", "size1 : " + storeList.size)
+                                    for (data in datas!!) {
+                                        storeNameList.add(data.storeName)
+                                        storeList.add(StoreNameVO(data.storeName, data.storeId))
+                                    }
+                                    Log.d("SEARCH_STORE_NAME", "storeList : " + storeList)
+                                    Log.d("SEARCH_STORE_NAME", "size2 : " + storeList.size)
+                                    storeAdapter.notifyDataSetChanged()
+
+                                }
+                            }
+                            override fun onFailure(
+                                call: Call<ApiResponse<ArrayList<StoreNameVO2>>>,
+                                t: Throwable
+                            ) {
+                                Log.e("StoreMarker","onFailure : ${t.message} ");
+                            }
+                        })
+                    } catch  (e: Exception) {
+                        // Exception handling
+                        Log.e(ContentValues.TAG, "Exception: ${e.message}", e)
+                    }
+                }
+
                 return false
             }
         })
