@@ -52,4 +52,6 @@ interface RetrofitService {
     @GET("/store/reviews/{store_id}")
     fun getReviewComments(@Path("store_id") store_id: Long): Call<ApiResponse<ArrayList<GetReviewCommentsVO>>>
 
+    @GET("/menu/{store_id}") // 가게 메뉴 정보 조회
+    fun getStoreMenu(@Path("store_id") store_id: Long): Call<ApiResponse<StoreMenuVO>>
 }
