@@ -32,6 +32,7 @@ class StoreDetailActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_store_detail)
+
         // activity_store_detail.xml에 설정했던 id 값 사용가능
         binding = ActivityStoreDetailBinding.inflate(layoutInflater)
         pic_btn.setOnClickListener {
@@ -52,6 +53,24 @@ class StoreDetailActivity : AppCompatActivity() {
         val data = intent.getStringExtra("store_id")
         val rand = data?.let { Integer.parseInt(it) }
         Log.d("store_id", rand.toString())
+//        val data = intent.getStringExtra("store_id")
+//        val rand = data?.let { Integer.parseInt(it) }
+//        Log.d("store_id", rand.toString())
+
+
+//        val todoBtn = findViewById<Button>(R.id.todo_btn)
+//        todoBtn.setOnClickListener {
+//            val storeId = intent.getStringExtra("store_id")
+//            val rand = storeId?.toIntOrNull()
+//            if (rand != null) {
+//                val intent = Intent(this, CreateReviewActivity::class.java) // 리뷰 작성
+//                intent.putExtra("store_id", rand.toString())
+//                startActivity(intent)
+//            } else {
+//                // store_id 값이 유효하지 않을 때 처리할 내용
+//            }
+//        }
+
 
 =======
 
@@ -118,6 +137,7 @@ class StoreDetailActivity : AppCompatActivity() {
             intent.putExtra("store_id", data)
             startActivity(intent)
         }
+
         retrofitService.getStoreInfo(rand.toLong()).enqueue(object :
             Callback<ApiResponse<StoreInfoVO>> {
             override fun onResponse(
@@ -148,10 +168,11 @@ class StoreDetailActivity : AppCompatActivity() {
                     telText.text = (storeInfoVO.tel).convertNumberToPhoneNumber()
                     // 가게 별점 평균, 가게 리뷰 수
                     try {
-                        starAvgTv.text = (storeInfoVO.reviewList[0].toString())
-                        reviewNumTv.text = (storeInfoVO.reviewList[1].toString())
+                        starAvgTv.text = (data.reviewList[0].toString())
+                        reviewNumTv.text = (data.reviewList[1].toString())
+
                     } catch (e: IndexOutOfBoundsException) {
-                        e.printStackTrace()
+                        // e.printStackTrace()
                         starAvgTv.text = "아직 등록된 별점이 없습니다. 첫번째 별점을 달아주세요!"
                         reviewNumTv.text = "아직 등록된 리뷰가 없습니다. 첫번째 리뷰어가 되어주세요!"
                     }
@@ -167,6 +188,17 @@ class StoreDetailActivity : AppCompatActivity() {
                 Log.e("info", "onFailure : ${t.message} ")
             }
         })
+
+        // 리뷰 작성
+        val todoBtn = findViewById<Button>(R.id.todo_btn)
+        todoBtn.setOnClickListener {
+            val intent = Intent(this, CreateReviewActivity::class.java)
+            intent.putExtra("store_id", rand.toString())
+            startActivity(intent)
+        }
+
+        // 메뉴 통신
+
         retrofitService.getStoreMenu(rand.toLong())
             .enqueue(object : Callback<ApiResponse<StoreMenuVO>> {
                 override fun onResponse(
@@ -187,8 +219,7 @@ class StoreDetailActivity : AppCompatActivity() {
                         val menuText = storeMenuVO?.menu
                         // 받아온 데이터 조작
                         // 메뉴 가격의 콤마(,)뒤에 숫자까지 감지해서 연속한 숫자가 끝날때 한줄 break
-                        val regex =
-                            Regex("(\\D+)(\\d{1,3}(?:,\\d{3})*)") // 메뉴와 가격 패턴을 찾기 위한 정규식입니다.
+                        val regex = Regex("(\\D+)(\\d{1,3}(?:,\\d{3})*)") // 메뉴와 가격 패턴을 찾기 위한 정규식입니다.
                         val modifiedText = menuText?.replace(regex) { matchResult ->
                             val menu = matchResult.groupValues[1].trim() // 앞, 뒤 공백 제거
                             val price = matchResult.groupValues[2]
@@ -207,24 +238,11 @@ class StoreDetailActivity : AppCompatActivity() {
     private fun setupEvents() {
     }
 
-//    fun setValues() {
-//
-//        // storeInfo를 serializable로 받는다
-//        // 그냥 받은 채로 변수에 넣으면 오류가 나는데 이 때 Casting을 해줘야 한다
-//        val store = intent.getSerializableExtra("storeInfo") as Store
-//        storeImageArea
-//        // activity_store_detail.xml에 설정했던 view에 따라 매핑
-//        storeNameTextArea.text = "${store.storeName}"
-//        storeKindTextArea.text = "${store.category1}"
-//        addressTxt.text = store.category2
-//        telText.text = (store.tel).convertNumberToPhoneNumber()
-//    }
-
     // 전화번호 하이픈 추가
     fun String.convertNumberToPhoneNumber(): String {     // 코틀린의 확장함수 사용
         return try {
             val regexString = "(\\d{2})(\\d{3,4})(\\d{4})"
-            return if (!Pattern.matches(regexString, this)) this else Regex(regexString).replace(
+            if (!Pattern.matches(regexString, this)) this else Regex(regexString).replace(
                 this,
                 "$1-$2-$3"
             )
@@ -234,3 +252,12 @@ class StoreDetailActivity : AppCompatActivity() {
         }
     }
 }
+
+private fun Any.error(s: String) {
+
+}
+
+private fun Any.into(storeImageArea: ImageView?) {
+
+}
+
