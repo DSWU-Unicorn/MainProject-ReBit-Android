@@ -3,8 +3,8 @@ package kr.ac.duksung.rebit.network.dto
 import com.google.gson.annotations.SerializedName
 
 data class GetReviewCommentsVO(
-    @SerializedName("storeId")
-    var storeId: Long,
+//    @SerializedName("store_id")
+//    var storeId: Long,
     @SerializedName("user_id") // get 할때
     var user:Long,
     @SerializedName("star")
