@@ -37,13 +37,6 @@ class StoreDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_store_detail)
 
-        // activity_store_detail.xml에 설정했던 id 값 사용가능
-        binding = ActivityStoreDetailBinding.inflate(layoutInflater)
-        pic_btn.setOnClickListener {
-            Toast.makeText(this, "내 용기가 맞을까? 확인하러 가기", Toast.LENGTH_SHORT).show()
-            val intent = Intent(this, CameraActivity::class.java)
-            startActivity(intent)
-        }
 
         //setValues()
         setupEvents()
@@ -57,6 +50,16 @@ class StoreDetailActivity : AppCompatActivity() {
         val data = intent.getStringExtra("store_id")
         val rand = data?.let { Integer.parseInt(it) }
         Log.d("store_id", rand.toString())
+
+        // activity_store_detail.xml에 설정했던 id 값 사용가능
+        binding = ActivityStoreDetailBinding.inflate(layoutInflater)
+        pic_btn.setOnClickListener {
+            Toast.makeText(this, "내 용기가 맞을까? 확인하러 가기", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, YonggiCameraActivity::class.java)
+            intent.putExtra("store_id", data)
+            startActivity(intent)
+        }
+
 //        val data = intent.getStringExtra("store_id")
 //        val rand = data?.let { Integer.parseInt(it) }
 //        Log.d("store_id", rand.toString())
@@ -88,14 +91,15 @@ class StoreDetailActivity : AppCompatActivity() {
 
         //storeImageArea.setImageResource(imgId[rand.toInt()])
 
-        // val pic_btn = findViewById<Button>(R.id.pic_btn)
-        // pic_btn.setOnClickListener {
-        //    Toast.makeText(this, "내 용기가 맞을까? 확인하러 가기", Toast.LENGTH_SHORT).show()
-        //
-        //  val intent = Intent(this, YonggiCameraActivity::class.java)
-        // intent.putExtra("store_id", data)
-        // startActivity(intent)
-        // }
+
+//        val pic_btn = findViewById<Button>(R.id.pic_btn)
+//       pic_btn.setOnClickListener {
+//            Toast.makeText(this, "내 용기가 맞을까? 확인하러 가기", Toast.LENGTH_SHORT).show()
+//            //
+//            val intent = Intent(this, YonggiCameraActivity::class.java)
+//            intent.putExtra("store_id", data)
+//            startActivity(intent)
+       // }
 //        // review view
         val goto_review_btn = findViewById<Button>(R.id.goto_review_btn)
 //        goto_review_btn.setOnClickListener {
