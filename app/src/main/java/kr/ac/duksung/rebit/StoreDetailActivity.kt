@@ -229,10 +229,13 @@ class StoreDetailActivity : AppCompatActivity() {
         })
 
         // 리뷰 작성
+        val reviewStoreData = intent.getStringExtra("store_id")
+        //val rand = Integer.parseInt(reviewStoredata.toString())
+
         val todoBtn = findViewById<Button>(R.id.todo_btn)
         todoBtn.setOnClickListener {
             val intent = Intent(this, CreateReviewActivity::class.java)
-            intent.putExtra("store_id", rand.toString())
+            intent.putExtra("store_id", reviewStoreData)
             startActivity(intent)
         }
 
@@ -265,7 +268,13 @@ class StoreDetailActivity : AppCompatActivity() {
                             val price = matchResult.groupValues[2]
                             "$menu $price\n" // 개행문자를 추가해 한줄 개행
                         }
-                        menuTv.text = modifiedText
+                        if (modifiedText==""){ // 만약 메뉴가 비었다면
+                            menuTv.text = "메뉴판을 최신 데이터로 업데이트 중입니다.."
+                        }
+                        else{
+                            menuTv.text = modifiedText
+                        }
+
                     }
                 }
 
