@@ -4,8 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="10dp"
-    android:orientation="vertical"
-    android:padding="8dp">
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,7 +15,7 @@
             android:id="@+id/userImageArea"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:contentDescription="@string/review_user_name_iv"
+            android:contentDescription="@string/todo"
             android:src="@drawable/user_icon" />
 
         <TextView
@@ -24,16 +23,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="20dp"
-            android:gravity="center"
+            android:fontFamily="@font/bmjua"
             android:text="@string/review_user_name_tv"
-            android:textStyle="bold|italic" />
+            android:textColor="@color/black"
+            android:layout_weight="1"
+            android:textAlignment="viewStart"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
 
         <TextView
             android:id="@+id/reviewDateTv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="100dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="17dp"
+            android:fontFamily="@font/bmjua"
             android:text="@string/review_date_tv" />
     </LinearLayout>
 
@@ -43,31 +47,31 @@
         android:layout_height="200dp"
         android:contentDescription="@string/store_review_tv" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:text="@string/store_star_tv" />
+    <!--    <TextView-->
+    <!--        android:id="@+id/starAvgTv"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_margin="10dp"-->
+    <!--        android:text="@string/store_star_tv"-->
+    <!--        android:textColor="@color/black" />-->
 
     <RatingBar
         android:id="@+id/starAvgRb"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_margin="10dp"
         android:numStars="5"
         android:rating="3.5"
         android:stepSize="1" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:text="@string/store_review_tv" />
 
     <TextView
         android:id="@+id/reviewTv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:text="@string/store_review_tv" />
-
+        android:fontFamily="@font/bmjua"
+        android:text="@string/store_review_tv"
+        android:textColor="@color/cardview_dark_background"
+        android:textSize="20sp" />
 </LinearLayout>

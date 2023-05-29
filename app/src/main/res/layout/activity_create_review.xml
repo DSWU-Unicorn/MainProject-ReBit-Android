@@ -22,8 +22,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10sp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10sp"
                 android:layout_marginBottom="5dp"
                 android:orientation="horizontal">
 
@@ -32,6 +32,7 @@
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_gravity="center_vertical"
+                    android:contentDescription="@string/todo"
                     android:src="@drawable/store_icon" />
 
                 <TextView
@@ -39,11 +40,29 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="20dp"
+                    android:fontFamily="@font/bmjua"
                     android:gravity="center"
-                    android:text="가게명"
+                    android:text="@string/store_name"
+                    android:textColor="@color/brown"
                     android:textSize="32sp"
                     android:textStyle="bold" />
+
+
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/bmjua"
+                android:gravity="center"
+                android:text="@string/review_please_text"
+                android:textAlignment="center"
+                android:textSize="24sp"
+                android:textColor="@color/cardview_dark_background"
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -53,54 +72,43 @@
                 android:orientation="vertical"
                 android:padding="10dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:layout_gravity="center"
-                    android:text="별점 등록"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-
+                <!--                <TextView-->
+                <!--                    android:layout_width="wrap_content"-->
+                <!--                    android:layout_height="wrap_content"-->
+                <!--                    android:layout_gravity="center"-->
+                <!--                    android:fontFamily="@font/bmjua"-->
+                <!--                    android:text="별점을 등록"-->
+                <!--                    android:textSize="24sp"-->
+                <!--                    android:textStyle="bold" />-->
                 <RatingBar
                     android:id="@+id/ratingBar"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
                     android:layout_gravity="center" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="200dp"
                 android:layout_margin="10dp"
                 android:background="@drawable/button_effect"
                 android:gravity="center"
                 android:orientation="vertical"
                 android:padding="10dp">
 
-                <TextView
-                    android:id="@+id/textView4"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="리뷰를 남겨주세요"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.498"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.108" />
-
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/getImage"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
                     android:background="@drawable/button_effect"
+                    android:drawableLeft="@drawable/review_gallery_icon_resize"
+                    android:drawablePadding="7dp"
+                    android:fontFamily="@font/bmjua"
                     android:gravity="center"
-                    android:text="사진 추가"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:text="@string/review_gallery_add_tv"
+                    android:textSize="20sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent" />
@@ -119,9 +127,9 @@
                 <ImageView
                     android:id="@+id/ReviewImageArea"
                     android:layout_width="match_parent"
-                    android:layout_height="200dp"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                   />
+                    android:contentDescription="@string/todo" />
 
             </LinearLayout>
 
@@ -136,9 +144,11 @@
                 <EditText
                     android:id="@+id/reviewEditText"
                     android:layout_width="match_parent"
-                    android:layout_height="100dp"
+                    android:layout_height="50dp"
                     android:layout_margin="10dp"
-                    android:hint="리뷰 작성하기" />
+                    android:fontFamily="@font/bmjua"
+                    android:hint="@string/review_please_text"
+                    android:textSize="20sp" />
             </LinearLayout>
         </LinearLayout>
 
@@ -153,18 +163,23 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/close_btn"
                 android:layout_width="100dp"
                 android:layout_height="50dp"
                 android:layout_marginRight="100dp"
-                android:text="취소" />
+                android:fontFamily="@font/bmjua"
+                android:text="취소"
 
-            <Button
+                android:textSize="20sp" />
+
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/submit_btn"
                 android:layout_width="100dp"
                 android:layout_height="50dp"
-                android:text="등록" />
+                android:fontFamily="@font/bmjua"
+                android:text="등록"
+                android:textSize="20sp" />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

@@ -10,6 +10,7 @@ import android.os.Parcel
 import android.os.Parcelable
 import android.provider.MediaStore
 import android.util.Log
+import android.view.View
 import android.widget.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -24,6 +25,7 @@ import com.amazonaws.services.s3.model.PutObjectRequest
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.unity3d.player.e
+import com.unity3d.player.i
 import kotlinx.android.synthetic.main.activity_create_review.*
 import kotlinx.android.synthetic.main.activity_create_review.storeNameTextArea
 import kotlinx.android.synthetic.main.activity_store_detail.*
@@ -38,6 +40,8 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.File
+import java.util.*
+import kotlin.collections.ArrayList
 
 class CreateReviewActivity() : AppCompatActivity() {
     private lateinit var retrofit: Retrofit
@@ -63,7 +67,7 @@ class CreateReviewActivity() : AppCompatActivity() {
 
         val putObjectRequest = PutObjectRequest(bucketName, file.name, file)
         val putObject = s3Client.putObject(putObjectRequest)
-        Log.d("S3_CHECK: " , putObject.toString())
+        Log.d("S3_CHECK: ", putObject.toString())
     }
 
 
@@ -80,6 +84,7 @@ class CreateReviewActivity() : AppCompatActivity() {
         val btnGetImage = findViewById<Button>(R.id.getImage)
         btnGetImage.setOnClickListener {
             selectGallery()
+            btnGetImage.visibility = View.GONE
         }
 //        recyclerView = findViewById(R.id.photoRecyclerView)
         val close_btn = findViewById<Button>(R.id.close_btn)
@@ -113,7 +118,10 @@ class CreateReviewActivity() : AppCompatActivity() {
                             .apply(RequestOptions().override(500, 500))
                             .into(ReviewImageArea)
 
-                        val uploadTask = UploadTask(imageFile, BuildConfig.bucketName, BuildConfig.accessKey, BuildConfig.secretKey)
+                        val uploadTask = UploadTask(imageFile,
+                            BuildConfig.bucketName,
+                            BuildConfig.accessKey,
+                            BuildConfig.secretKey)
                         uploadTask.execute()
                     }
                     // 여기서 할당
@@ -130,7 +138,8 @@ class CreateReviewActivity() : AppCompatActivity() {
 
             val storeId: Long = rand.toLong() //통신
             val star: Int = ratingBar.rating.toInt()
-            val userId: Long = 2//아직 회원구분 기능이 없기에,하드 코딩.
+            //아직 회원구분 기능이 없기에
+            val userId: Long = 3
             val comment: String = reviewEditText.text.toString()
 
             // null 값 체크
@@ -163,9 +172,12 @@ class CreateReviewActivity() : AppCompatActivity() {
                     }
                 })
 
+            val storeId2 = intent.getStringExtra("store_id")
+            val storeId2ToInt = Integer.parseInt(storeId2.toString())
+
             Toast.makeText(this, "리뷰가 등록되었습니다!", Toast.LENGTH_SHORT).show()
             val intent = Intent(this, ReviewDetailActivity::class.java)
-            intent.putExtra("store_id", storeId) // 리뷰 조회 액티비티로 인텐트 넘긴다.
+            intent.putExtra("store_id", storeId2ToInt.toString()) // 리뷰 조회 액티비티로 인텐트 넘긴다.
             startActivity(intent)
 
         }

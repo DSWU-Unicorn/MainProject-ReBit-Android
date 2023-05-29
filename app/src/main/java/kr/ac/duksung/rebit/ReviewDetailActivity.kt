@@ -71,10 +71,11 @@ class ReviewDetailActivity : AppCompatActivity() {
 //        val data = intent.getStringExtra("store_id")
 //        val storeId = Integer.parseInt(data)
         if (intent.hasExtra("store_id")) {
-            val storeId = intent.getLongExtra("store_id", 357)
+            val data = intent.getStringExtra("store_id")
             //val photoUrl = intent.getStringExtra("photo_url")
+            val rand = data!!.toInt()
 
-            retrofitService.getReviewComments(storeId).enqueue(object :
+            retrofitService.getReviewComments(rand.toLong()).enqueue(object :
                 Callback<ApiResponse<ArrayList<GetReviewCommentsVO>>> {
                 override fun onResponse(
                     call: Call<ApiResponse<ArrayList<GetReviewCommentsVO>>>,
@@ -101,11 +102,10 @@ class ReviewDetailActivity : AppCompatActivity() {
 
                             for (review in reviews) {
                                 val photoUrl = review.photo
-                                Log.d("getReviewComments", "photoUrl: $photoUrl")
+//                                Log.d("getReviewComments", "photoUrl: $photoUrl")
 
                                 reviewAdapter.setReviews(reviews)
 
-                                reviewAdapter.setReviews(reviews)
                                 val itemBinding = ReviewDetailItemBinding.inflate(layoutInflater)
                                 itemBinding.userNameTextArea.text = review.user.toString()
                                 itemBinding.starAvgRb.rating = review.star.toFloat()
@@ -127,7 +127,9 @@ class ReviewDetailActivity : AppCompatActivity() {
 
                         }
 
+
                     }
+
                 }
 
                 override fun onFailure(
