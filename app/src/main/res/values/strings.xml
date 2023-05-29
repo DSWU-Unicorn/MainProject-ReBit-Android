@@ -22,15 +22,22 @@
     <string name="store_menu_tv">메뉴</string>
     <string name="store_menu">메뉴판</string>
     <string name="store_pic_button">사진촬영</string>
-    <string name="store_review_button">리뷰작성</string>
-    <string name="store_show_review_button">리뷰 보러가기</string>
+    <string name="store_review_button">후기작성</string>
+    <string name="store_show_review_button">후기 보러가기</string>
     <string name="review_date_tv">2023.3.23</string>
     <string name="review_user_name_tv">홍길동</string>
     <string name="review_user_name_iv">유저 이미지</string>
-    <string name="store_review_count">개</string>
+
+    <string name="store_review_count">리뷰수</string>
     <string name="togo_model_text">해당 다회용기는 \n사용이 적합합니다.</string>
     <string name="store_star_avg_total_tv">/5</string>
     <string name="togo_goto_tv">용기내러\n가기!</string>
     <string name="togo_extra_shot_tv">추가 촬영</string>
+    <string name="todo">TODO</string>
+    <string name="review_please_text">방문 후기를 남겨주세요</string>
+    <string name="review_gallery_add_tv">사진 추가</string>
+    <string name="store_review_text">방문후기</string>
+    <string name="custom_ballon_click_extra_info">더보기 ></string>
+    <string name="togo_map">용기내 지도</string>
 
 </resources>
