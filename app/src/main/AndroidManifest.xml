@@ -38,10 +38,14 @@
         android:theme="@style/Theme.Rebit"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+
+        <!-- unity 설정 변경 -->
         <activity
             android:name=".UnityHandlerActivity"
             android:exported="true"
+            android:process=":unity"
             android:label="@string/title_activity_unity_handler" />
+
         <activity
             android:name=".StoreDetailActivity"
             android:exported="true" />
@@ -86,6 +90,12 @@
         <activity
             android:name=".YonggiCameraActivity"
             android:exported="true" />
+
+        <!-- UnityPlayerActivity export 설정 추가, 위치 중요 -->
+        <activity
+            android:name="com.unity3d.player.UnityPlayerActivity"
+            android:process=":unity"
+            android:exported="true"/>
 
         <provider
             android:name="androidx.core.content.FileProvider"

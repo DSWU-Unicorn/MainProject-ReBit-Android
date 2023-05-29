@@ -23,12 +23,11 @@ include ':unityLibrary'
 // git pull 받은후 오류난다면 각자의 pc에 맞게 경로 변경했는지 확인할것
 // 여유있을때 각자의 pc내 unityLirary 찾아서 경로 설정해주는 코드로 변경필요.
 
-//project(':unityLibrary').projectDir=new File("C:\\CookAndroid\\Project\\UnityTest\\unityLibrary")
-//project(':unityLibrary').projectDir=new File("C:\\Users\\pebis\\Desktop\\unity_real\\unityLibrary")
-//project(':unityLibrary').projectDir=new File("C:\\Rebit\\export-unity\\unityLibrary")
+// 은비 절대주소
+project(':unityLibrary').projectDir=new File("C:\\Users\\pebis\\Desktop\\export\\unityLibrary")
 
 // 다영 절대주소
-project(':unityLibrary').projectDir=new File("/Users/dy/AndroidStudioProjects/UnityTest/unityLibrary")
+//project(':unityLibrary').projectDir=new File("/Users/dy/AndroidStudioProjects/UnityTest/unityLibrary")
 
 // 유정 절대주소
 //project(':unityLibrary').projectDir=new File("/Users/kimyujeong/Downloads/UnityTest/unityLibrary")
