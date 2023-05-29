@@ -26,7 +26,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:layout_editor_absoluteX="64dp"
-        tools:layout_editor_absoluteY="146dp" />
+        tools:layout_editor_absoluteY="146dp"
+        android:contentDescription="@string/todo" />
 
     <TextView
         android:id="@+id/howto_text"
@@ -36,14 +37,13 @@
         android:fontFamily="@font/bmjua"
         android:gravity="center_vertical"
         android:padding="10dp"
-        android:text="해당 다회용기는 \n사용이 적합합니다."
-        android:textAlignment="center"
+        android:text="@string/togo_model_text"
         android:textSize="34sp"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toEndOf="parent"
-
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+        app:layout_constraintTop_toBottomOf="@+id/imageView"
+        android:textColor="@color/cardview_dark_background"/>
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -89,8 +89,8 @@
             android:fontFamily="@font/bmjua"
             android:paddingLeft="5dp"
             android:paddingRight="11dp"
-            android:text="용기내러 가기"
-            android:textSize="20dp"
+            android:text="@string/togo_goto_tv"
+            android:textSize="20sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />

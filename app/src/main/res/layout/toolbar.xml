@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#b0d485">
+    android:background="#cce994">
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -12,15 +13,17 @@
             android:id="@+id/left_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_baseline_directions_walk_24" />
+            android:src="@drawable/togo_map_icon_resize" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="20dp"
+            android:layout_centerVertical="true"
             android:layout_toEndOf="@id/left_icon"
             android:fontFamily="@font/bmjua"
-            android:textSize="24sp"
-            android:text="포장하러 가는 중입니다..."/>
+            android:text="@string/togo_map"
+            android:textSize="28sp" />
 
     </RelativeLayout>
 
