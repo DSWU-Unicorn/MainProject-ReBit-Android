@@ -26,6 +26,11 @@ class YonggiCameraActivity : AppCompatActivity(){
     private lateinit var binding: ActivityCameraBinding
     private lateinit var systemUiController: SystemUiController
 
+    // toast message
+    private var toast: Toast?  = null
+
+    var flag = 0
+
     // 권한을 확인할때의 권한 확인을 위함
     val CAMERA = arrayOf(Manifest.permission.CAMERA)
 
@@ -63,8 +68,32 @@ class YonggiCameraActivity : AppCompatActivity(){
         systemUiController.setSystemBarsColor(ContextCompat.getColor(this, R.color.purple_200))
 
 
+        // 부적합한 용기일때
+        binding.noBtn.setOnClickListener {
+            // Dialog만들기
+            val mDialogView =
+                LayoutInflater.from(this).inflate(R.layout.after_yongginae_model_unsuitable_dialog, null)
+            val mBuilder = AlertDialog.Builder(this)
+                .setView(mDialogView)
+
+            val mAlertDialog = mBuilder.show()
+
+
+            val noButton = mDialogView.findViewById<Button>(R.id.AgainButton)
+            noButton.setOnClickListener {
+                CallCamera()
+                mAlertDialog.dismiss()
+            }
+        } //setOnClickListener
+
+
         binding.picBtn.setOnClickListener() {
             CallCamera()
+            if(flag.equals(0)){
+                makeToast( "정확한 측정을 위해 동전과 함께 용기의 윗부분을 촬영해주세요!")
+            }
+            flag+=1
+
             binding.startButton.setOnClickListener {
 
                 // Dialog만들기
@@ -78,8 +107,9 @@ class YonggiCameraActivity : AppCompatActivity(){
 
                 val togoButton = mDialogView.findViewById<Button>(R.id.togoButton)
                 togoButton.setOnClickListener {
+                    makeToast( "용기를 내서 포장하러 가는 당신! 멋져요⭐️️")
 
-                    Toast.makeText(this, "용기를 내서 포장하러 가는 당신! 멋져요⭐️️", Toast.LENGTH_SHORT).show()
+                    //Toast.makeText(this, "용기를 내서 포장하러 가는 당신! 멋져요⭐️️", Toast.LENGTH_SHORT).show()
                     mAlertDialog.dismiss()
 
                     // 포장하러가기 누르면.. 용기내 main 화면으로 이동해 지도에 포장하러가기 상태바 띄움.
@@ -148,9 +178,18 @@ class YonggiCameraActivity : AppCompatActivity(){
                     if (data?.extras?.get("data") != null) {
                         val img = data?.extras?.get("data") as Bitmap
                         binding.imageView.setImageBitmap(img)
+                        if(flag.equals(1)){
+                            makeToast( "정확한 측정을 위해 한번 더 동전과 함께 용기의 측면을 촬영해주세요!️️")
+                        }
+                        flag+=1
                     }
                 }
             }
         }
+    }
+    private fun makeToast(message: String){
+        toast?.cancel()
+        toast = Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT)
+        toast?.show()
     }
 }

@@ -45,20 +45,6 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
 
     var storeId: String = ""
 
-
-    // 정적인 arrayOf 대신 ArrayList 사용(4/8 토 14:30~15:44)
-    //val storeList = ArrayList<Store>();
-    //lateinit var storeAdapter: StoreAdapter
-
-//    private val user = arrayOf(
-//        // 통신한 후 가게이름으로 변경 필요.
-//        "메가커피",
-//        "커피드림",
-//        "콩블랑제리",
-//        "블랙다운커피",
-//        "히피스 베이글",
-//    )
-
     private val ACCESS_FINE_LOCATION = 1000     // Request Code
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,14 +54,12 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
 
         // 키해시 구하기
         // getHashKey()
-        //
-        //supportActionBar?.hide();      // 액션바가 안 보이도록 // 근데 안먹네;;
 
         //서버 연결
         initRetrofit()
 
         // 가게 이름 조회 통신
-        //getStoreInfo()
+        // getStoreInfo()
 
         mMapView = MapView(this) // 카카오 지도 뷰
         // setCalloutBalloonAdapter: 마커를 추가하는 부분보다 앞에 있어야 커스텀 말풍선이 표시된다.
@@ -85,8 +69,7 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
 
         // 리스트 목록 클릭시
         setupEvents()
-        // 목록 값 지정
-        // setValues()
+
 
         /**
          * 검색
@@ -138,9 +121,6 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
 
         binding.searchView.setOnQueryTextFocusChangeListener { searchView, hasFocus ->
             if (hasFocus) {
-                // focus 를 가지고 있는 경우에만 가게목록이 뜨도록.
-                // binding.user.adapter = userAdapter;
-                // 오류 발생. 해결 -> 해당 액티비티의 xml id 놓침.
                 binding.storeList.adapter = storeAdapter
             }
         }
@@ -206,44 +186,9 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
                 return false
             }
         })
-        // 검색돋보기 클릭시
-//        binding.searchView.setOnClickListener {
-//            // Dialog만들기
-//            val mDialogView = LayoutInflater.from(this).inflate(R.layout.store_info_dialog, null)
-//            val mBuilder = AlertDialog.Builder(this)
-//                .setView(mDialogView)
-//                .setTitle("가게 정보")
-//            mBuilder.show()
-//
-//            val pic_btn = mDialogView.findViewById<Button>(R.id.pic_btn)
-//            pic_btn.setOnClickListener {
-//                Toast.makeText(this, "내 용기가 맞을까? 확인하러 가기", Toast.LENGTH_SHORT).show()
-//                val intent = Intent(this, CameraActivity::class.java)
-//                startActivity(intent)
-//
-//                // action bar show
-//                getSupportActionBar()?.show();
-//            }
-//            val goto_review_btn = mDialogView.findViewById<Button>(R.id.goto_review_btn)
-//
-//            goto_review_btn.setOnClickListener {
-//                Toast.makeText(this, "생생한 후기가 궁금하나요? 리뷰 보러 가기", Toast.LENGTH_SHORT).show()
-//                val intent = Intent(this, ReviewActivity::class.java)
-//                startActivity(intent)
-//            }
-//            // review create
-//            val todo_btn = mDialogView.findViewById<Button>(R.id.todo_btn)
-//
-//            todo_btn.setOnClickListener {
-//                Toast.makeText(this, "이미 용기냈다면! 어땠는지 후기 작성하러 가기", Toast.LENGTH_SHORT).show()
-//
-//                val intent = Intent(this, CreateReviewActivity::class.java)
-//                startActivity(intent)
-//            }
-//        }
 
         //지도
-        val mMapViewContainer = findViewById(R.id.map_mv_mapcontainer) as ViewGroup
+        val mMapViewContainer = findViewById<ViewGroup>(R.id.map_mv_mapcontainer)
         mMapViewContainer.addView(mMapView)
 
         if (checkLocationService()) {
@@ -309,9 +254,6 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
                                                                 address.latitude,
                                                                 address.longitude
                                                             )
-                                                        // 가게 이름
-                                                        //                                                        itemName =
-                                                        //                                                            data?.storeName.toString() // Assign the storeName to itemName
                                                         // exception
                                                         itemName = storeName
                                                             ?: "" // Assign the storeName to itemName, or empty string if null
@@ -349,8 +291,8 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
                                 //           mMapView.addPOIItem(marker)
                                 //     }
 
-                                Log.d("StoreMarker", "on response 성공: " + result.toString())
-                                Log.d("StoreMarker", "data : " + datas.toString())
+                                Log.d("StoreMarker", "on response 성공: $result")
+                                Log.d("StoreMarker", "data : $datas")
 
                             }
                         }
@@ -413,21 +355,6 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
         }
     }// setupEvents
 
-//    fun setValues() {
-//        // test data 삽입 // 통신 후 데이터로 변경 필요
-//        storeList.add(Store(0,
-//            "메가MGC커피 4.19사거리점",
-//            "휴게음식점",
-//            "서울 강북구 삼양로 510 1층 메가커피",
-//            "02-900-1288"))
-//        storeList.add(Store(1, "커피드림", "휴게음식점", "서울특별시 도봉구 삼양로144길 25", "01022360284"))
-//        storeList.add(Store(2, "eeeyo", "휴게음식점", "서울 도봉구 삼양로142길 33 일층", "0507-1323-2307"))
-//        storeList.add(Store(3, "블랙다운커피", "휴게음식점", "서울 강북구 삼양로 528-1 1층", "02-6338-0606"))
-//        storeList.add(Store(4, "히피스 베이글", "휴게음식점", "서울 강북구 삼양로 528", "02-906-6778"))
-//
-//        //storeAdapter = StoreAdapter(this, android.R.layout.simple_list_item_1, storeList)
-//        //binding.searchView.adapter = storeAdapter
-//    }
 
     // 위치 권한 확인
     private fun permissionCheck() {
@@ -555,8 +482,6 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
 //        mMapView.currentLocationTrackingMode =
 //            MapView.CurrentLocationTrackingMode.TrackingModeOff
 //    }
-
-
 
 
 

@@ -14,6 +14,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
+import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View.INVISIBLE
@@ -21,6 +22,7 @@ import android.view.View.VISIBLE
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -44,6 +46,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
+import java.security.MessageDigest
 
 class MainActivity : AppCompatActivity() {
     // 뒤로 가기
@@ -68,12 +71,102 @@ class MainActivity : AppCompatActivity() {
 
 
     private lateinit var binding: ActivityMainBinding
+    @RequiresApi(Build.VERSION_CODES.P)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
+
+        //
+        val btn = findViewById<Button>(R.id.btn)
+        btn.setOnClickListener{
+            Log.d("버튼클릭:" , "버튼클릭됨 !")
+            // Dialog만들기
+            val mDialogView =
+                LayoutInflater.from(this).inflate(R.layout.after_togo_dialog, null)
+            val mBuilder = AlertDialog.Builder(this)
+                .setView(mDialogView)
+
+            val mAlertDialog = mBuilder.show()
+            val yesBtn = mDialogView.findViewById<Button>(R.id.yesBtn)
+            yesBtn.setOnClickListener {
+                // 6. 포인트 증가
+                // api 호출
+                lifecycleScope.launch {
+                    try {
+                        retrofitService.postUserWithPointAfterYonggi(1)?.enqueue(object :
+                            Callback<ApiResponse<Int>> {
+                            override fun onResponse(
+                                call: Call<ApiResponse<Int>>,
+                                response: Response<ApiResponse<Int>>
+                            ){
+                                if(response.isSuccessful){
+                                    // 통신 성공시
+                                    val result: ApiResponse<Int>?=response.body()
+                                    val datas = result?.getResult()
+
+                                    Log.d("POINTRESULT" ,"용기내 onresponse 성공: "+ result?.toString())
+                                    Log.d("POINTRESULT", "용기내 data : "+ datas?.toString())
+                                }
+                            }
+                            override fun onFailure(
+                                call: Call<ApiResponse<Int>>,
+                                t: Throwable
+                            ) {
+                                Log.e("POINTRESULT","용기내 onFailure : ${t.message} ");
+                            }
+                        })
+                    } catch  (e: Exception) {
+                        // Exception handling
+                        Log.e(ContentValues.TAG, "Exception: ${e.message}", e)
+                    }
+                }
+                mAlertDialog.dismiss()
+                // UI 초기화
+                toGoTxt.visibility = INVISIBLE
+            }
+
+            val noBtn = mDialogView.findViewById<Button>(R.id.noBtn)
+            noBtn.setOnClickListener {
+                // Create and show the "No" dialog
+                val noDialogView = LayoutInflater.from(this).inflate(R.layout.after_togo_diglog_nobtn, null)
+                val noBuilder = AlertDialog.Builder(this)
+                    .setView(noDialogView)
+
+                val noAlertDialog = noBuilder.create() // Create the dialog but do not show it yet
+                noAlertDialog.show() // Show the dialog
+                val againBtn = noDialogView.findViewById<Button>(R.id.AgainButton)
+                againBtn.setOnClickListener{
+                      noAlertDialog.dismiss()
+                }
+
+                // Dismiss the current dialog
+//                mAlertDialog.dismiss()
+            }
+        }
+
+
+
+
+        try {
+            val information =
+                packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNING_CERTIFICATES)
+            val signatures = information.signingInfo.apkContentsSigners
+            val md = MessageDigest.getInstance("SHA")
+            for (signature in signatures) {
+                val md: MessageDigest
+                md = MessageDigest.getInstance("SHA")
+                md.update(signature.toByteArray())
+                var hashcode = String(Base64.encode(md.digest(), 0))
+                Log.d("hashcode", "" + hashcode)
+            }
+        } catch (e: Exception) {
+            Log.d("hashcode", "에러::" + e.toString())
+
+        }
+
 
         //서버 연결
         initRetrofit()

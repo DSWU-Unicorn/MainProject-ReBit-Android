@@ -14,10 +14,9 @@
         android:layout_centerInParent="true"
         android:layout_marginStart="100dp"
         android:layout_marginLeft="100dp"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="80dp"
         android:layout_marginEnd="100dp"
         android:layout_marginRight="100dp"
-        android:layout_marginBottom="20dp"
         android:scaleType="centerCrop"
         android:src="@drawable/drawable_dagom_icon_resize"
         app:layout_constraintBottom_toTopOf="@+id/howto_text"
@@ -35,22 +34,20 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:fontFamily="@font/bmjua"
-        android:gravity="center_vertical"
         android:padding="10dp"
-        android:text="@string/togo_model_text"
-        android:textSize="34sp"
         android:textAlignment="center"
+        android:text="해당 용기는\n사용이 어렵습니다!"
+        android:textSize="34sp"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView"
-        android:textColor="@color/cardview_dark_background"/>
+        android:textColor="#ff0000"/>
 
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
         android:gravity="center"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -63,7 +60,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="9dp"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="20dp"
             android:background="@drawable/button_effect"
             android:drawableLeft="@drawable/drawable_camera_icon_resize"
             android:drawablePadding="7dp"
@@ -76,25 +73,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/togoButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginLeft="40dp"
-            android:layout_marginTop="9dp"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/button_effect"
-            android:drawableLeft="@drawable/drawable_walking_icon_resize"
-            android:drawablePadding="2dp"
-            android:fontFamily="@font/bmjua"
-            android:paddingLeft="5dp"
-            android:paddingRight="11dp"
-            android:text="@string/togo_goto_tv"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
 
     </LinearLayout>
     <!--    <Button-->

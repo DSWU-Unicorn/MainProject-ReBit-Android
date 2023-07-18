@@ -13,7 +13,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:fontFamily="@font/bmjua"
-        android:gravity="center_vertical"
         android:padding="10dp"
         android:text="가게에 도착했습니다!\n포장하셨습니까?"
         android:textAlignment="center"
