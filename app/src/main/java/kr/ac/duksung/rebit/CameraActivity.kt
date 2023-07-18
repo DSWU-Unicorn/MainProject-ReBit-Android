@@ -43,26 +43,28 @@ import java.util.*
 
 class CameraActivity : AppCompatActivity() {
     // 통신
-    private lateinit var retrofit : Retrofit
+    private lateinit var retrofit: Retrofit
     private lateinit var retrofitService: RetrofitService
+
     // GPS
-    private var mFusedLocationProviderClient: FusedLocationProviderClient? = null // 현재 위치를 가져오기 위한 변수
+    private var mFusedLocationProviderClient: FusedLocationProviderClient? =
+        null // 현재 위치를 가져오기 위한 변수
     lateinit var mLastLocation: Location // 위치 값을 가지고 있는 객체
     internal lateinit var mLocationRequest: LocationRequest // 위치 정보 요청의 매개변수를 저장하는
     private val REQUEST_PERMISSION_LOCATION = 10
-    private lateinit var mAlertDialog : AlertDialog
+    private lateinit var mAlertDialog: AlertDialog
 
-    private lateinit var content : String
+    private lateinit var content: String
     lateinit var bitmap: Bitmap
     lateinit var imageView: ImageView
 
-    private lateinit var textView : TextView
-    private lateinit var textView2 : TextView
+    private lateinit var textView: TextView
+    private lateinit var textView2: TextView
     private lateinit var geocoder: Geocoder
 
     // 모델 연결
     private lateinit var classifier: Classifier
-    private var dataLabel : String = ""
+    private var dataLabel: String = ""
 
     private lateinit var binding: ActivityCameraBinding
 
@@ -86,12 +88,11 @@ class CameraActivity : AppCompatActivity() {
         initRetrofit()
 
 
-        mLocationRequest =  LocationRequest.create().apply {
+        mLocationRequest = LocationRequest.create().apply {
 
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
 
         }
-
 
 
         //객체 생성
@@ -120,7 +121,7 @@ class CameraActivity : AppCompatActivity() {
             val title_text = mDialogView.findViewById<TextView>(R.id.title_text)
             howto_text.text = content
             title_text.text = dataLabel + "-분리수거 방법"
-            Log.d("content", "content1 : "+ howto_text)
+            Log.d("content", "content1 : " + howto_text)
 
             /*
             val okButton = mDialogView.findViewById<Button>(R.id.successButton)
@@ -235,7 +236,7 @@ class CameraActivity : AppCompatActivity() {
                             String.format(Locale.ENGLISH, "class : %s", output.first)
                         binding.run {
                             binding.textResult.text = resultStr
-                            Log.d("MODEL_RESLT: " , resultStr)
+                            Log.d("MODEL_RESLT: ", resultStr)
                             dataLabel = resultStr
                             binding.imageView.setImageBitmap(img)
                             getRecycle()
@@ -264,16 +265,16 @@ class CameraActivity : AppCompatActivity() {
                         call: Call<ApiResponse<RecycleVO>>,
                         response: Response<ApiResponse<RecycleVO>>
                     ) {
-                        if(response.isSuccessful) {
+                        if (response.isSuccessful) {
                             //정상적으로 통신 성공
-                            val result : ApiResponse<RecycleVO>? = response.body();
+                            val result: ApiResponse<RecycleVO>? = response.body();
                             val data = result?.getResult();
 
-                            Log.d("RECYCLE_CAMERA" ,"onresponse 성공: "+ result?.toString() )
-                            Log.d("RECYCLE_CAMERA", "data : "+ data)
-                            Log.d("RECYCLE_CAMERA", "content : "+ data?.content)
+                            Log.d("RECYCLE_CAMERA", "onresponse 성공: " + result?.toString())
+                            Log.d("RECYCLE_CAMERA", "data : " + data)
+                            Log.d("RECYCLE_CAMERA", "content : " + data?.content)
                             content = data!!.content
-                            Log.d("RECYCLE_CAMERA_CONTENT", "content1 : "+ content)
+                            Log.d("RECYCLE_CAMERA_CONTENT", "content1 : " + content)
 
 
                         } else {
@@ -288,7 +289,7 @@ class CameraActivity : AppCompatActivity() {
                     }
 
                 })
-            } catch  (e: Exception) {
+            } catch (e: Exception) {
                 // Exception handling
                 Log.e(ContentValues.TAG, "Exception: ${e.message}", e)
             }
@@ -299,13 +300,18 @@ class CameraActivity : AppCompatActivity() {
 
         //FusedLocationProviderClient의 인스턴스를 생성.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-            && ActivityCompat.checkSelfPermission(this,Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+            && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+        ) {
             return
         }
         // 기기의 위치에 관한 정기 업데이트를 요청하는 메서드 실행
         // 지정한 루퍼 스레드(Looper.myLooper())에서 콜백(mLocationCallback)으로 위치 업데이트를 요청
-        mFusedLocationProviderClient!!.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper())
+        mFusedLocationProviderClient!!.requestLocationUpdates(mLocationRequest,
+            mLocationCallback,
+            Looper.myLooper())
     }
 
     // 시스템으로 부터 위치 정보를 콜백으로 받음
@@ -343,7 +349,7 @@ class CameraActivity : AppCompatActivity() {
         // 지오코딩
         mLastLocation = location
         Log.d("latitude", mLastLocation.latitude.toString())
-        val address = geocoder.getFromLocation(mLastLocation.latitude,mLastLocation.longitude, 1)
+        val address = geocoder.getFromLocation(mLastLocation.latitude, mLastLocation.longitude, 1)
         val nowAddr = address.get(0).getAddressLine(0).toString();
         textView2.text = nowAddr
         Log.d("latitude", nowAddr)
@@ -366,13 +372,13 @@ class CameraActivity : AppCompatActivity() {
                 call: Call<ApiResponse<RecycleDetailVO>>,
                 response: Response<ApiResponse<RecycleDetailVO>>
             ) {
-                if(response.isSuccessful) {
+                if (response.isSuccessful) {
                     //정상적으로 통신 성공
-                    val result : ApiResponse<RecycleDetailVO>? = response.body();
+                    val result: ApiResponse<RecycleDetailVO>? = response.body();
                     val data = result?.getResult();
 
-                    Log.d("RecycleDetailVO" ,"onresponse 성공: "+ result?.toString() )
-                    Log.d("RecycleDetailVO", "data : "+ data?.toString())
+                    Log.d("RecycleDetailVO", "onresponse 성공: " + result?.toString())
+                    Log.d("RecycleDetailVO", "data : " + data?.toString())
                     textView.text = "[재활용 가능자원 배출 요일] \n" + data!!.day +
                             "\n\n [비닐, 투명페트명 배출 요일]\n" + data!!.typicalDay
 
@@ -391,7 +397,7 @@ class CameraActivity : AppCompatActivity() {
 
         })
 
-        successBtn.setOnClickListener{
+        successBtn.setOnClickListener {
             // 포인트 획득 통신
             retrofitService.postUserPointByRecycle(1L)?.enqueue(object :
                 Callback<ApiResponse<Int>> {
@@ -399,20 +405,21 @@ class CameraActivity : AppCompatActivity() {
                     call: Call<ApiResponse<Int>>,
                     response: Response<ApiResponse<Int>>
                 ) {
-                    if(response.isSuccessful) {
+                    if (response.isSuccessful) {
                         //정상적으로 통신 성공
-                        val result : ApiResponse<Int>? = response.body();
+                        val result: ApiResponse<Int>? = response.body();
                         val data = result?.getResult();
 
-                        Log.d("pointRecycle" ,"onresponse 성공: "+ result?.toString() )
-                        Log.d("pointRecycle", "data : "+ data?.toString())
+                        Log.d("pointRecycle", "onresponse 성공: " + result?.toString())
+                        Log.d("pointRecycle", "data : " + data?.toString())
                         val point = data.toString()
 
                         // 다이얼로그 종료
                         mAlertDialog2.dismiss()
 
                         // toast
-                        Toast.makeText(applicationContext, "회원 포인트 : " + point, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(applicationContext, "회원 포인트 : " + point, Toast.LENGTH_SHORT)
+                            .show()
 
 
                     } else {
@@ -433,6 +440,7 @@ class CameraActivity : AppCompatActivity() {
 
 
     }
+
     // 위치 권한이 있는지 확인하는 메서드
     private fun checkPermissionForLocation(context: Context): Boolean {
         // Android 6.0 Marshmallow 이상에서는 위치 권한에 추가 런타임 권한이 필요
@@ -441,7 +449,9 @@ class CameraActivity : AppCompatActivity() {
                 true
             } else {
                 // 권한이 없으므로 권한 요청 알림 보내기
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_PERMISSION_LOCATION)
+                ActivityCompat.requestPermissions(this,
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                    REQUEST_PERMISSION_LOCATION)
                 false
             }
         } else {
@@ -452,7 +462,9 @@ class CameraActivity : AppCompatActivity() {
     //위도 경도로 주소 구하는 Reverse-GeoCoding
     private fun getAddress(location: Location): String {
         return try {
-            with(Geocoder(applicationContext, Locale.KOREA).getFromLocation(location.latitude, location.longitude, 1).first()){
+            with(Geocoder(applicationContext, Locale.KOREA).getFromLocation(location.latitude,
+                location.longitude,
+                1).first()) {
                 getAddressLine(0)   //주소
                 countryName     //국가이름 (대한민국)
                 countryCode     //국가코드
@@ -461,10 +473,10 @@ class CameraActivity : AppCompatActivity() {
                 thoroughfare    //상세구역 (봉래동2가)
                 featureName     //상세주소 (122-21)
             }
-        } catch (e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
             getAddress(location)
         }
     }
-
 }
+

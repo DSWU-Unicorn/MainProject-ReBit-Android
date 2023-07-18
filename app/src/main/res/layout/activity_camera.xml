@@ -5,7 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".CameraActivity">
-
+<!--    부적합한 용기일 시 띄우는 dialog의 trigger 역할의 버튼-->
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/noBtn"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="#00ff0000"
+        app:layout_constraintBottom_toTopOf="@+id/startButton"
+        app:layout_constraintEnd_toEndOf="parent" />
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="300dp"
