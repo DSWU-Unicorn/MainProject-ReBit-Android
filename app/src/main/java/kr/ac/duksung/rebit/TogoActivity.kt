@@ -18,6 +18,7 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.contains
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import kr.ac.duksung.rebit.databinding.ActivityTogoBinding
@@ -33,7 +34,8 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 
-class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // TogoActivity
+class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener,
+    MapView.CurrentLocationEventListener { // TogoActivity
     private lateinit var retrofit: Retrofit
     private lateinit var retrofitService: RetrofitService
 
@@ -46,6 +48,9 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
     var storeId: String = ""
 
     private val ACCESS_FINE_LOCATION = 1000     // Request Code
+
+    var isTrackingMode = false //트래킹 모드인지 (현재위치 추적 눌렀을 경우 true되고 현재 위치 허용 안할시 false로 된다)
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -204,9 +209,16 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
         mMapView.setPOIItemEventListener(this)
         mMapView.setOpenAPIKeyAuthenticationResultListener(this)
 
+        // 230723
+        // 현재 위치 업데이트를 위한 setCurrentLocationEventListener 등록
+        setCurrentLocationEventListener()
+
+        // Add the following line to enable current location tracking and updates.
+
         lifecycleScope.launch {
             try {
-                retrofitService.getStoreMarker("도봉구")
+                // 사용자의 현재 위치 -> "구"로 가져와야 함.
+                retrofitService.getStoreMarker("금천구")
                     .enqueue(object : // 임시적으로 줄여가게 많은 곳으로 하드코딩해 변경
                         Callback<ApiResponse<ArrayList<StoreMarkerVO>>> {
                         override fun onResponse(
@@ -254,6 +266,8 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
                                                                 address.latitude,
                                                                 address.longitude
                                                             )
+                                                        Log.d("상점 위도경도테스트", "$mapPoint")
+
                                                         // exception
                                                         itemName = storeName
                                                             ?: "" // Assign the storeName to itemName, or empty string if null
@@ -312,6 +326,52 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
         }
 
     }//OnCreate()
+
+    private fun setCurrentLocationEventListener() {
+        // p1: MapPoint 객체 (사용자의 위치 좌표)
+        // p2: accuracyInMeters(위치 정확도인 accuracyInMeters (단위: 미터))
+//    private fun setCurrentLocationEventListener() {
+//        mMapView.setCurrentLocationEventListener(object : MapView.CurrentLocationEventListener {
+        fun onCurrentLocationUpdate(p0: MapView?, p1: MapPoint?, p2: Float) {
+            val mapPointGeo = p1?.mapPointGeoCoord
+            if (mapPointGeo != null) {
+                Log.i("onCurrentLocationUpdate",
+                    String.format("MapView onCurrentLocationUpdate (%f,%f) accuracy (%f)",
+                        mapPointGeo.latitude,
+                        mapPointGeo.longitude,
+                        p2))
+            }
+            var currentMapPoint =
+                mapPointGeo?.let { MapPoint.mapPointWithGeoCoord(it.latitude, mapPointGeo.longitude) }
+            //이 좌표로 지도 중심 이동
+            mMapView.setMapCenterPoint(currentMapPoint, true)
+            //전역변수로 현재 좌표 저장
+            var mCurrentLat = mapPointGeo?.latitude
+            var mCurrentLng = mapPointGeo?.longitude
+            Log.d("onCurrentLocationUpdate", "현재위치 => " + mCurrentLat.toString() + "  " + mCurrentLng)
+            // mLoaderLayout.setVisibility(View.GONE) // 레이아웃 숨기기
+
+            //트래킹 모드가 아닌 단순 현재위치 업데이트일 경우, 한번만 위치 업데이트하고 트래킹을 중단시키기 위한 로직
+            if (!isTrackingMode) {
+                mMapView.currentLocationTrackingMode =
+                    MapView.CurrentLocationTrackingMode.TrackingModeOff
+            }
+        }
+
+        fun onCurrentLocationDeviceHeadingUpdate(mapView: MapView?, v: Float) {}
+
+        fun onCurrentLocationUpdateFailed(mapView: MapView?) {
+            Log.i("onCurrentLocationUpdate", "onCurrentLocationUpdateFailed")
+            mMapView.currentLocationTrackingMode =
+                MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading
+        }
+
+        fun onCurrentLocationUpdateCancelled(mapView: MapView?) {
+            Log.i("onCurrentLocationUpdate", "onCurrentLocationUpdateCancelled")
+            mMapView.currentLocationTrackingMode =
+                MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading
+        }
+    }
 
     // kakaoMap 앱 키 해시 얻어오는 메소드. // Logcat 에 KEY_HASH 입력 후 나오는 값 확인할 것!
 //    fun getHashKey(){
@@ -447,6 +507,9 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
     private fun startTracking() {
         mMapView.currentLocationTrackingMode =
             MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading // 계속 따라옴
+        isTrackingMode = true;
+
+        // 사용자 현위치 트래킹 기능 켜짐
         mMapView.setCustomCurrentLocationMarkerTrackingImage(R.drawable.custom_map_present_tracking,
             MapPOIItem.ImageOffset(16, 16))
 
@@ -482,8 +545,6 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
 //        mMapView.currentLocationTrackingMode =
 //            MapView.CurrentLocationTrackingMode.TrackingModeOff
 //    }
-
-
 
     // 마커 클릭 이벤트
     override fun onPOIItemSelected(p0: MapView?, p1: MapPOIItem?) {
@@ -560,7 +621,10 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener { // Togo
     override fun onDraggablePOIItemMoved(p0: MapView?, p1: MapPOIItem?, p2: MapPoint?) {
         TODO("Not yet implemented")
     }
-}
+
+
+
+
 
 
 private fun MapView.setOpenAPIKeyAuthenticationResultListener(togoActivity: TogoActivity) {
@@ -574,10 +638,23 @@ private fun MapView.setMapViewEventListener(togoActivity: TogoActivity) {
 
 }
 
-//private fun MapView.setCurrentLocationEventListener(togoActivity: TogoActivity) {
-//
-//}
+    private fun ListView.contains(view: String?): Boolean {
+        return true
+    }
 
-private fun ListView.contains(view: String?): Boolean {
-    return true
+    override fun onCurrentLocationUpdate(p0: MapView?, p1: MapPoint?, p2: Float) {
+        Log.d("onCurrentLocationUpdate", "현재위치 => ")
+    }
+
+    override fun onCurrentLocationDeviceHeadingUpdate(p0: MapView?, p1: Float) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onCurrentLocationUpdateFailed(p0: MapView?) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onCurrentLocationUpdateCancelled(p0: MapView?) {
+        TODO("Not yet implemented")
+    }
 }
