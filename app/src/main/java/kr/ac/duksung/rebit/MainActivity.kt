@@ -56,21 +56,23 @@ class MainActivity : AppCompatActivity() {
     private lateinit var retrofitService: RetrofitService
 
     // GPS
-    private var mFusedLocationProviderClient: FusedLocationProviderClient? = null // 현재 위치를 가져오기 위한 변수
+    private var mFusedLocationProviderClient: FusedLocationProviderClient? =
+        null // 현재 위치를 가져오기 위한 변수
     lateinit var mLastLocation: Location // 위치 값을 가지고 있는 객체
     internal lateinit var mLocationRequest: LocationRequest // 위치 정보 요청의 매개변수를 저장하는
     private val REQUEST_PERMISSION_LOCATION = 10
 
     // 위치
-    private var storeLatitude : Double = 0.0
-    private var storeLongitude : Double = 0.0
-    private var myLatitude : Double = 0.0
-    private var myLongitude : Double = 0.0
+    private var storeLatitude: Double = 0.0
+    private var storeLongitude: Double = 0.0
+    private var myLatitude: Double = 0.0
+    private var myLongitude: Double = 0.0
 
     private var isArrived = false
 
 
     private lateinit var binding: ActivityMainBinding
+
     @RequiresApi(Build.VERSION_CODES.P)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,9 +83,9 @@ class MainActivity : AppCompatActivity() {
 
         //
         val btn = findViewById<Button>(R.id.btn)
-        btn.setOnClickListener{
-            Log.d("버튼클릭:" , "버튼클릭됨 !")
-            // Dialog만들기
+        btn.setOnClickListener {
+            Log.d("버튼클릭:", "버튼클릭됨 !")
+            // 포장하셨습니까? Dialog만들기
             val mDialogView =
                 LayoutInflater.from(this).inflate(R.layout.after_togo_dialog, null)
             val mBuilder = AlertDialog.Builder(this)
@@ -100,25 +102,26 @@ class MainActivity : AppCompatActivity() {
                             Callback<ApiResponse<Int>> {
                             override fun onResponse(
                                 call: Call<ApiResponse<Int>>,
-                                response: Response<ApiResponse<Int>>
-                            ){
-                                if(response.isSuccessful){
+                                response: Response<ApiResponse<Int>>,
+                            ) {
+                                if (response.isSuccessful) {
                                     // 통신 성공시
-                                    val result: ApiResponse<Int>?=response.body()
+                                    val result: ApiResponse<Int>? = response.body()
                                     val datas = result?.getResult()
 
-                                    Log.d("POINTRESULT" ,"용기내 onresponse 성공: "+ result?.toString())
-                                    Log.d("POINTRESULT", "용기내 data : "+ datas?.toString())
+                                    Log.d("POINTRESULT", "용기내 onresponse 성공: " + result?.toString())
+                                    Log.d("POINTRESULT", "용기내 data : " + datas?.toString())
                                 }
                             }
+
                             override fun onFailure(
                                 call: Call<ApiResponse<Int>>,
-                                t: Throwable
+                                t: Throwable,
                             ) {
-                                Log.e("POINTRESULT","용기내 onFailure : ${t.message} ");
+                                Log.e("POINTRESULT", "용기내 onFailure : ${t.message} ");
                             }
                         })
-                    } catch  (e: Exception) {
+                    } catch (e: Exception) {
                         // Exception handling
                         Log.e(ContentValues.TAG, "Exception: ${e.message}", e)
                     }
@@ -128,18 +131,20 @@ class MainActivity : AppCompatActivity() {
                 toGoTxt.visibility = INVISIBLE
             }
 
+            // 포장하셨습니까?-아니요 클릭시
             val noBtn = mDialogView.findViewById<Button>(R.id.noBtn)
             noBtn.setOnClickListener {
                 // Create and show the "No" dialog
-                val noDialogView = LayoutInflater.from(this).inflate(R.layout.after_togo_diglog_nobtn, null)
+                val noDialogView =
+                    LayoutInflater.from(this).inflate(R.layout.after_togo_diglog_nobtn, null)
                 val noBuilder = AlertDialog.Builder(this)
                     .setView(noDialogView)
 
                 val noAlertDialog = noBuilder.create() // Create the dialog but do not show it yet
                 noAlertDialog.show() // Show the dialog
                 val againBtn = noDialogView.findViewById<Button>(R.id.AgainButton)
-                againBtn.setOnClickListener{
-                      noAlertDialog.dismiss()
+                againBtn.setOnClickListener {
+                    noAlertDialog.dismiss()
                 }
 
                 // Dismiss the current dialog
@@ -174,13 +179,13 @@ class MainActivity : AppCompatActivity() {
         var toGoTxt = findViewById<TextView>(R.id.toGoTxt)
 
         // intent 얻기
+        /* Togo Activity로 이동
         val status = intent.getStringExtra("status")
-        val store_id = intent.getStringExtra("store_id")
+
         Log.d("STATUS", status.toString())
-        Log.d("MAIN_STORE_ID", store_id.toString())
         if (status.toBoolean()) {
 
-            mLocationRequest =  LocationRequest.create().apply {
+            mLocationRequest = LocationRequest.create().apply {
                 priority = LocationRequest.PRIORITY_HIGH_ACCURACY
             }
 
@@ -192,46 +197,49 @@ class MainActivity : AppCompatActivity() {
             // 2. api 호출
             lifecycleScope.launch {
                 try {
-                    retrofitService.getStoreAddressTogo(Integer.parseInt(store_id))?.enqueue(object :
-                        Callback<ApiResponse<StoreAddressVO>> {
-                        override fun onResponse(
-                            call: Call<ApiResponse<StoreAddressVO>>,
-                            response: Response<ApiResponse<StoreAddressVO>>
-                        ){
-                            if(response.isSuccessful){
-                                // 통신 성공시
-                                val result: ApiResponse<StoreAddressVO>?=response.body()
-                                val datas = result?.getResult()
+                    retrofitService.getStoreAddressTogo(Integer.parseInt(store_id))
+                        ?.enqueue(object :
+                            Callback<ApiResponse<StoreAddressVO>> {
+                            override fun onResponse(
+                                call: Call<ApiResponse<StoreAddressVO>>,
+                                response: Response<ApiResponse<StoreAddressVO>>,
+                            ) {
+                                if (response.isSuccessful) {
+                                    // 통신 성공시
+                                    val result: ApiResponse<StoreAddressVO>? = response.body()
+                                    val datas = result?.getResult()
 
-                                Log.d("MAINRESULT" ,"onresponse 성공: "+ result?.toString())
-                                Log.d("MAINRESULT", "data : "+ datas?.address)
+                                    Log.d("MAINRESULT", "onresponse 성공: " + result?.toString())
+                                    Log.d("MAINRESULT", "data : " + datas?.address)
 
-                                var geocoder = Geocoder(applicationContext)
-                                val fromLocationName =
-                                    geocoder.getFromLocationName(datas.toString(), 1)
-                                Log.d("MAINRESULT", "LONGITUDE : "+ fromLocationName.get(0).longitude.toString())
-                                Log.d("MAINRESULT", "LATITUDE : "+ fromLocationName.get(0).latitude.toString())
-
-                                storeLatitude = fromLocationName.get(0).latitude
-                                storeLongitude = fromLocationName.get(0).longitude
-
+                                    var geocoder = Geocoder(applicationContext)
+                                    val fromLocationName =
+                                        geocoder.getFromLocationName(datas.toString(), 1)
+                                    Log.d("MAINRESULT",
+                                        "LONGITUDE : " + fromLocationName.get(0).longitude.toString())
+                                    Log.d("MAINRESULT",
+                                        "LATITUDE : " + fromLocationName.get(0).latitude.toString())
+                                    // 가게 주소->좌표로 변환한 값
+                                    storeLatitude = fromLocationName.get(0).latitude
+                                    storeLongitude = fromLocationName.get(0).longitude
+                                }
                             }
-                        }
-                        override fun onFailure(
-                            call: Call<ApiResponse<StoreAddressVO>>,
-                            t: Throwable
-                        ) {
-                            Log.e("MAINRESULT","onFailure : ${t.message} ");
-                        }
-                    })
-                } catch  (e: Exception) {
+
+                            override fun onFailure(
+                                call: Call<ApiResponse<StoreAddressVO>>,
+                                t: Throwable,
+                            ) {
+                                Log.e("MAINRESULT", "onFailure : ${t.message} ");
+                            }
+                        })
+                } catch (e: Exception) {
                     // Exception handling
                     Log.e(ContentValues.TAG, "Exception: ${e.message}", e)
                 }
             }
             // 3. ui 변경
             toGoTxt.visibility = VISIBLE
-        }
+        }*/
 
 
         val recycle_btn = findViewById<Button>(R.id.recycle_btn)
@@ -240,7 +248,7 @@ class MainActivity : AppCompatActivity() {
         //== unity 연결 버튼
         val unity_btn = findViewById<Button>(R.id.unity_btn)
 
-        recycle_btn.setOnClickListener{
+        recycle_btn.setOnClickListener {
             val intent = Intent(this, RecycleActivity::class.java)
             startActivity(intent)
         }
@@ -256,6 +264,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
     }
+
     override fun onBackPressed() {
         Log.d("MainActivity", "backbutton")
         if (isDouble == true) { // 두번 뒤로가기 클릭시
@@ -274,139 +283,155 @@ class MainActivity : AppCompatActivity() {
         retrofit = RetofitClient.getInstance()
         retrofitService = retrofit.create(RetrofitService::class.java)
     }
-
+}// 일단은 주석처리
+/*
     private fun startLocationUpdates() {
         //FusedLocationProviderClient의 인스턴스를 생성.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-            && ActivityCompat.checkSelfPermission(this,Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+            && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+        ) {
             return
         }
         // 기기의 위치에 관한 정기 업데이트를 요청하는 메서드 실행
         // 지정한 루퍼 스레드(Looper.myLooper())에서 콜백(mLocationCallback)으로 위치 업데이트를 요청
-        mFusedLocationProviderClient!!.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper())
+        mFusedLocationProviderClient!!.requestLocationUpdates(mLocationRequest,
+            mLocationCallback,
+            Looper.myLooper())
+    }*/
+
+// 시스템으로 부터 위치 정보를 콜백으로 받음
+/*
+private val mLocationCallback = object : LocationCallback() {
+    override fun onLocationResult(locationResult: LocationResult) {
+        // 시스템에서 받은 location 정보를 onLocationChanged()에 전달
+        locationResult.lastLocation
+        onLocationChanged(locationResult.lastLocation)
     }
-
-    // 시스템으로 부터 위치 정보를 콜백으로 받음
-    private val mLocationCallback = object : LocationCallback() {
-        override fun onLocationResult(locationResult: LocationResult) {
-            // 시스템에서 받은 location 정보를 onLocationChanged()에 전달
-            locationResult.lastLocation
-            onLocationChanged(locationResult.lastLocation)
-        }
-    }
-
-    // 시스템으로 부터 받은 위치정보를 화면에 갱신해주는 메소드
-    fun onLocationChanged(location: Location) {
-        mLastLocation = location
-        Log.d("MAIN_위도 : ",  mLastLocation.latitude.toString()) // 갱신 된 위도
-        Log.d("MAIN_경도 : ",  mLastLocation.longitude.toString())  // 갱신 된 경도
-        myLatitude = mLastLocation.latitude
-        myLongitude = mLastLocation.longitude
-
-        /**
-         * 4. 거리 계산
-         */
-        var myLocation = Location("my location")
-        myLocation.latitude = myLatitude
-        myLocation.longitude = myLongitude
-
-        var storeLocation = Location("store location")
-        storeLocation.latitude = storeLatitude
-        storeLocation.longitude = storeLongitude
-        Log.d("STORELOCATION: " , storeLocation.latitude.toString())
-        Log.d("STORELOCATION: " , storeLocation.longitude.toString())
-
-        val distance = myLocation.distanceTo(storeLocation)
-        Log.d("MAIN_DISTANCE", distance.toString())
-
-        if (distance <= 250) {
-            isArrived = true
-        }
-
-        if (isArrived) {
-            // 5. 다이얼로그
-            // Dialog만들기
-            val mDialogView =
-                LayoutInflater.from(this).inflate(R.layout.after_togo_dialog, null)
-            val mBuilder = AlertDialog.Builder(this)
-                .setView(mDialogView)
-
-            val mAlertDialog = mBuilder.show()
-            val yesBtn = mDialogView.findViewById<Button>(R.id.yesBtn)
-            yesBtn.setOnClickListener {
-                // 6. 포인트 증가
-                // api 호출
-                lifecycleScope.launch {
-                    try {
-                        retrofitService.postUserWithPointAfterYonggi(1)?.enqueue(object :
-                            Callback<ApiResponse<Int>> {
-                            override fun onResponse(
-                                call: Call<ApiResponse<Int>>,
-                                response: Response<ApiResponse<Int>>
-                            ){
-                                if(response.isSuccessful){
-                                    // 통신 성공시
-                                    val result: ApiResponse<Int>?=response.body()
-                                    val datas = result?.getResult()
-
-                                    Log.d("POINTRESULT" ,"용기내 onresponse 성공: "+ result?.toString())
-                                    Log.d("POINTRESULT", "용기내 data : "+ datas?.toString())
-                                }
-                            }
-                            override fun onFailure(
-                                call: Call<ApiResponse<Int>>,
-                                t: Throwable
-                            ) {
-                                Log.e("POINTRESULT","용기내 onFailure : ${t.message} ");
-                            }
-                        })
-                    } catch  (e: Exception) {
-                        // Exception handling
-                        Log.e(ContentValues.TAG, "Exception: ${e.message}", e)
-                    }
-                }
-                mAlertDialog.dismiss()
-                // UI 초기화
-                toGoTxt.visibility = INVISIBLE
-            }
-
-            val noBtn = mDialogView.findViewById<Button>(R.id.noBtn)
-            noBtn.setOnClickListener {
-                mAlertDialog.dismiss()
-            }
-        }
-    }
-
-    // 위치 권한이 있는지 확인하는 메서드
-    private fun checkPermissionForLocation(context: Context): Boolean {
-        // Android 6.0 Marshmallow 이상에서는 위치 권한에 추가 런타임 권한이 필요
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                true
-            } else {
-                // 권한이 없으므로 권한 요청 알림 보내기
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_PERMISSION_LOCATION)
-                false
-            }
-        } else {
-            true
-        }
-    }
-
-    // 사용자에게 권한 요청 후 결과에 대한 처리 로직
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == REQUEST_PERMISSION_LOCATION) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                startLocationUpdates()
-
-            } else {
-                Log.d("ttt", "onRequestPermissionsResult() _ 권한 허용 거부")
-                Toast.makeText(this, "권한이 없어 해당 기능을 실행할 수 없습니다.", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-
 }
+*/
+// 시스템으로 부터 받은 위치정보를 화면에 갱신해주는 메소드
+/* Togo Activity로 이동
+
+fun onLocationChanged(location: Location) {
+mLastLocation = location
+Log.d("MAIN_위도 : ", mLastLocation.latitude.toString()) // 갱신 된 위도
+Log.d("MAIN_경도 : ", mLastLocation.longitude.toString())  // 갱신 된 경도
+myLatitude = mLastLocation.latitude
+myLongitude = mLastLocation.longitude
+
+/**
+* 4. 거리 계산
+*/
+var myLocation = Location("my location")
+myLocation.latitude = myLatitude
+myLocation.longitude = myLongitude
+
+var storeLocation = Location("store location")
+storeLocation.latitude = storeLatitude
+storeLocation.longitude = storeLongitude
+Log.d("STORELOCATION: ", storeLocation.latitude.toString())
+Log.d("STORELOCATION: ", storeLocation.longitude.toString())
+
+//        val distance = myLocation.distanceTo(storeLocation)
+//        Log.d("MAIN_DISTANCE", distance.toString())
+//
+//        if (distance <= 250) {
+//            isArrived = true
+//        }
+//
+//        if (isArrived) {
+//            // 5. 다이얼로그
+//            // Dialog만들기
+//            val mDialogView =
+//                LayoutInflater.from(this).inflate(R.layout.after_togo_dialog, null)
+//            val mBuilder = AlertDialog.Builder(this)
+//                .setView(mDialogView)
+//
+//            val mAlertDialog = mBuilder.show()
+//            val yesBtn = mDialogView.findViewById<Button>(R.id.yesBtn)
+//            yesBtn.setOnClickListener {
+//                // 6. 포인트 증가
+//                // api 호출
+//                lifecycleScope.launch {
+//                    try {
+//                        retrofitService.postUserWithPointAfterYonggi(1)?.enqueue(object :
+//                            Callback<ApiResponse<Int>> {
+//                            override fun onResponse(
+//                                call: Call<ApiResponse<Int>>,
+//                                response: Response<ApiResponse<Int>>,
+//                            ) {
+//                                if (response.isSuccessful) {
+//                                    // 통신 성공시
+//                                    val result: ApiResponse<Int>? = response.body()
+//                                    val datas = result?.getResult()
+//
+//                                    Log.d("POINTRESULT", "용기내 onresponse 성공: " + result?.toString())
+//                                    Log.d("POINTRESULT", "용기내 data : " + datas?.toString())
+//                                }
+//                            }
+//
+//                            override fun onFailure(
+//                                call: Call<ApiResponse<Int>>,
+//                                t: Throwable,
+//                            ) {
+//                                Log.e("POINTRESULT", "용기내 onFailure : ${t.message} ");
+//                            }
+//                        })
+//                    } catch (e: Exception) {
+//                        // Exception handling
+//                        Log.e(ContentValues.TAG, "Exception: ${e.message}", e)
+//                    }
+//                }
+//                mAlertDialog.dismiss()
+//                // UI 초기화
+//                toGoTxt.visibility = INVISIBLE
+//            }
+//
+//            val noBtn = mDialogView.findViewById<Button>(R.id.noBtn)
+//            noBtn.setOnClickListener {
+//                mAlertDialog.dismiss()
+//            }
+//        }
+//    }
+
+// 위치 권한이 있는지 확인하는 메서드
+private fun checkPermissionForLocation(context: Context): Boolean {
+// Android 6.0 Marshmallow 이상에서는 위치 권한에 추가 런타임 권한이 필요
+return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+if (context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+    true
+} else {
+    // 권한이 없으므로 권한 요청 알림 보내기
+    ActivityCompat.requestPermissions(this,
+        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+        REQUEST_PERMISSION_LOCATION)
+    false
+}
+} else {
+true
+}
+}
+
+// 사용자에게 권한 요청 후 결과에 대한 처리 로직
+override fun onRequestPermissionsResult(
+requestCode: Int,
+permissions: Array<out String>,
+grantResults: IntArray,
+) {
+super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+if (requestCode == REQUEST_PERMISSION_LOCATION) {
+if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+    startLocationUpdates()
+
+} else {
+    Log.d("ttt", "onRequestPermissionsResult() _ 권한 허용 거부")
+    Toast.makeText(this, "권한이 없어 해당 기능을 실행할 수 없습니다.", Toast.LENGTH_SHORT).show()
+}
+}
+}
+
+
+}*/

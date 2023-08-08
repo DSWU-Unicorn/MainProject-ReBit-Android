@@ -56,6 +56,7 @@ class StoreDetailActivity : AppCompatActivity() {
         pic_btn.setOnClickListener {
             Toast.makeText(this, "내 용기가 맞을까? 확인하러 가기", Toast.LENGTH_SHORT).show()
             val intent = Intent(this, YonggiCameraActivity::class.java)
+            // YonggiCameraActivity로 값 넘기기
             intent.putExtra("store_id", data)
             startActivity(intent)
         }

@@ -13,12 +13,14 @@ import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.INVISIBLE
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.launch
 import kr.ac.duksung.rebit.databinding.ActivityTogoBinding
 import kr.ac.duksung.rebit.network.RetofitClient
@@ -56,6 +58,11 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener,
     private var mCurrentLat: Double = 0.0
     private var isTrackingMode = false //트래킹 모드인지 (현재위치 추적 눌렀을 경우 true되고 현재 위치 허용 안할시 false로 된다)
 
+    // 상점 위치 좌표(위도, 경도)
+    private var storeLatitude: Double = 0.0
+    private var storeLongitude: Double = 0.0
+    private var isArrived = false
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,6 +87,9 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener,
         // 리스트 목록 클릭시
         setupEvents()
 
+
+        // 포장하러 가는 중입니다.
+        var toGoTxt = findViewById<TextView>(R.id.toGoTxt)
 
         /**
          * 검색
@@ -220,12 +230,13 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener,
         // this에 MapView.CurrentLocationEventListener 구현
         mMapView.setCurrentLocationEventListener(this);
         //setCurrentLocationTrackingMode-> 지도랑 현재위치의 좌표를 찍어주고 따라다닌다
-        mMapView.currentLocationTrackingMode = MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading
+        mMapView.currentLocationTrackingMode =
+            MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading
 
         lifecycleScope.launch {
             try {
                 // 사용자의 현재 위치 -> "구"로 가져와야 함.
-                retrofitService.getStoreMarker("도봉구")
+                retrofitService.getStoreMarker("금천구")
                     .enqueue(object : // 임시적으로 줄여가게 많은 곳으로 하드코딩해 변경
                         Callback<ApiResponse<ArrayList<StoreMarkerVO>>> {
                         override fun onResponse(
@@ -330,6 +341,61 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener,
                 Log.e(ContentValues.TAG, "Exception: ${e.message}", e)
             }
 
+        }
+
+        // 포장하러가는중입니다...
+        // intent 얻기
+        val status = intent.getStringExtra("status")
+        val store_id = intent.getStringExtra("store_id")
+
+        Log.i("STATUS", status.toString()) // ok
+
+        if (status.toBoolean()) {
+            // 2. api 호출
+            lifecycleScope.launch {
+                try {
+                    retrofitService.getStoreAddressTogo(Integer.parseInt(store_id))
+                        ?.enqueue(object :
+                            Callback<ApiResponse<StoreAddressVO>> {
+                            override fun onResponse(
+                                call: Call<ApiResponse<StoreAddressVO>>,
+                                response: Response<ApiResponse<StoreAddressVO>>,
+                            ) {
+                                if (response.isSuccessful) {
+                                    // 통신 성공시
+                                    val result: ApiResponse<StoreAddressVO>? = response.body()
+                                    val datas = result?.getResult()
+
+                                    Log.d("MAINRESULT", "onresponse 성공: " + result?.toString())
+                                    Log.d("MAINRESULT", "data : " + datas?.address)
+
+                                    var geocoder = Geocoder(applicationContext)
+                                    val fromLocationName =
+                                        geocoder.getFromLocationName(datas.toString(), 1)
+                                    Log.d("MAINRESULT",
+                                        "LONGITUDE : " + fromLocationName.get(0).longitude.toString())
+                                    Log.d("MAINRESULT",
+                                        "LATITUDE : " + fromLocationName.get(0).latitude.toString())
+                                    // 가게 주소->좌표로 변환한 값
+                                    storeLatitude = fromLocationName.get(0).latitude
+                                    storeLongitude = fromLocationName.get(0).longitude
+                                }
+                            }
+
+                            override fun onFailure(
+                                call: Call<ApiResponse<StoreAddressVO>>,
+                                t: Throwable,
+                            ) {
+                                Log.e("MAINRESULT", "onFailure : ${t.message} ");
+                            }
+                        })
+                } catch (e: Exception) {
+                    // Exception handling
+                    Log.e(ContentValues.TAG, "Exception: ${e.message}", e)
+                }
+            }
+            // 3. ui 변경
+            toGoTxt.visibility = View.VISIBLE
         }
 
     }//OnCreate()
@@ -501,31 +567,7 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener,
         mMapView.setCustomCurrentLocationMarkerTrackingImage(R.drawable.custom_map_present_tracking,
             MapPOIItem.ImageOffset(16, 16))
 
-//        val lm: LocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-//         val userNowLocation: Location? = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
-//        // 위도 , 경도
-//        val uLatitude = userNowLocation?.latitude
-//        val uLongitude = userNowLocation?.longitude
-//        val uNowPosition = MapPoint.mapPointWithGeoCoord(uLatitude!!, uLongitude!!)
-//
-//        // 현 위치에 마커 찍기
-//        val marker = MapPOIItem()
-//        marker.apply {
-//            // marker.itemName = "현재 위치"
-//            mapPoint = uNowPosition
-//            markerType =
-//                MapPOIItem.MarkerType.CustomImage          // 마커 모양 (커스텀)
-//            customImageResourceId =
-//                R.drawable.custom_poi_marker_start          // 커스텀 마커 이미지
-//            // 클릭 시 어떤 이벤트를 보여줘야 할지 고민.
-////            selectedMarkerType =
-////                MapPOIItem.MarkerType.CustomImage  // 클릭 시 마커 모양 (커스텀)
-////            customSelectedImageResourceId =
-////                R.drawable.custom_map_present_direction     // 클릭 시 커스텀 마커 이미지
-//            isCustomImageAutoscale = true      // 커스텀 마커 이미지 크기 자동 조정
-//            setCustomImageAnchor(0.5f, 1.0f)    // 마커 이미지 기준점
-//        }
-//        mMapView.addPOIItem(marker)
+
     }
 
     // 위치추적 중지
@@ -570,9 +612,12 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener,
                             if (data != null) {
                                 storeId = data.id.toString()
                             }
+                            // 가게 상세 페이지로 store_id값 넘기기.
+                            //
                             val intent = Intent(this@TogoActivity, StoreDetailActivity::class.java)
                             intent.putExtra("store_id", storeId)
                             this@TogoActivity.startActivity(intent) // Use the TogoActivity context to start the activity
+
                         }
                     }
 
@@ -652,13 +697,80 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener,
         mCurrentLat = mapPointGeo.latitude
         mCurrentLng = mapPointGeo.longitude
         Log.d(gpsTAG, "현재위치 => $mCurrentLat  $mCurrentLng")
-//        mLoaderLayout.setVisibility(View.GONE)
+
+        // 현재 좌표 - 가게 좌표 <= 250이라면 포장하셨습니까 다이얼로그 띄우기
+        val distance =
+            DistanceManager.getDistance(mCurrentLat, mCurrentLng, storeLatitude, storeLongitude)
+        Log.d("반경250", distance.toString())
+
+
+        if (distance <= 250) {
+            isArrived = true
+        }
+
+        if (isArrived) {
+            // 5. 다이얼로그
+            // Dialog만들기
+            val mDialogView =
+                LayoutInflater.from(this).inflate(R.layout.after_togo_dialog, null)
+            val mBuilder = androidx.appcompat.app.AlertDialog.Builder(this)
+                .setView(mDialogView)
+
+            val mAlertDialog = mBuilder.show()
+            val yesBtn = mDialogView.findViewById<Button>(R.id.yesBtn)
+            yesBtn.setOnClickListener {
+                // 6. 포인트 증가
+                // api 호출
+                lifecycleScope.launch {
+                    try {
+                        retrofitService.postUserWithPointAfterYonggi(1)?.enqueue(object :
+                            Callback<ApiResponse<Int>> {
+                            override fun onResponse(
+                                call: Call<ApiResponse<Int>>,
+                                response: Response<ApiResponse<Int>>,
+                            ) {
+                                if (response.isSuccessful) {
+                                    // 통신 성공시
+                                    val result: ApiResponse<Int>? = response.body()
+                                    val datas = result?.getResult()
+
+                                    Log.d("POINTRESULT", "용기내 onresponse 성공: " + result?.toString())
+                                    Log.d("POINTRESULT", "용기내 data : " + datas?.toString())
+                                }
+                            }
+
+                            override fun onFailure(
+                                call: Call<ApiResponse<Int>>,
+                                t: Throwable,
+                            ) {
+                                Log.e("POINTRESULT", "용기내 onFailure : ${t.message} ");
+                            }
+                        })
+                    } catch (e: Exception) {
+                        // Exception handling
+                        Log.e(ContentValues.TAG, "Exception: ${e.message}", e)
+                    }
+                }
+                mAlertDialog.dismiss()
+                // UI 초기화
+                //toGoTxt.visibility = View.INVISIBLE
+            }
+
+            val noBtn = mDialogView.findViewById<Button>(R.id.noBtn)
+            noBtn.setOnClickListener {
+                mAlertDialog.dismiss()
+            }
+        }
+
+
+        //        mLoaderLayout.setVisibility(View.GONE)
         // 트래킹 모드가 아닌 단순 현재위치 업데이트일 경우, 한번만 위치 업데이트하고 트래킹을 중단시키기 위한 로직
         if (!isTrackingMode) {
             mMapView.currentLocationTrackingMode =
                 MapView.CurrentLocationTrackingMode.TrackingModeOff
         }
     }
+
 
     override fun onCurrentLocationDeviceHeadingUpdate(p0: MapView?, p1: Float) {
     }

@@ -97,6 +97,7 @@ class YonggiCameraActivity : AppCompatActivity(){
             binding.startButton.setOnClickListener {
 
                 // Dialog만들기
+                // 해당 다회용기는 사용이 적합하다.
                 val mDialogView =
                     LayoutInflater.from(this).inflate(R.layout.after_yongginae_model_dialog, null)
                 val mBuilder = AlertDialog.Builder(this)
@@ -104,7 +105,7 @@ class YonggiCameraActivity : AppCompatActivity(){
 
                 val mAlertDialog = mBuilder.show()
 
-
+                // 용기내러 가기! 버튼 클릭시
                 val togoButton = mDialogView.findViewById<Button>(R.id.togoButton)
                 togoButton.setOnClickListener {
                     makeToast( "용기를 내서 포장하러 가는 당신! 멋져요⭐️️")
@@ -112,9 +113,8 @@ class YonggiCameraActivity : AppCompatActivity(){
                     //Toast.makeText(this, "용기를 내서 포장하러 가는 당신! 멋져요⭐️️", Toast.LENGTH_SHORT).show()
                     mAlertDialog.dismiss()
 
-                    // 포장하러가기 누르면.. 용기내 main 화면으로 이동해 지도에 포장하러가기 상태바 띄움.
-                    //
-                    val intent = Intent(this, MainActivity::class.java)
+                    // 포장하러가기 누르면.. 용기내 지도 화면으로 이동해 지도에 포장하러가기 상태바 띄움.
+                    val intent = Intent(this, TogoActivity::class.java)
                     intent.putExtra("status", "true")
                     intent.putExtra("store_id", store_id.toString())
                     startActivity(intent)
