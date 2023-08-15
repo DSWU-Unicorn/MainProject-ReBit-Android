@@ -33,7 +33,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-    buildFeatures{
+    buildFeatures {
         viewBinding true
         dataBinding true
     }
@@ -41,11 +41,11 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-    dataBinding{
-        enabled=true
+    dataBinding {
+        enabled = true
     }
-    viewBinding{
-        enabled=true
+    viewBinding {
+        enabled = true
     }
     kotlinOptions {
         jvmTarget = '1.8'
@@ -73,7 +73,7 @@ dependencies {
 
     // GPS
     implementation 'com.google.android.gms:play-services-location:18.0.0'
-    
+
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
@@ -82,7 +82,7 @@ dependencies {
     // unity
     implementation project(':unityLibrary')
 //    implementation fileTree(dir: project(':unityLibrary').getProjectDir().toString() + ('\\libs'), include: ['*.jar'])
-    implementation fileTree(dir: project(':unityLibrary').getProjectDir().toString() + File.separator+ 'libs', include: ['*.jar'])
+    implementation fileTree(dir: project(':unityLibrary').getProjectDir().toString() + File.separator + 'libs', include: ['*.jar'])
 
 
     implementation "land.sungbin:systemuicontroller:1.0.1"
@@ -95,4 +95,8 @@ dependencies {
     implementation 'com.amazonaws:aws-android-sdk-mobile-client:2.13.5'
     implementation 'com.amazonaws:aws-android-sdk-cognito:2.13.5'
     implementation 'com.amazonaws:aws-android-sdk-s3:2.16.0'
+
+    // 안드로이드 ui 라이브러리-FancyToast 사용
+    implementation 'io.github.shashank02051997:FancyToast:2.0.2'
+
 }

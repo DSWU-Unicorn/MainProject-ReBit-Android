@@ -17,6 +17,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.shashank.sony.fancytoastlib.FancyToast
 import kr.ac.duksung.rebit.databinding.ActivityCameraBinding
 
 class YonggiCameraActivity : AppCompatActivity(){
@@ -108,7 +109,6 @@ class YonggiCameraActivity : AppCompatActivity(){
                 // 용기내러 가기! 버튼 클릭시
                 val togoButton = mDialogView.findViewById<Button>(R.id.togoButton)
                 togoButton.setOnClickListener {
-                    makeToast( "용기를 내서 포장하러 가는 당신! 멋져요⭐️️")
 
                     //Toast.makeText(this, "용기를 내서 포장하러 가는 당신! 멋져요⭐️️", Toast.LENGTH_SHORT).show()
                     mAlertDialog.dismiss()

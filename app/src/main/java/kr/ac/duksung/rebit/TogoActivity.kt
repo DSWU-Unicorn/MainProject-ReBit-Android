@@ -13,14 +13,13 @@ import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.INVISIBLE
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import kotlinx.android.synthetic.main.activity_main.*
+import com.shashank.sony.fancytoastlib.FancyToast
 import kotlinx.coroutines.launch
 import kr.ac.duksung.rebit.databinding.ActivityTogoBinding
 import kr.ac.duksung.rebit.network.RetofitClient
@@ -348,9 +347,16 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener,
         val status = intent.getStringExtra("status")
         val store_id = intent.getStringExtra("store_id")
 
-        Log.i("STATUS", status.toString()) // ok
+        Log.d("status_test", status.toString()) // ok
+
 
         if (status.toBoolean()) {
+            val toast = FancyToast.makeText(this, "포장하러 가는 중입니다..",
+                FancyToast.LENGTH_LONG,
+                FancyToast.SUCCESS, true)
+            toast.show()
+
+
             // 2. api 호출
             lifecycleScope.launch {
                 try {
@@ -391,11 +397,14 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener,
                         })
                 } catch (e: Exception) {
                     // Exception handling
-                    Log.e(ContentValues.TAG, "Exception: ${e.message}", e)
+                    Log.e("MAINRESULT", "Exception: ${e.message}", e)
                 }
             }
-            // 3. ui 변경
-            toGoTxt.visibility = View.VISIBLE
+
+        // 3. ui 변경
+//            FancyToast.makeText(this,"Hello World !",FancyToast.LENGTH_LONG,FancyToast.DEFAULT,true);
+
+            //toGoTxt.visibility = View.VISIBLE
         }
 
     }//OnCreate()
