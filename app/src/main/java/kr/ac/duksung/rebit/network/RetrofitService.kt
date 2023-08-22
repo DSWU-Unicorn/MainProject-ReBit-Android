@@ -54,6 +54,10 @@ interface RetrofitService {
 
     // 가게 메뉴판 조회
     @GET("/menu/{store_id}")
-
     fun getStoreMenu(@Path("store_id") store_id: Long): Call<ApiResponse<StoreMenuVO>>
+
+    // 플라스크 서버
+    @GET("/yongginae/{file_name_1},{file_name_2}/{store_type}")
+    fun getYongginaeResult(@Path("file_name_1") file_name_1: String, @Path("file_name_2") file_name_2: String, @Path("store_type") store_type: String)
+        : Call<ApiResponse<String>>
 }
