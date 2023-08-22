@@ -10,25 +10,38 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.model.PutObjectRequest
 import com.shashank.sony.fancytoastlib.FancyToast
+import kotlinx.coroutines.launch
 import kr.ac.duksung.rebit.databinding.ActivityCameraBinding
+import kr.ac.duksung.rebit.network.RetofitClient
+import kr.ac.duksung.rebit.network.RetrofitClientFlask
+import kr.ac.duksung.rebit.network.RetrofitService
+import kr.ac.duksung.rebit.network.dto.ApiResponse
+import kr.ac.duksung.rebit.network.dto.StoreInfoVO
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
-class YonggiCameraActivity : AppCompatActivity(){
+class YonggiCameraActivity : AppCompatActivity() {
     lateinit var bitmap: Bitmap
     lateinit var imageView: ImageView
 
@@ -37,10 +50,16 @@ class YonggiCameraActivity : AppCompatActivity(){
     private var firstPhotoFileName: String? = null
     private var secondPhotoFileName: String? = null
     private var isSecondPhotoTaken = false
+    private var store_id_s: String? = null
+    private var mDialogView: View? = null
+    private var mAlertDialog: AlertDialog? = null
+
+    private lateinit var retrofit: Retrofit
+    private lateinit var retrofitService: RetrofitService
 
 
     // toast message
-    private var toast: Toast?  = null
+    private var toast: Toast? = null
 
     var flag = 0
 
@@ -55,8 +74,8 @@ class YonggiCameraActivity : AppCompatActivity(){
         setContentView(R.layout.activity_camera)
 
         //
-        val data = intent.getStringExtra("store_id")
-        val store_id = Integer.parseInt(data)
+        store_id_s = intent.getStringExtra("store_id")
+        val store_id = Integer.parseInt(store_id_s)
         Log.d("YONGGICAMERA_STORE_ID", store_id.toString())
 
         //객체 생성
@@ -80,6 +99,8 @@ class YonggiCameraActivity : AppCompatActivity(){
         // Set the system bars color
         systemUiController.setSystemBarsColor(ContextCompat.getColor(this, R.color.purple_200))
 
+        // 플라스크 서버 연결
+        initRetrofit()
 
         // S3 설정
         fun uploadFileToS3(file: File, bucketName: String, accessKey: String, secretKey: String) {
@@ -95,16 +116,17 @@ class YonggiCameraActivity : AppCompatActivity(){
         // 부적합한 용기일때
         binding.noBtn.setOnClickListener {
             // Dialog만들기
-            val mDialogView =
-                LayoutInflater.from(this).inflate(R.layout.after_yongginae_model_unsuitable_dialog, null)
+            mDialogView =
+                LayoutInflater.from(this)
+                    .inflate(R.layout.after_yongginae_model_unsuitable_dialog, null)
             val mBuilder = AlertDialog.Builder(this)
                 .setView(mDialogView)
 
             val mAlertDialog = mBuilder.show()
 
 
-            val noButton = mDialogView.findViewById<Button>(R.id.AgainButton)
-            noButton.setOnClickListener {
+            val noButton = mDialogView?.findViewById<Button>(R.id.AgainButton)
+            noButton?.setOnClickListener {
                 CallCamera()
                 mAlertDialog.dismiss()
             }
@@ -113,43 +135,97 @@ class YonggiCameraActivity : AppCompatActivity(){
 
         binding.picBtn.setOnClickListener() {
             CallCamera()
-            if(flag.equals(0)){
-                makeToast( "정확한 측정을 위해 동전과 함께 용기의 윗부분을 촬영해주세요!")
+            if (flag.equals(0)) {
+                makeToast("정확한 측정을 위해 동전과 함께 용기의 윗부분을 촬영해주세요!")
             }
-            flag+=1
+            flag += 1
 
+            // 촬영 완료 버튼
             binding.startButton.setOnClickListener {
+                getYongginaeResult()
 
-                // Dialog만들기
-                // 해당 다회용기는 사용이 적합하다.
-                val mDialogView =
-                    LayoutInflater.from(this).inflate(R.layout.after_yongginae_model_dialog, null)
-                val mBuilder = AlertDialog.Builder(this)
-                    .setView(mDialogView)
 
-                val mAlertDialog = mBuilder.show()
-
-                // 용기내러 가기! 버튼 클릭시
-                val togoButton = mDialogView.findViewById<Button>(R.id.togoButton)
-                togoButton.setOnClickListener {
-
-                    //Toast.makeText(this, "용기를 내서 포장하러 가는 당신! 멋져요⭐️️", Toast.LENGTH_SHORT).show()
-                    mAlertDialog.dismiss()
-
-                    // 포장하러가기 누르면.. 용기내 지도 화면으로 이동해 지도에 포장하러가기 상태바 띄움.
-                    val intent = Intent(this, TogoActivity::class.java)
-                    intent.putExtra("status", "true")
-                    intent.putExtra("store_id", store_id.toString())
-                    startActivity(intent)
-                }
-
-                val noButton = mDialogView.findViewById<Button>(R.id.AgainButton)
-                noButton.setOnClickListener {
-                    CallCamera()
-                }
             } //setOnClickListener
         }
     }//onCreate
+
+    private fun getYongginaeResult() {
+        //1. 카페 - 블랙다운357, 백다방358, 그때거기359,
+        //2. 식당 - 이요 356, 맥켄 360
+        var store_type: String? = null
+        if (store_id_s.equals("357") || store_id_s.equals("358") || store_id_s.equals("359")) {
+            store_type = "1"
+        } else store_type = "2"
+
+        lifecycleScope.launch {
+            retrofitService.getYongginaeResult(
+                firstPhotoFileName.toString(),
+                secondPhotoFileName.toString(),
+                store_type
+            ).enqueue(object :
+                Callback<ApiResponse<String>> {
+                override fun onResponse(
+                    call: Call<ApiResponse<String>>,
+                    response: Response<ApiResponse<String>>,
+                ) {
+                    if (response.isSuccessful) {
+                        val result: ApiResponse<String>? = response.body();
+                        val data = result?.getMessage()
+                        Log.d("YONGGINAE_RESULT", "data : " + data)
+
+                        // Dialog만들기
+                        // 해당 다회용기는 사용이 적합하다.
+                        val mDialogView =
+                            LayoutInflater.from(applicationContext)
+                                .inflate(R.layout.after_yongginae_model_dialog, null)
+                        val mBuilder =
+                            AlertDialog.Builder(this@YonggiCameraActivity, R.style.AlertDialogTheme)
+                                .setView(mDialogView)
+                        var resultText = mDialogView?.findViewById<TextView>(R.id.howto_text)
+
+                        if (data.equals("1")) {
+                            Log.d("YONGGINAE_RESULT: ", "1찍힘")
+                            resultText?.text = "해당 용기는 포장이 가능합니다."
+                        } else if (data.equals("0")) {
+                            Log.d("YONGGINAE_RESULT: ", "0찍힘")
+                            resultText?.text = "해당 용기는 포장이 불가능합니다."
+                        }
+
+                        mAlertDialog = mBuilder.show()
+
+
+                        // 용기내러 가기! 버튼 클릭시
+                        val togoButton = mDialogView?.findViewById<Button>(R.id.togoButton)
+                        togoButton?.setOnClickListener {
+
+                            //Toast.makeText(this, "용기를 내서 포장하러 가는 당신! 멋져요⭐️️", Toast.LENGTH_SHORT).show()
+                            mAlertDialog?.dismiss()
+
+                            // 포장하러가기 누르면.. 용기내 지도 화면으로 이동해 지도에 포장하러가기 상태바 띄움.
+                            val intent = Intent(this@YonggiCameraActivity, TogoActivity::class.java)
+                            intent.putExtra("status", "true")
+                            intent.putExtra("store_id", store_id_s.toString())
+                            startActivity(intent)
+
+                        }
+
+                        val noButton = mDialogView?.findViewById<Button>(R.id.AgainButton)
+                        noButton?.setOnClickListener {
+                            CallCamera()
+                        }
+
+                    } else {
+                        //통신 실패(응답코드 3xx, 4xx 등)
+                        Log.d("YMC", "onResponse 실패" + response.errorBody().toString())
+                    }
+                }
+
+                override fun onFailure(call: Call<ApiResponse<String>>, t: Throwable) {
+                    Log.e("YMC", "onFailure : ${t.message} ")
+                }
+            })
+        }
+}
 
     fun checkPermission(permissions: Array<out String>): Boolean {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -164,7 +240,6 @@ class YonggiCameraActivity : AppCompatActivity(){
                 }
             }
         }
-
         return true;
     }
 
@@ -203,6 +278,8 @@ class YonggiCameraActivity : AppCompatActivity(){
                         binding.imageView.setImageBitmap(img)
 
                         if (!isSecondPhotoTaken) {
+                            firstPhotoFileName = null
+                            secondPhotoFileName = null
                             firstPhotoFileName = generatePhotoFileName()
                             val firstImageFile = convertBitmapToFile(img, firstPhotoFileName.toString())
                             Log.d("FIRST_IMAGENAME:", firstImageFile.name)
@@ -212,6 +289,7 @@ class YonggiCameraActivity : AppCompatActivity(){
                                 BuildConfig.accessKey,
                                 BuildConfig.secretKey)
                             uploadTask.execute()
+
                             isSecondPhotoTaken = true
                         } else {
                             secondPhotoFileName = generatePhotoFileName()
@@ -226,8 +304,6 @@ class YonggiCameraActivity : AppCompatActivity(){
 
                             // Reset for the next round of photos
                             isSecondPhotoTaken = false
-                            firstPhotoFileName = null
-                            secondPhotoFileName = null
                         }
 
                         if(flag.equals(1)){
@@ -263,5 +339,10 @@ class YonggiCameraActivity : AppCompatActivity(){
     private fun generatePhotoFileName(): String {
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         return "IMG_$timeStamp.jpg"
+    }
+
+    private fun initRetrofit() {
+        retrofit = RetrofitClientFlask.getInstance()
+        retrofitService = retrofit.create(RetrofitService::class.java)
     }
 }

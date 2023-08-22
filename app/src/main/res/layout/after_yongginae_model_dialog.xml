@@ -37,7 +37,7 @@
         android:fontFamily="@font/bmjua"
         android:gravity="center_vertical"
         android:padding="10dp"
-        android:text="@string/togo_model_text"
+        android:text="test"
         android:textSize="34sp"
         android:textAlignment="center"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout"
