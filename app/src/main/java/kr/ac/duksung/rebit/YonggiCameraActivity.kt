@@ -17,8 +17,16 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.amazonaws.auth.BasicAWSCredentials
+import com.amazonaws.services.s3.AmazonS3Client
+import com.amazonaws.services.s3.model.PutObjectRequest
 import com.shashank.sony.fancytoastlib.FancyToast
 import kr.ac.duksung.rebit.databinding.ActivityCameraBinding
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.*
 
 class YonggiCameraActivity : AppCompatActivity(){
     lateinit var bitmap: Bitmap
@@ -26,6 +34,10 @@ class YonggiCameraActivity : AppCompatActivity(){
 
     private lateinit var binding: ActivityCameraBinding
     private lateinit var systemUiController: SystemUiController
+    private var firstPhotoFileName: String? = null
+    private var secondPhotoFileName: String? = null
+    private var isSecondPhotoTaken = false
+
 
     // toast message
     private var toast: Toast?  = null
@@ -67,6 +79,17 @@ class YonggiCameraActivity : AppCompatActivity(){
 
         // Set the system bars color
         systemUiController.setSystemBarsColor(ContextCompat.getColor(this, R.color.purple_200))
+
+
+        // S3 설정
+        fun uploadFileToS3(file: File, bucketName: String, accessKey: String, secretKey: String) {
+            val credentials = BasicAWSCredentials(accessKey, secretKey)
+            val s3Client = AmazonS3Client(credentials)
+
+            val putObjectRequest = PutObjectRequest(bucketName, file.name, file)
+            val putObject = s3Client.putObject(putObjectRequest)
+            Log.d("S3_CHECK: ", putObject.toString())
+        }
 
 
         // 부적합한 용기일때
@@ -178,6 +201,35 @@ class YonggiCameraActivity : AppCompatActivity(){
                     if (data?.extras?.get("data") != null) {
                         val img = data?.extras?.get("data") as Bitmap
                         binding.imageView.setImageBitmap(img)
+
+                        if (!isSecondPhotoTaken) {
+                            firstPhotoFileName = generatePhotoFileName()
+                            val firstImageFile = convertBitmapToFile(img, firstPhotoFileName.toString())
+                            Log.d("FIRST_IMAGENAME:", firstImageFile.name)
+
+                            val uploadTask = UploadTask(firstImageFile,
+                                BuildConfig.bucketName,
+                                BuildConfig.accessKey,
+                                BuildConfig.secretKey)
+                            uploadTask.execute()
+                            isSecondPhotoTaken = true
+                        } else {
+                            secondPhotoFileName = generatePhotoFileName()
+                            val secondImageFile = convertBitmapToFile(img, secondPhotoFileName.toString())
+                            Log.d("SECOND_IMAGENAME:", secondImageFile.name)
+
+                            val uploadTask = UploadTask(secondImageFile,
+                                BuildConfig.bucketName,
+                                BuildConfig.accessKey,
+                                BuildConfig.secretKey)
+                            uploadTask.execute()
+
+                            // Reset for the next round of photos
+                            isSecondPhotoTaken = false
+                            firstPhotoFileName = null
+                            secondPhotoFileName = null
+                        }
+
                         if(flag.equals(1)){
                             makeToast( "정확한 측정을 위해 한번 더 동전과 함께 용기의 측면을 촬영해주세요!️️")
                         }
@@ -187,9 +239,29 @@ class YonggiCameraActivity : AppCompatActivity(){
             }
         }
     }
+
     private fun makeToast(message: String){
         toast?.cancel()
         toast = Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT)
         toast?.show()
+    }
+
+    private fun convertBitmapToFile(bitmap: Bitmap, filename: String): File {
+        val file = File(this.cacheDir, filename)
+        try {
+            val outputStream = FileOutputStream(file)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream)
+            outputStream.flush()
+            outputStream.close()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        return file
+    }
+
+
+    private fun generatePhotoFileName(): String {
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        return "IMG_$timeStamp.jpg"
     }
 }
