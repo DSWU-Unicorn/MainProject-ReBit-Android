@@ -37,6 +37,7 @@ import com.google.android.gms.location.*
 import kotlinx.coroutines.launch
 import kr.ac.duksung.rebit.model.Classifier
 import kr.ac.duksung.rebit.network.dto.RecycleDetailVO
+import org.json.JSONObject
 import java.io.IOException
 import java.util.*
 
@@ -108,6 +109,7 @@ class CameraActivity : AppCompatActivity() {
             CallCamera()
         }
 
+        // 🚨
         binding.startButton.setOnClickListener {
             // Dialog만들기
             val mDialogView =
@@ -121,7 +123,8 @@ class CameraActivity : AppCompatActivity() {
             val title_text = mDialogView.findViewById<TextView>(R.id.title_text)
             howto_text.text = content
             title_text.text = dataLabel + "-분리수거 방법"
-            Log.d("content", "content1 : " + howto_text)
+            Log.d("DIALOG", "content1 : " + content)
+            Log.d("DIALOG", "content1 : " + howto_text.text)
 
             /*
             val okButton = mDialogView.findViewById<Button>(R.id.successButton)
@@ -143,13 +146,12 @@ class CameraActivity : AppCompatActivity() {
                 if (checkPermissionForLocation(this)) {
                     startLocationUpdates()
                 }
-
             }
-
 
             val noButton = mDialogView.findViewById<Button>(R.id.AgainButton)
             noButton.setOnClickListener {
                 CallCamera()
+                mAlertDialog.dismiss()
             }
         } //setOnClickListener
 
@@ -233,13 +235,13 @@ class CameraActivity : AppCompatActivity() {
                         val img = data?.extras?.get("data") as Bitmap
                         val output = classifier.classify(img)
                         val resultStr =
-                            String.format(Locale.ENGLISH, "class : %s", output.first)
+                            String.format(Locale.ENGLISH, output.first)
                         binding.run {
                             binding.textResult.text = resultStr
                             Log.d("MODEL_RESLT: ", resultStr)
                             dataLabel = resultStr
                             binding.imageView.setImageBitmap(img)
-                            getRecycle()
+                            getRecycle(resultStr)    // 🚨
                         }
                     }
                 }
@@ -254,17 +256,20 @@ class CameraActivity : AppCompatActivity() {
         retrofitService = retrofit.create(RetrofitService::class.java)
     }
 
-    private fun getRecycle() {
+    // 🚨
+    private fun getRecycle(value : String) {
+        Log.d("RECYCLE_DATA_LABEL: ", value)
         // 분리수거 방법 통신
         lifecycleScope.launch {
             try {
-                Log.d("RECYCLE_DATA_LABEL: ", dataLabel)
-                retrofitService.getRecycle("Plastic")?.enqueue(object :
+                Log.d("RECYCLE_DATA_LABEL: ", value)
+                retrofitService.getRecycle(value)?.enqueue(object :
                     Callback<ApiResponse<RecycleVO>> {
                     override fun onResponse(
                         call: Call<ApiResponse<RecycleVO>>,
                         response: Response<ApiResponse<RecycleVO>>
                     ) {
+                        Log.d("GET_RECYCLE: ", value)
                         if (response.isSuccessful) {
                             //정상적으로 통신 성공
                             val result: ApiResponse<RecycleVO>? = response.body();
@@ -276,10 +281,10 @@ class CameraActivity : AppCompatActivity() {
                             content = data!!.content
                             Log.d("RECYCLE_CAMERA_CONTENT", "content1 : " + content)
 
-
                         } else {
                             //통신 실패(응답코드 3xx, 4xx 등)
-                            Log.d("YMC", "onResponse 실패" + response.errorBody().toString())
+                            var stringToJson = JSONObject(response.errorBody()?.string()!!)
+                            Log.d("YMC", "onResponse 실패" + "stringToJson: ${stringToJson}")
                         }
                     }
 
