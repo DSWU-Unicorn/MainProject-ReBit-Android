@@ -62,6 +62,9 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener,
     private var storeLongitude: Double = 0.0
     private var isArrived = false
 
+    //
+    private var flag = 0 // dialog 하나만 만들어져라 얍
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -348,9 +351,7 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener,
 
 
         if (status.toBoolean()) {
-            val toast = FancyToast.makeText(this, "포장하러 가는 중입니다..",
-                FancyToast.LENGTH_LONG,
-                FancyToast.SUCCESS, true)
+            val toast = FancyToast.makeText(this, "포장하러 가는 중입니다..", FancyToast.LENGTH_LONG, FancyToast.SUCCESS, R.drawable.dagom_happy_pixel, false);
             toast.show()
 
 
@@ -407,52 +408,6 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener,
         }
 
     }//OnCreate()
-
-//    private fun setCurrentLocationEventListener() {
-//        // p1: MapPoint 객체 (사용자의 위치 좌표)
-//        // p2: accuracyInMeters(위치 정확도인 accuracyInMeters (단위: 미터))
-////    private fun setCurrentLocationEventListener() {
-////        mMapView.setCurrentLocationEventListener(object : MapView.CurrentLocationEventListener {
-//        fun onCurrentLocationUpdate(p0: MapView?, p1: MapPoint?, p2: Float) {
-//            val mapPointGeo = p1?.mapPointGeoCoord
-//            if (mapPointGeo != null) {
-//                Log.i("onCurrentLocationUpdate",
-//                    String.format("MapView onCurrentLocationUpdate (%f,%f) accuracy (%f)",
-//                        mapPointGeo.latitude,
-//                        mapPointGeo.longitude,
-//                        p2))
-//            }
-//            var currentMapPoint =
-//                mapPointGeo?.let { MapPoint.mapPointWithGeoCoord(it.latitude, mapPointGeo.longitude) }
-//            //이 좌표로 지도 중심 이동
-//            mMapView.setMapCenterPoint(currentMapPoint, true)
-//            //전역변수로 현재 좌표 저장
-//            var mCurrentLat = mapPointGeo?.latitude
-//            var mCurrentLng = mapPointGeo?.longitude
-//            Log.d("onCurrentLocationUpdate", "현재위치 => " + mCurrentLat.toString() + "  " + mCurrentLng)
-//            // mLoaderLayout.setVisibility(View.GONE) // 레이아웃 숨기기
-//
-//            //트래킹 모드가 아닌 단순 현재위치 업데이트일 경우, 한번만 위치 업데이트하고 트래킹을 중단시키기 위한 로직
-//            if (!isTrackingMode) {
-//                mMapView.currentLocationTrackingMode =
-//                    MapView.CurrentLocationTrackingMode.TrackingModeOff
-//            }
-//        }
-//
-//        fun onCurrentLocationDeviceHeadingUpdate(mapView: MapView?, v: Float) {}
-//
-//        fun onCurrentLocationUpdateFailed(mapView: MapView?) {
-//            Log.i("onCurrentLocationUpdate", "onCurrentLocationUpdateFailed")
-//            mMapView.currentLocationTrackingMode =
-//                MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading
-//        }
-//
-//        fun onCurrentLocationUpdateCancelled(mapView: MapView?) {
-//            Log.i("onCurrentLocationUpdate", "onCurrentLocationUpdateCancelled")
-//            mMapView.currentLocationTrackingMode =
-//                MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading
-//        }
-//    }
 
 
     //서버 연결
@@ -585,7 +540,7 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener,
         isTrackingMode = true
 
         // 사용자 현위치 트래킹 기능 켜짐
-        mMapView.setCustomCurrentLocationMarkerTrackingImage(R.drawable.walking_woman_128,
+        mMapView.setCustomCurrentLocationMarkerTrackingImage(R.drawable.dagom_happy_pixel_128,
             MapPOIItem.ImageOffset(64, 64))
     }
 
@@ -728,69 +683,75 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener,
         }
 
         if (isArrived) {
-            // 5. 다이얼로그
-            // Dialog만들기
-            val mDialogView =
-                LayoutInflater.from(this).inflate(R.layout.after_togo_dialog, null)
-            val mBuilder = androidx.appcompat.app.AlertDialog.Builder(this)
-                .setView(mDialogView)
-
-            val mAlertDialog = mBuilder.show()
-            val yesBtn = mDialogView.findViewById<Button>(R.id.yesBtn)
-            yesBtn.setOnClickListener {
-                // 6. 포인트 증가
-                // api 호출
-                lifecycleScope.launch {
-                    try {
-                        retrofitService.postUserWithPointAfterYonggi(1)?.enqueue(object :
-                            Callback<ApiResponse<Int>> {
-                            override fun onResponse(
-                                call: Call<ApiResponse<Int>>,
-                                response: Response<ApiResponse<Int>>,
-                            ) {
-                                if (response.isSuccessful) {
-                                    // 통신 성공시
-                                    val result: ApiResponse<Int>? = response.body()
-                                    val datas = result?.getResult()
-
-                                    Log.d("POINTRESULT", "용기내 onresponse 성공: " + result?.toString())
-                                    Log.d("POINTRESULT", "용기내 data : " + datas?.toString())
-                                }
-                            }
-
-                            override fun onFailure(
-                                call: Call<ApiResponse<Int>>,
-                                t: Throwable,
-                            ) {
-                                Log.e("POINTRESULT", "용기내 onFailure : ${t.message} ");
-                            }
-                        })
-                    } catch (e: Exception) {
-                        // Exception handling
-                        Log.e(ContentValues.TAG, "Exception: ${e.message}", e)
-                    }
-                }
-                mAlertDialog.dismiss()
-                // UI 초기화
-                //toGoTxt.visibility = View.INVISIBLE
-            }
-
-            val noBtn = mDialogView.findViewById<Button>(R.id.noBtn)
-            noBtn.setOnClickListener {
-                mAlertDialog.dismiss()
-                // 포장완료 아니요 클릭
+            if (flag.equals(0)) {
+                // 5. 다이얼로그
+                // Dialog만들기
                 val mDialogView =
-                    LayoutInflater.from(this).inflate(R.layout.after_togo_dialog_nobtn, null)
+                    LayoutInflater.from(this).inflate(R.layout.after_togo_dialog, null)
                 val mBuilder = androidx.appcompat.app.AlertDialog.Builder(this)
                     .setView(mDialogView)
 
+                val mAlertDialog = mBuilder.show()
+                val yesBtn = mDialogView.findViewById<Button>(R.id.yesBtn)
+                yesBtn.setOnClickListener {
+                    // 6. 포인트 증가
+                    // api 호출
+                    lifecycleScope.launch {
+                        try {
+                            retrofitService.postUserWithPointAfterYonggi(1)?.enqueue(object :
+                                Callback<ApiResponse<Int>> {
+                                override fun onResponse(
+                                    call: Call<ApiResponse<Int>>,
+                                    response: Response<ApiResponse<Int>>,
+                                ) {
+                                    if (response.isSuccessful) {
+                                        // 통신 성공시
+                                        val result: ApiResponse<Int>? = response.body()
+                                        val datas = result?.getResult()
 
-                val mAlertDialog2 = mBuilder.show()
-                mAlertDialog2.findViewById<Button>(R.id.AgainButton)?.setOnClickListener {
-                    mAlertDialog2.dismiss()
+                                        Log.d("POINTRESULT",
+                                            "용기내 onresponse 성공: " + result?.toString())
+                                        Log.d("POINTRESULT", "용기내 data : " + datas?.toString())
+                                    }
+                                }
+
+                                override fun onFailure(
+                                    call: Call<ApiResponse<Int>>,
+                                    t: Throwable,
+                                ) {
+                                    Log.e("POINTRESULT", "용기내 onFailure : ${t.message} ");
+                                }
+                            })
+                        } catch (e: Exception) {
+                            // Exception handling
+                            Log.e(ContentValues.TAG, "Exception: ${e.message}", e)
+                        }
+                    }
+                    mAlertDialog.dismiss()
+                    // UI 초기화
+                    //toGoTxt.visibility = View.INVISIBLE
                 }
 
+                val noBtn = mDialogView.findViewById<Button>(R.id.noBtn)
+                noBtn.setOnClickListener {
+                    mAlertDialog.dismiss()
+                    // 포장완료 아니요 클릭
+                    val mDialogView =
+                        LayoutInflater.from(this).inflate(R.layout.after_togo_dialog_nobtn, null)
+                    val mBuilder = androidx.appcompat.app.AlertDialog.Builder(this)
+                        .setView(mDialogView)
+
+
+                    val mAlertDialog2 = mBuilder.show()
+                    mAlertDialog2.findViewById<Button>(R.id.AgainButton)?.setOnClickListener {
+                        mAlertDialog2.dismiss()
+                        flag=0
+                    }
+
+                }
             }
+            flag += 1
+
 
         }
 

@@ -66,75 +66,6 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
 
         //
-        val btn = findViewById<Button>(R.id.btn)
-        btn.setOnClickListener {
-            Log.d("버튼클릭:", "버튼클릭됨 !")
-            // 포장하셨습니까? Dialog만들기
-            val mDialogView =
-                LayoutInflater.from(this).inflate(R.layout.after_togo_dialog, null)
-            val mBuilder = AlertDialog.Builder(this)
-                .setView(mDialogView)
-
-            val mAlertDialog = mBuilder.show()
-            val yesBtn = mDialogView.findViewById<Button>(R.id.yesBtn)
-            yesBtn.setOnClickListener {
-                // 6. 포인트 증가
-                // api 호출
-                lifecycleScope.launch {
-                    try {
-                        retrofitService.postUserWithPointAfterYonggi(1)?.enqueue(object :
-                            Callback<ApiResponse<Int>> {
-                            override fun onResponse(
-                                call: Call<ApiResponse<Int>>,
-                                response: Response<ApiResponse<Int>>,
-                            ) {
-                                if (response.isSuccessful) {
-                                    // 통신 성공시
-                                    val result: ApiResponse<Int>? = response.body()
-                                    val datas = result?.getResult()
-
-                                    Log.d("POINTRESULT", "용기내 onresponse 성공: " + result?.toString())
-                                    Log.d("POINTRESULT", "용기내 data : " + datas?.toString())
-                                }
-                            }
-
-                            override fun onFailure(
-                                call: Call<ApiResponse<Int>>,
-                                t: Throwable,
-                            ) {
-                                Log.e("POINTRESULT", "용기내 onFailure : ${t.message} ");
-                            }
-                        })
-                    } catch (e: Exception) {
-                        // Exception handling
-                        Log.e(ContentValues.TAG, "Exception: ${e.message}", e)
-                    }
-                }
-                mAlertDialog.dismiss()
-                // UI 초기화
-                toGoTxt.visibility = INVISIBLE
-            }
-
-            // 포장하셨습니까?-아니요 클릭시
-            val noBtn = mDialogView.findViewById<Button>(R.id.noBtn)
-            noBtn.setOnClickListener {
-                // Create and show the "No" dialog
-                val noDialogView =
-                    LayoutInflater.from(this).inflate(R.layout.after_togo_dialog_nobtn, null)
-                val noBuilder = AlertDialog.Builder(this)
-                    .setView(noDialogView)
-
-                val noAlertDialog = noBuilder.create() // Create the dialog but do not show it yet
-                noAlertDialog.show() // Show the dialog
-                val againBtn = noDialogView.findViewById<Button>(R.id.AgainButton)
-                againBtn.setOnClickListener {
-                    noAlertDialog.dismiss()
-                }
-
-                // Dismiss the current dialog
-//                mAlertDialog.dismiss()
-            }
-        }
 
 
 
@@ -160,7 +91,6 @@ class MainActivity : AppCompatActivity() {
         //서버 연결
         initRetrofit()
 
-        var toGoTxt = findViewById<TextView>(R.id.toGoTxt)
 
         // intent 얻기
         /* Togo Activity로 이동
@@ -221,8 +151,6 @@ class MainActivity : AppCompatActivity() {
                     Log.e(ContentValues.TAG, "Exception: ${e.message}", e)
                 }
             }
-            // 3. ui 변경
-            toGoTxt.visibility = VISIBLE
         }*/
 
 
@@ -370,8 +298,7 @@ Log.d("STORELOCATION: ", storeLocation.longitude.toString())
 //                    }
 //                }
 //                mAlertDialog.dismiss()
-//                // UI 초기화
-//                toGoTxt.visibility = INVISIBLE
+
 //            }
 //
 //            val noBtn = mDialogView.findViewById<Button>(R.id.noBtn)
