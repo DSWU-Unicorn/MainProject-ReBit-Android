@@ -87,9 +87,6 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener,
         setupEvents()
 
 
-        // 포장하러 가는 중입니다.
-        var toGoTxt = findViewById<TextView>(R.id.toGoTxt)
-
         /**
          * 검색
          */
@@ -235,7 +232,7 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener,
         lifecycleScope.launch {
             try {
                 // 사용자의 현재 위치 -> "구"로 가져와야 함.
-                retrofitService.getStoreMarker("금천구")
+                retrofitService.getStoreMarker("도봉구")
                     .enqueue(object : // 임시적으로 줄여가게 많은 곳으로 하드코딩해 변경
                         Callback<ApiResponse<ArrayList<StoreMarkerVO>>> {
                         override fun onResponse(
@@ -385,6 +382,8 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener,
                                     // 가게 주소->좌표로 변환한 값
                                     storeLatitude = fromLocationName.get(0).latitude
                                     storeLongitude = fromLocationName.get(0).longitude
+
+                                    startTogoTracking()
                                 }
                             }
 
@@ -401,7 +400,7 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener,
                 }
             }
 
-        // 3. ui 변경
+            // 3. ui 변경
 //            FancyToast.makeText(this,"Hello World !",FancyToast.LENGTH_LONG,FancyToast.DEFAULT,true);
 
             //toGoTxt.visibility = View.VISIBLE
@@ -577,6 +576,17 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener,
             MapPOIItem.ImageOffset(16, 16))
 
 
+    }
+
+    // 포장하러갈때 위치 추적 시작
+    private fun startTogoTracking() {
+        mMapView.currentLocationTrackingMode =
+            MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading // 계속 따라옴
+        isTrackingMode = true
+
+        // 사용자 현위치 트래킹 기능 켜짐
+        mMapView.setCustomCurrentLocationMarkerTrackingImage(R.drawable.walking_woman_128,
+            MapPOIItem.ImageOffset(64, 64))
     }
 
     // 위치추적 중지
@@ -768,7 +778,20 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener,
             val noBtn = mDialogView.findViewById<Button>(R.id.noBtn)
             noBtn.setOnClickListener {
                 mAlertDialog.dismiss()
+                // 포장완료 아니요 클릭
+                val mDialogView =
+                    LayoutInflater.from(this).inflate(R.layout.after_togo_dialog_nobtn, null)
+                val mBuilder = androidx.appcompat.app.AlertDialog.Builder(this)
+                    .setView(mDialogView)
+
+
+                val mAlertDialog2 = mBuilder.show()
+                mAlertDialog2.findViewById<Button>(R.id.AgainButton)?.setOnClickListener {
+                    mAlertDialog2.dismiss()
+                }
+
             }
+
         }
 
 

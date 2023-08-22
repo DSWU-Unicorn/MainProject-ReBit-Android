@@ -1,47 +1,31 @@
 package kr.ac.duksung.rebit
 
-import android.Manifest
 import android.content.ContentValues
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.location.Geocoder
 import android.location.Location
-import android.location.LocationManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.os.Looper
-import android.provider.Settings
 import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View.INVISIBLE
-import android.view.View.VISIBLE
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.location.*
 import com.unity3d.player.UnityPlayerActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.launch
 import kr.ac.duksung.rebit.databinding.ActivityMainBinding
-import kr.ac.duksung.rebit.databinding.ActivityStoreDetailBinding
 import kr.ac.duksung.rebit.network.RetofitClient
 import kr.ac.duksung.rebit.network.RetrofitService
 import kr.ac.duksung.rebit.network.dto.ApiResponse
-import kr.ac.duksung.rebit.network.dto.StoreAddressVO
-import kr.ac.duksung.rebit.network.dto.StoreNameVO
-import net.daum.mf.map.api.MapPOIItem
-import net.daum.mf.map.api.MapPoint
-import net.daum.mf.map.api.MapView
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -136,7 +120,7 @@ class MainActivity : AppCompatActivity() {
             noBtn.setOnClickListener {
                 // Create and show the "No" dialog
                 val noDialogView =
-                    LayoutInflater.from(this).inflate(R.layout.after_togo_diglog_nobtn, null)
+                    LayoutInflater.from(this).inflate(R.layout.after_togo_dialog_nobtn, null)
                 val noBuilder = AlertDialog.Builder(this)
                     .setView(noDialogView)
 
