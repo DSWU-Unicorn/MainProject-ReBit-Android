@@ -4,48 +4,68 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".TogoActivity"
-    android:orientation="vertical">
-    <include layout="@layout/toolbar"/>
+    android:orientation="vertical"
+    tools:context=".TogoActivity">
 
+    <include layout="@layout/toolbar" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:paddingTop="10dp"
+        android:orientation="horizontal">
 
         <SearchView
             android:id="@+id/searchView"
-            android:layout_width="match_parent"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:queryHint="가게명을 검색하세요."
-            android:iconifiedByDefault="false"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="16dp"
             android:focusable="false"
             android:focusableInTouchMode="false"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="30dp"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/searchview_background"
+            android:iconifiedByDefault="false"
             android:queryBackground="@android:color/transparent"
-            />
+            android:queryHint="가게명을 검색하세요." />
 
+
+        <TextView
+            android:id="@+id/addressTxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+
+            android:drawableLeft="@drawable/dagom"
+            android:fontFamily="@font/bmjua"
+            android:gravity="center"
+            android:paddingLeft="20dp"
+            android:paddingTop="5dp"
+            android:paddingRight="20dp"
+
+            android:text="현재 위치"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+
+    </LinearLayout>
 
     <ListView
         android:id="@+id/storeList"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="150dp"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        />
-
-
-
+        android:layout_marginEnd="16dp" />
 
     <RelativeLayout
         android:id="@+id/map_mv_mapcontainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
-<!--    <net.daum.mf.map.api.MapView-->
-<!--        android:id="@+id/mapView"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"-->
-<!--        />-->
+        android:layout_height="match_parent" />
+    <!--    <net.daum.mf.map.api.MapView-->
+    <!--        android:id="@+id/mapView"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="match_parent"-->
+    <!--        />-->
 
 
 </LinearLayout>

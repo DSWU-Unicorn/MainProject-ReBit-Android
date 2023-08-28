@@ -6,9 +6,11 @@ import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Geocoder
+import android.location.Location
 import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.Looper
 import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
@@ -18,7 +20,9 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.contains
 import androidx.lifecycle.lifecycleScope
+import com.google.android.gms.location.*
 import com.shashank.sony.fancytoastlib.FancyToast
 import kotlinx.coroutines.launch
 import kr.ac.duksung.rebit.databinding.ActivityTogoBinding
@@ -65,6 +69,17 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener,
     //
     private var flag = 0 // dialog 하나만 만들어져라 얍
 
+    // 사용자 현재 위치 기준으로 상점 불러오기
+    // GPS
+    private lateinit var geocoder: Geocoder
+    private var mFusedLocationProviderClient: FusedLocationProviderClient? =
+        null // 현재 위치를 가져오기 위한 변수
+    private lateinit var mLastLocation: Location // 위치 값을 가지고 있는 객체
+    private lateinit var mLocationRequest: LocationRequest // 위치 정보 요청의 매개변수를 저장하는
+    private val REQUEST_PERMISSION_LOCATION = 10
+
+    lateinit var slice_address_gu: String
+    lateinit var test_slice_address_gu: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,6 +91,15 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener,
 
         //서버 연결
         initRetrofit()
+
+        // 현재 위치
+        mLocationRequest = LocationRequest.create().apply {
+
+            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+
+        }
+        geocoder = Geocoder(this)
+
 
         // 가게 이름 조회 통신
         // getStoreInfo()
@@ -213,6 +237,8 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener,
         if (checkLocationService()) {
             // GPS가 켜져있을 경우
             permissionCheck()
+            startLocationUpdates()                  // 현재 위치 찾기
+
         } else {
             // GPS가 꺼져있을 경우
             Toast.makeText(this, "GPS를 켜주세요", Toast.LENGTH_SHORT).show()
@@ -227,114 +253,122 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener,
         // 현재 위치 업데이트를 위한 setCurrentLocationEventListener 등록
         // 230801
         // this에 MapView.CurrentLocationEventListener 구현
-        mMapView.setCurrentLocationEventListener(this);
+        mMapView.setCurrentLocationEventListener(this)
         //setCurrentLocationTrackingMode-> 지도랑 현재위치의 좌표를 찍어주고 따라다닌다
         mMapView.currentLocationTrackingMode =
             MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeading
 
         lifecycleScope.launch {
+
             try {
-                // 사용자의 현재 위치 -> "구"로 가져와야 함.
-                retrofitService.getStoreMarker("도봉구")
-                    .enqueue(object : // 임시적으로 줄여가게 많은 곳으로 하드코딩해 변경
-                        Callback<ApiResponse<ArrayList<StoreMarkerVO>>> {
-                        override fun onResponse(
-                            call: Call<ApiResponse<ArrayList<StoreMarkerVO>>>,
-                            response: Response<ApiResponse<ArrayList<StoreMarkerVO>>>,
-                        ) {
-                            if (response.isSuccessful) {
-                                // 통신 성공시
-                                val result: ApiResponse<ArrayList<StoreMarkerVO>>? = response.body()
-                                val datas = result?.getResult()
 
-                                val geocoder = Geocoder(applicationContext)
+                // 사용자의 현재 위치 -> "구"로 가져옴
+                if (slice_address_gu.contains("구")) {
 
-                                for (data in datas!!) {
-                                    val address =
-                                        geocoder.getFromLocationName(data.address, 10).get(0)
-                                    Log.d("ADDRESS", "on response 성공: " + address.latitude)
+                    retrofitService.getStoreMarker(slice_address_gu)
+                        .enqueue(object : // 임시적으로 줄여가게 많은 곳으로 하드코딩해 변경
+                            Callback<ApiResponse<ArrayList<StoreMarkerVO>>> {
+                            override fun onResponse(
+                                call: Call<ApiResponse<ArrayList<StoreMarkerVO>>>,
+                                response: Response<ApiResponse<ArrayList<StoreMarkerVO>>>,
+                            ) {
+                                if (response.isSuccessful) {
+                                    // 통신 성공시
+                                    val result: ApiResponse<ArrayList<StoreMarkerVO>>? =
+                                        response.body()
+                                    val datas = result?.getResult()
 
-                                    retrofitService.getStoreInfo(data.id)
-                                        .enqueue(object :
-                                            Callback<ApiResponse<StoreInfoVO>> {
-                                            override fun onResponse(
-                                                call: Call<ApiResponse<StoreInfoVO>>,
-                                                response: Response<ApiResponse<StoreInfoVO>>,
-                                            ) {
-                                                if (response.isSuccessful) {
-                                                    // 통신 성공시
-                                                    val StoreInfoVO: ApiResponse<StoreInfoVO>? =
-                                                        response.body()
-                                                    val StoreInfoData = StoreInfoVO?.getResult()
-                                                    val storeName = StoreInfoData?.storeName
+                                    val geocoder = Geocoder(applicationContext)
+
+                                    for (data in datas!!) {
+                                        val address =
+                                            geocoder.getFromLocationName(data.address, 10).get(0)
+                                        Log.d("ADDRESS", "on response 성공: " + address.latitude)
+
+                                        retrofitService.getStoreInfo(data.id)
+                                            .enqueue(object :
+                                                Callback<ApiResponse<StoreInfoVO>> {
+                                                override fun onResponse(
+                                                    call: Call<ApiResponse<StoreInfoVO>>,
+                                                    response: Response<ApiResponse<StoreInfoVO>>,
+                                                ) {
+                                                    if (response.isSuccessful) {
+                                                        // 통신 성공시
+                                                        val StoreInfoVO: ApiResponse<StoreInfoVO>? =
+                                                            response.body()
+                                                        val StoreInfoData = StoreInfoVO?.getResult()
+                                                        val storeName = StoreInfoData?.storeName
 
 //                                                    Log.d("가게이름*",
 //                                                        "on response 성공: " + StoreInfoVO?.toString())
 //                                                    Log.d("가게이름**",
 //                                                        "data : " + StoreInfoData?.toString())
-                                                    Log.d("가게이름***", "storeName : $storeName")
+                                                        Log.d("가게이름***", "storeName : $storeName")
 
 
-                                                    // 마커 생성 및 itemName 대입
-                                                    val marker = MapPOIItem()
-                                                    marker.apply {
-                                                        mapPoint =
-                                                            MapPoint.mapPointWithGeoCoord(
-                                                                address.latitude,
-                                                                address.longitude
-                                                            )
-                                                        Log.d("상점 위도경도테스트", "$mapPoint")
+                                                        // 마커 생성 및 itemName 대입
+                                                        val marker = MapPOIItem()
+                                                        marker.apply {
+                                                            mapPoint =
+                                                                MapPoint.mapPointWithGeoCoord(
+                                                                    address.latitude,
+                                                                    address.longitude
+                                                                )
+                                                            Log.d("상점 위도경도테스트", "$mapPoint")
 
-                                                        // exception
-                                                        itemName = storeName
-                                                            ?: "" // Assign the storeName to itemName, or empty string if null
+                                                            // exception
+                                                            itemName = storeName
+                                                                ?: "" // Assign the storeName to itemName, or empty string if null
 
-                                                        markerType =
-                                                            MapPOIItem.MarkerType.CustomImage          // 마커 모양 (커스텀)
-                                                        customImageResourceId =
-                                                            R.drawable.map_pin_blue            // 커스텀 마커 이미지
-                                                        selectedMarkerType =
-                                                            MapPOIItem.MarkerType.CustomImage  // 클릭 시 마커 모양 (커스텀)
-                                                        customSelectedImageResourceId =
-                                                            R.drawable.dagom_marker_resize    // 클릭 시 커스텀 마커 이미지
-                                                        isCustomImageAutoscale =
-                                                            false      // 커스텀 마커 이미지 크기 자동 조정
-                                                        setCustomImageAnchor(0.5f, 1.0f)
+                                                            markerType =
+                                                                MapPOIItem.MarkerType.CustomImage          // 마커 모양 (커스텀)
+                                                            customImageResourceId =
+                                                                R.drawable.map_pin_blue            // 커스텀 마커 이미지
+                                                            selectedMarkerType =
+                                                                MapPOIItem.MarkerType.CustomImage  // 클릭 시 마커 모양 (커스텀)
+                                                            customSelectedImageResourceId =
+                                                                R.drawable.dagom_marker_resize    // 클릭 시 커스텀 마커 이미지
+                                                            isCustomImageAutoscale =
+                                                                false      // 커스텀 마커 이미지 크기 자동 조정
+                                                            setCustomImageAnchor(0.5f, 1.0f)
+                                                        }
+                                                        mMapView.addPOIItem(marker)
+
                                                     }
-                                                    mMapView.addPOIItem(marker)
-
                                                 }
-                                            }
 
-                                            override fun onFailure(
-                                                call: Call<ApiResponse<StoreInfoVO>>,
-                                                t: Throwable,
-                                            ) {
-                                                Log.e("가게이름", "onFailure : ${t.message} ")
-                                            }
-                                        })
+                                                override fun onFailure(
+                                                    call: Call<ApiResponse<StoreInfoVO>>,
+                                                    t: Throwable,
+                                                ) {
+                                                    Log.e("가게이름", "onFailure : ${t.message} ")
+                                                }
+                                            })
+
+                                    }
+                                    // 기존 코드
+                                    //                                marker.mapPoint = MapPoint.mapPointWithGeoCoord(address.latitude,
+                                    //                                    address.longitude)
+                                    //                                marker.itemName = data.id.toString()
+                                    //           mMapView.addPOIItem(marker)
+                                    //     }
+
+                                    Log.d("StoreMarker", "on response 성공: $result")
+                                    Log.d("StoreMarker", "data : $datas")
 
                                 }
-                                // 기존 코드
-                                //                                marker.mapPoint = MapPoint.mapPointWithGeoCoord(address.latitude,
-                                //                                    address.longitude)
-                                //                                marker.itemName = data.id.toString()
-                                //           mMapView.addPOIItem(marker)
-                                //     }
-
-                                Log.d("StoreMarker", "on response 성공: $result")
-                                Log.d("StoreMarker", "data : $datas")
-
                             }
-                        }
 
-                        override fun onFailure(
-                            call: Call<ApiResponse<ArrayList<StoreMarkerVO>>>,
-                            t: Throwable,
-                        ) {
-                            Log.e("StoreMarker", "onFailure : ${t.message} ")
-                        }
-                    })
+                            override fun onFailure(
+                                call: Call<ApiResponse<ArrayList<StoreMarkerVO>>>,
+                                t: Throwable,
+                            ) {
+                                Log.e("StoreMarker", "onFailure : ${t.message} ")
+                            }
+                        })
+                } else {
+                    startLocationUpdates()
+                }
             } catch (e: Exception) {
                 // Exception handling
                 Log.e(ContentValues.TAG, "Exception: ${e.message}", e)
@@ -351,7 +385,12 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener,
 
 
         if (status.toBoolean()) {
-            val toast = FancyToast.makeText(this, "포장하러 가는 중입니다..", FancyToast.LENGTH_LONG, FancyToast.SUCCESS, R.drawable.dagom_happy_pixel, false);
+            val toast = FancyToast.makeText(this,
+                "포장하러 가는 중입니다..",
+                FancyToast.LENGTH_LONG,
+                FancyToast.SUCCESS,
+                R.drawable.dagom_happy_pixel,
+                false);
             toast.show()
 
 
@@ -409,6 +448,80 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener,
 
     }//OnCreate()
 
+    // 사용자 현재위치 가져오기-> "구"로
+    fun startLocationUpdates() {
+
+        //FusedLocationProviderClient의 인스턴스를 생성.
+        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+            && ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
+        // 기기의 위치에 관한 정기 업데이트를 요청하는 메서드 실행
+        // 지정한 루퍼 스레드(Looper.myLooper())에서 콜백(mLocationCallback)으로 위치 업데이트를 요청
+        mFusedLocationProviderClient!!.requestLocationUpdates(mLocationRequest,
+            mLocationCallback,
+            Looper.myLooper())
+    }
+
+    // 시스템으로 부터 위치 정보를 콜백으로 받음
+    val mLocationCallback = object : LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult) {
+            // 시스템에서 받은 location 정보를 onLocationChanged()에 전달
+            locationResult.lastLocation
+            onLocationChanged(locationResult.lastLocation)
+        }
+    }
+
+    // 시스템으로 부터 받은 위치정보를 화면에 갱신해주는 메소드
+    fun onLocationChanged(location: Location) {
+        var addressTxt = binding.addressTxt
+
+        // 지오코딩
+        mLastLocation = location
+        Log.i("latitude", mLastLocation.latitude.toString())
+        val address = geocoder.getFromLocation(mLastLocation.latitude, mLastLocation.longitude, 1)
+        val nowAddr = address.get(0).getAddressLine(0).toString();
+        Log.i("latitude", nowAddr)
+        val seoulcity: Array<String> = arrayOf("강남구",
+            "강동구",
+            "강서구",
+            "강북구",
+            "관악구",
+            "광진구",
+            "구로구",
+            "금천구",
+            "노원구",
+            "동대문구",
+            "도봉구",
+            "동작구",
+            "마포구",
+            "서대문구",
+            "성동구",
+            "성북구",
+            "서초구",
+            "송파구",
+            "영등포구",
+            "용산구",
+            "양천구",
+            "은평구",
+            "종로구",
+            "중구",
+            "중랑구")
+        for (city in seoulcity) {
+            if (nowAddr.contains(city)) {
+                slice_address_gu = city
+                test_slice_address_gu = city
+            } else {
+                addressTxt.text = "현재 위치: 도봉구"
+            }
+        }
+        if (slice_address_gu.contains("구")) addressTxt.text =
+            "현재 위치: $slice_address_gu" else addressTxt.text = "현재 위치: 도봉구"
+    }
 
     //서버 연결
     private fun initRetrofit() {
@@ -745,7 +858,7 @@ class TogoActivity : AppCompatActivity(), MapView.POIItemEventListener,
                     val mAlertDialog2 = mBuilder.show()
                     mAlertDialog2.findViewById<Button>(R.id.AgainButton)?.setOnClickListener {
                         mAlertDialog2.dismiss()
-                        flag=0
+                        flag = 0
                     }
 
                 }

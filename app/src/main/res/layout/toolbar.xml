@@ -7,7 +7,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:padding="10dp">
 
         <ImageView
             android:id="@+id/left_icon"
@@ -16,14 +16,16 @@
             android:src="@drawable/togo_map_icon_resize" />
 
         <TextView
+            android:id="@+id/text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
             android:layout_centerVertical="true"
+            android:layout_marginStart="20dp"
             android:layout_toEndOf="@id/left_icon"
             android:fontFamily="@font/bmjua"
             android:text="@string/togo_map"
             android:textSize="28sp" />
+
 
     </RelativeLayout>
 
